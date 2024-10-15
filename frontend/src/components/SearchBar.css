@@ -1,0 +1,72 @@
+body, html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-wrapper {
+  width: 1000px;
+  height: 3.5rem;
+  border: none;
+  border-radius: 10px;
+  padding: 0 15px;
+  box-shadow: 0px 0px 8px #ddd;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  margin-top: -223px;
+  position: relative;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  height: 100%;
+  font-size: 1.25rem;
+  width: 100%;
+  margin-left: 10px;
+}
+
+input:focus {
+  outline: none;
+}
+
+#search-icon {
+  color: royalblue;
+}
+
+#filter-icon {
+  color: black;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  width: 20%;
+  top: 55px; 
+  right: 0;
+  background-color: #f5f5dc; /* Cream white */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  color: black;
+}
+
+.dropdown-menu label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.genres {
+  margin: -70px;
+  text-align: center;
+}
+

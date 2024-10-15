@@ -35,6 +35,15 @@ h1 {
   line-height: 1.1;
 }
 
+body {
+  background-color: black;
+  background-image: url('public/Background.png');
+  color: white;
+  background-size: cover;
+  background-position: center;
+}
+
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;

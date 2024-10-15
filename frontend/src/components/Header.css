@@ -1,0 +1,19 @@
+.header {
+  background-color: #f5f5dc !important;
+  height: 70px; /* Increase the height of the header */
+}
+
+.hover-effect {
+  transition: transform 0.2s, color 0.2s;
+}
+
+.hover-effect:hover {
+  transform: translateY(-3px);
+  color: red !important;
+}
+
+.menu-item {
+  color: red;
+  font-family: 'Lato', sans-serif;
+  font-size: 18px;
+}
