@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import bookRoutes from './routes/bookRoute.js'
+import deviceRoutes from './routes/deviceRoute.js'
 
 const app = express();
 const port = 3000;
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", bookRoutes);
+app.use("/api", deviceRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
