@@ -13,7 +13,6 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0,
     ssl: {
-        ca: fs.readFileSync(process.env.SSL_CERT_PATH),
         rejectUnauthorized: false  // This bypasses the SSL validation
       }
 })
