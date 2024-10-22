@@ -4,3 +4,24 @@
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
 }
+
+nav {
+  height: 80px;
+  display: flex;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
+  background-color: white;
+  position: relative;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul{
+  display: flex;
+}
+
+img {
+  height: 100%;
+  width: 100%;
+}

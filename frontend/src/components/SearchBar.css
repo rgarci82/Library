@@ -1,14 +1,18 @@
-body, html {
-  height: 100%;
+header {
+  height: calc(100vh - 80px);
+}
+
+.header__container {
   width: 100%;
-  margin: 0;
+  max-width: 720px;
+  margin: 0 auto;
+  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .input-wrapper {
-  width: 1000px;
   height: 3.5rem;
   border: none;
   border-radius: 10px;
@@ -17,7 +21,6 @@ body, html {
   background-color: white;
   display: flex;
   align-items: center;
-  margin-top: -223px;
   position: relative;
 }
 
@@ -35,7 +38,7 @@ input:focus {
 }
 
 #search-icon {
-  color: royalblue;
+  color: #C8102E;
 }
 
 #filter-icon {
@@ -68,5 +71,10 @@ input:focus {
 .genres {
   margin: -70px;
   text-align: center;
+}
+
+.header__img--wrapper {
+  padding: 20px;
+  z-index: 50;
 }
 
