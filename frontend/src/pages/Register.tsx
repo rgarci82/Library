@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register: React.FC = () => {
     const [step, setStep] = useState(1);
@@ -9,7 +10,8 @@ const Register: React.FC = () => {
     const [userType, setUserType] = useState<string>("Student");
     const [phoneNum, setPhoneNum] = useState<string>("");
     const [error, setError] = useState<string>("");
-  
+    const navigate = useNavigate();
+
     const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
     
@@ -49,6 +51,7 @@ const Register: React.FC = () => {
     
           if (response.ok) {
             console.log("User created successfully", data);
+            navigate('/login/');
             // Handle successful user creation, e.g., redirect or display success message
           } else {
             setError(data.message || "An error occurred");

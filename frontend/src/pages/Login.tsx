@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,6 +33,7 @@ const Login: React.FC = () => {
       if (response.ok) {
         console.log("User logged in successfully", data);
         localStorage.setItem("token", data.token);
+        navigate('/');
         // Handle successful user creation, e.g., redirect or display success message
       } else {
         setError(data.message || "An error occurred");
