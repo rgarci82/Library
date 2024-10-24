@@ -137,7 +137,7 @@ const Register: React.FC = () => {
                 </div>
               </div>
               <div style={styles.row}>
-              <div style={styles.inputGroup}>
+                <div style={styles.inputGroup}>
                   <label style={styles.label}>Phone Number</label>
                   <input
                     type="text"
@@ -200,7 +200,7 @@ const styles : { [key: string]: React.CSSProperties }= {
     },
     registrationBox: {
       width: "52.5vw",
-      minHeight: "50vh",
+      minHeight: "40vh",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -225,14 +225,15 @@ const styles : { [key: string]: React.CSSProperties }= {
     },
     row: {
       display: "flex",
+      gap: "20px", // Ensures equal spacing between input groups
       flexWrap: "wrap",
-      gap: "10px",
-      marginBottom: "20px",
+      marginBottom: "20px", // Provides equal spacing between the rows
     },
+    
     inputGroup: {
-      flex: "1 1 calc(50% - 10px)",
-      minWidth: "300px",
-      marginBottom: "10px",
+      flex: "1 1 calc(50% - 10px)", // Ensures equal width for each input group
+      minWidth: "200px",
+      // Removed the marginBottom from here, so the spacing is uniform across rows
     },
     label: {
       display: "block",
@@ -241,6 +242,7 @@ const styles : { [key: string]: React.CSSProperties }= {
     },
     input: {
       width: "100%",
+      height: "7.5vh",
       padding: "10px",
       border: "1px solid #ddd",
       borderRadius: "5px",
@@ -248,6 +250,7 @@ const styles : { [key: string]: React.CSSProperties }= {
       boxSizing: "border-box",
       backgroundColor: "#f9f9f9",
       color: "#333333",
+      margin: "0",
     },
     textarea: {
       width: "100%",
@@ -269,40 +272,6 @@ const styles : { [key: string]: React.CSSProperties }= {
       cursor: "pointer",
       fontSize: "16px",
       marginTop: "20px",
-    },
-    multiSelectContainer: {
-      position: "relative",
-      cursor: "pointer",
-    },
-    multiSelect: {
-      border: "1px solid #ccc",
-      borderRadius: "4px",
-      padding: "10px",
-      display: "flex",
-      flexWrap: "wrap",
-      alignItems: "center",
-      backgroundColor: "#fff",
-      minHeight: "40px",
-      boxSizing: "border-box",
-    },
-    selectedSkills: {
-      display: "flex",
-      flexWrap: "wrap",
-      gap: "5px",
-      color: "#808080",
-      marginBottom: "5px",
-    },
-    skillTag: {
-      backgroundColor: "#007BFF",
-      color: "#fff",
-      padding: "5px 10px",
-      borderRadius: "4px",
-      display: "flex",
-      alignItems: "center",
-    },
-    clearTag: {
-      marginLeft: "5px",
-      cursor: "pointer",
     },
     dropdown: {
       position: "absolute",
@@ -328,14 +297,6 @@ const styles : { [key: string]: React.CSSProperties }= {
     dropdownItemSelected: {
       backgroundColor: "#007BFF",
       color: "#fff",
-    },
-    availabilityCheckbox: {
-      marginRight: "10px",
-    },
-    availabilityOption: {
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "5px",
     },
     links: {
       marginTop: "15px",

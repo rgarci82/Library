@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import AdminLogin from "./pages/adminLogin"; // Capitalized
-import AdminRegister from "./pages/adminRegister"; // Capitalized
+import AdminLogin from "./pages/AdminLogin"; // Capitalized
+import AdminRegister from "./pages/AdminRegister"; // Capitalized
 import User from "./pages/User"; // Renamed to Users (should match your actual filename)
 import Browse from "./pages/Browse";
 
