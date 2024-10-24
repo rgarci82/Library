@@ -5,7 +5,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Both email and password are required.");
@@ -13,6 +13,31 @@ const Login: React.FC = () => {
       setError("");
       console.log("Email:", email);
       console.log("Password:", password);
+    }
+    try {
+      const response = await fetch('http://localhost:3000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("User logged in successfully", data);
+        localStorage.setItem("token", data.token);
+        // Handle successful user creation, e.g., redirect or display success message
+      } else {
+        setError(data.message || "An error occurred");
+      }
+    } catch (error) {
+      setError("Failed to log in user. Please try again.");
+      console.error("Error:", error);
     }
   };
 

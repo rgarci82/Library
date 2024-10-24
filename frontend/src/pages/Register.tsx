@@ -6,13 +6,13 @@ const Register: React.FC = () => {
     const [password, setPassword] = useState<string>("");
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
-    const [userType, setUserType] = useState<string>("");
+    const [userType, setUserType] = useState<string>("Student");
     const [phoneNum, setPhoneNum] = useState<string>("");
     const [error, setError] = useState<string>("");
   
     const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-  
+    
       if (step === 1) {
         if (!email || !password) {
           setError("Please fill in all fields");
@@ -20,21 +20,46 @@ const Register: React.FC = () => {
         }
         setStep(2);
       } else {
-        if (
-          !firstName ||
-          !lastName ||
-          !userType ||
-          !phoneNum 
-        ) {
+        if (!firstName || !lastName || !userType || !phoneNum) {
           setError("Please fill in all fields");
           return;
         }
-        if (phoneNum.length !== 10){
+        if (phoneNum.length !== 10) {
           setError("Phone number must be exactly 10 digits");
           return;
         }
+    
+        try {
+          const response = await fetch('http://localhost:3000/api/users/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              email,
+              phoneNum,
+              userType,
+              password,
+            }),
+          });
+    
+          const data = await response.json();
+    
+          if (response.ok) {
+            console.log("User created successfully", data);
+            // Handle successful user creation, e.g., redirect or display success message
+          } else {
+            setError(data.message || "An error occurred");
+          }
+        } catch (error) {
+          setError("Failed to create user. Please try again.");
+          console.error("Error:", error);
+        }
       }
     };
+    
 
 
   return (
@@ -131,7 +156,10 @@ const Register: React.FC = () => {
                   <label style={styles.label}>User Type</label>
                   <select
                     value={userType}
-                    onChange={(e) => setUserType(e.target.value)}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setUserType(e.target.value);
+                    }}
                     required
                     style={styles.input}
                   >
