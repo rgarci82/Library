@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Login: React.FC = () => {
+const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   return (
     <div style={styles.container}>
       <div style={styles.loginBox}>
-        <h1 style={styles.title}>Login</h1>
+        <h1 style={styles.title}>Admin Login</h1>
         <form onSubmit={handleSubmit} style={styles.form}>
           {error && <p style={styles.error}>{error}</p>}
           <div style={styles.inputGroup}>
@@ -47,11 +47,6 @@ const Login: React.FC = () => {
           <button type="submit" style={styles.button}>
             Login
           </button>
-          <div style={styles.links}>
-            <a href="/register" style={styles.link}>
-              Don't have an account? Register here
-            </a>
-          </div>
         </form>
       </div>
     </div>
@@ -82,7 +77,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     textAlign: "center",
   },
   title: {
-    color: "#333333",
+    color: "#C8102E",
   },
   form: {
     display: "flex",
@@ -132,4 +127,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-export default Login;
+export default AdminLogin;

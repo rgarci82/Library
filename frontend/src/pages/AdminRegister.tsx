@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 
-const Register: React.FC = () => {
+const AdminRegister: React.FC = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
-    const [userType, setUserType] = useState<string>("");
     const [phoneNum, setPhoneNum] = useState<string>("");
     const [error, setError] = useState<string>("");
   
@@ -23,7 +22,6 @@ const Register: React.FC = () => {
         if (
           !firstName ||
           !lastName ||
-          !userType ||
           !phoneNum 
         ) {
           setError("Please fill in all fields");
@@ -40,7 +38,7 @@ const Register: React.FC = () => {
   return (
     <div style={styles.container}>
       <div style={styles.registrationBox}>
-        <h1 style={styles.title}>Registration</h1>
+        <h1 style={styles.title}>Admin Register</h1>
         <form onSubmit={handleNext} style={styles.form}>
           {error && <p style={styles.error}>{error}</p>}
           {step === 1 && (
@@ -127,18 +125,7 @@ const Register: React.FC = () => {
                     style={styles.input}
                   />
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>User Type</label>
-                  <select
-                    value={userType}
-                    onChange={(e) => setUserType(e.target.value)}
-                    required
-                    style={styles.input}
-                  >
-                    <option value="Student">Student</option>
-                    <option value="Faculty">Faculty</option>
-                  </select>
-                </div>
+                
               </div>
             </>
           )}
@@ -182,7 +169,7 @@ const styles : { [key: string]: React.CSSProperties }= {
     title: {
       textAlign: "center",
       marginBottom: "20px",
-      color: "#333",
+      color: "#C8102E",
     },
     form: {
       display: "flex",
@@ -317,4 +304,4 @@ const styles : { [key: string]: React.CSSProperties }= {
     },
   };
 
-  export default Register;
+  export default AdminRegister;
