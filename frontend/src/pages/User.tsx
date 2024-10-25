@@ -65,6 +65,12 @@ const UserPage: React.FC = () => {
             onClick={() => handleTabClick('itemRequested')}
           >
             Item Requested
+            </div>
+          <div 
+            className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} 
+            onClick={() => handleTabClick('itemHold')}
+          >
+            Item Holds
           </div>
         </div>
       </div>
@@ -73,10 +79,12 @@ const UserPage: React.FC = () => {
       <div className="info-boxes">
         <div className={`info-box books-box ${activeTab !== 'books' ? 'hidden' : ''}`}>
           <h3>Books Borrowed</h3>
-          <ul>
+          <ul className = "bookborrowed"> 
+
             <li key="title">Title: </li>
             <li key="borrowedDate">Borrowed Date: </li>
             <li key="dueDate">Due Date: </li>
+            <li key="status">Status: </li>
           </ul>
         </div>
         <div className={`info-box media-box ${activeTab !== 'media' ? 'hidden' : ''}`}>
@@ -85,6 +93,7 @@ const UserPage: React.FC = () => {
             <li key="title">Title: </li>
             <li key="borrowedDate">Borrowed Date: </li>
             <li key="dueDate">Due Date: </li>
+            <li key="status">Status: </li>
           </ul>
         </div>
         <div className={`info-box devices-box ${activeTab !== 'devices' ? 'hidden' : ''}`}>
@@ -93,12 +102,14 @@ const UserPage: React.FC = () => {
             <li key="device">Device: </li>
             <li key="borrowedDate">Borrowed Date: </li>
             <li key="dueDate">Due Date:</li>
+            <li key="status">Status: </li>
           </ul>
         </div>
         <div className={`info-box fines-box ${activeTab !== 'fines' ? 'hidden' : ''}`}>
           <h3>Fines</h3>
           <ul>
             <li key="fine">Fine: $</li>
+           
           </ul>
         </div>
         <div className={`info-box notifications-box ${activeTab !== 'notifications' ? 'hidden' : ''}`}>
@@ -113,6 +124,15 @@ const UserPage: React.FC = () => {
             <li key="requestedTitle">Requested Title: </li>
             <li key="requestDate">Request Date: </li>
             <li key="status">Status: </li> {/* Corrected 'Status' to 'status' for consistency */}
+          </ul>
+        </div>
+        
+         <div className={`info-box item-Hold-box ${activeTab !== 'itemHold' ? 'hidden' : ''}`}>
+          <h3>Item Hold</h3>
+          <ul>
+            <li key="holdTitle">Hold Title:</li>
+            <li key="holdDate">Hold Date:</li>
+            <li key="status">Status:</li>
           </ul>
         </div>
       </div>

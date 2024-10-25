@@ -139,6 +139,9 @@ body {
   background-image: url('https://img.icons8.com/?size=100&id=Xz9oqe2aw9AM&format=png&color=000000');
 }
 
+.item-Hold-box::before {
+  background-image: url('https://img.icons8.com/?size=100&id=Efp1UfqxGKqd&format=png&color=000000');
+}
 /* Ensure the list items appear vertically */
 .info-box ul {
   list-style-type: none; /* Remove bullet points */
