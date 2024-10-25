@@ -3,37 +3,38 @@ import './User.css';
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
+
+  //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
 
-  
+
   const booksData = [
-    { title: 'Book 1', borrowedDate: '', dueDate: '', status: '' },
-    { title: 'Book 2', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Book 1', borrowedDate: '2024-01-01', dueDate: '2024-01-14', status: 'Borrowed' },
+    { title: 'Book 2', borrowedDate: '2024-01-01', dueDate: '2024-01-28', status: 'Borrowed' },
   ];
 
   const mediaData = [
-    { title: 'Media 1', borrowedDate: '', dueDate: '', status: '' },
-    { title: 'Media 2', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Media 1', borrowedDate: '2024-01-01', dueDate: '2024-01-14', status: 'Borrowed' },
+    { title: 'Media 2', borrowedDate: '2024-01-01', dueDate: '2024-01-28', status: 'Borrowed' },
   ];
 
   const devicesData = [
-    { title: 'Device 1', borrowedDate: '', dueDate: '', status: '' },
-    { title: 'Device 2', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Device 1', borrowedDate: '2024-01-01', dueDate: '2024-01-14', status: 'Borrowed' },
+    { title: 'Device 2', borrowedDate: '2024-01-01', dueDate: '2024-01-28', status: 'Borrowed' },
   ];
 
   const finesData = [
-    { fine: 0.0}, 
-    { fine: 0.00 }, 
+    { fine: 0.0}
   ];
 
   const itemRequestedData = [
-    { title: 'Item 1', requestDate: '', status: '' },
-    { title: 'Item 2', requestDate: '', status: '' },
+    { title: 'Item 1', requestDate: '2024-01-01', status: 'Pending' },
+    { title: 'Item 2', requestDate: '2024-01-02', status: 'Accepted' },
   ];
 
   const itemHoldData = [
-    { title: 'Item 1', holdDate: '', status: '' },
-    { title: 'Item 2', holdDate: '', status: '' }
+    { title: 'Item 1', holdDate: '2024-01-01', status: 'OnHold' },
+    { title: 'Item 2', holdDate: '2024-01-02', status: 'CheckedOut' }
   ];
 
   const checkOverdueItems = () => {
@@ -67,10 +68,14 @@ const UserPage: React.FC = () => {
   useEffect(() => {
     checkOverdueItems(); 
   }, []);
-  
+
+
+  //END OF DUMMY DATA
+  //****************************************************************************** 
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
+
 
   return (
     <div>
@@ -170,7 +175,7 @@ const UserPage: React.FC = () => {
           </div>
         ))}
 
-{activeTab === 'notifications' && notificationsData.map((notification, index) => (
+        {activeTab === 'notifications' && notificationsData.map((notification, index) => (
           <div key={index} className="info-box notifications-box">
             <h3>Notification</h3>
             <ul>
