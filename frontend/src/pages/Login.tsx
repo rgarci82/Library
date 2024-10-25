@@ -33,7 +33,7 @@ const Login: React.FC = () => {
       if (response.ok) {
         console.log("User logged in successfully", data);
         localStorage.setItem("token", data.token);
-        navigate('/');
+        navigate('/user');
         // Handle successful user creation, e.g., redirect or display success message
       } else {
         setError(data.message || "An error occurred");
