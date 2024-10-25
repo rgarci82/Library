@@ -1,144 +1,186 @@
-import React, { useState } from 'react';
-import './User.css'; 
-const UserPage: React.FC = () => {
-  // State to keep track of the active tab
-  const [activeTab, setActiveTab] = useState('books'); // Default to 'books'
+import React, { useState , useEffect} from 'react';
+import './User.css';
 
-  // Function to handle tab click and change active tab
+const UserPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('books');
+  const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
+
+  
+  const booksData = [
+    { title: 'Book 1', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Book 2', borrowedDate: '', dueDate: '', status: '' },
+  ];
+
+  const mediaData = [
+    { title: 'Media 1', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Media 2', borrowedDate: '', dueDate: '', status: '' },
+  ];
+
+  const devicesData = [
+    { title: 'Device 1', borrowedDate: '', dueDate: '', status: '' },
+    { title: 'Device 2', borrowedDate: '', dueDate: '', status: '' },
+  ];
+
+  const finesData = [
+    { fine: 0.0}, 
+    { fine: 0.00 }, 
+  ];
+
+  const itemRequestedData = [
+    { title: 'Item 1', requestDate: '', status: '' },
+    { title: 'Item 2', requestDate: '', status: '' },
+  ];
+
+  const itemHoldData = [
+    { title: 'Item 1', holdDate: '', status: '' },
+    { title: 'Item 2', holdDate: '', status: '' }
+  ];
+
+  const checkOverdueItems = () => {
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    const notifications: { reminder: string }[] = [];
+
+    // Check books
+    booksData.forEach(book => {
+      if (book.dueDate < today) {
+        notifications.push({ reminder: `Your book "${book.title}" is overdue!` });
+      }
+    });
+
+    // Check media
+    mediaData.forEach(item => {
+      if (item.dueDate < today) {
+        notifications.push({ reminder: `Your media item "${item.title}" is overdue!` });
+      }
+    });
+
+    // Check devices
+    devicesData.forEach(device => {
+      if (device.dueDate < today) {
+        notifications.push({ reminder: `Your device "${device.title}" is overdue!` });
+      }
+    });
+
+    setNotificationsData(notifications);
+  };
+
+  useEffect(() => {
+    checkOverdueItems(); 
+  }, []);
+  
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
 
   return (
     <div>
-      {/* Navigation Bar */}
       <div className="navbar">
-        {/* Library Name */}
         <div className="navbar-section library-name">
           My Library
         </div>
         
-        {/* Search Section */}
         <div className="navbar-section search-section">
-          <input type="text" className="search-bar" placeholder="Search..." />
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Search..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                window.location.href = '/browse';
+              }
+            }}
+          />
           <div className="nav-icons">
-            {/* Add settings and profile icons */}
             <span>🔧</span>
             <span>👤</span>
           </div>
         </div>
         
-        {/* Tabs Section */}
         <div className="navbar-section tabs">
-          <div 
-            className={`tab ${activeTab === 'books' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('books')}
-          >
-            Books
-          </div>
-          <div 
-            className={`tab ${activeTab === 'media' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('media')}
-          >
-            Media
-          </div>
-          <div 
-            className={`tab ${activeTab === 'devices' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('devices')}
-          >
-            Devices
-          </div>
-          <div 
-            className={`tab ${activeTab === 'fines' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('fines')}
-          >
-            Fines
-          </div>
-          <div 
-            className={`tab ${activeTab === 'notifications' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('notifications')}
-          >
-            Notifications
-          </div>
-          <div 
-            className={`tab ${activeTab === 'itemRequested' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('itemRequested')}
-          >
-            Item Requested
-            </div>
-          <div 
-            className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('itemHold')}
-          >
-            Item Holds
-          </div>
+          <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Books</div>
+          <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
+          <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Devices</div>
+          <div className={`tab ${activeTab === 'fines' ? 'active' : ''}`} onClick={() => handleTabClick('fines')}>Fines</div>
+          <div className={`tab ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => handleTabClick('notifications')}>Notifications</div>
+          <div className={`tab ${activeTab === 'itemRequested' ? 'active' : ''}`} onClick={() => handleTabClick('itemRequested')}>Item Requested</div>
+          <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
         </div>
       </div>
 
-      {/* Information Boxes */}
       <div className="info-boxes">
-        <div className={`info-box books-box ${activeTab !== 'books' ? 'hidden' : ''}`}>
-          <h3>Books Borrowed</h3>
-          <ul className = "bookborrowed"> 
+        {activeTab === 'books' && booksData.map((book, index) => (
+          <div key={index} className="info-box books-box">
+            <h3>{book.title}</h3>
+            <ul>
+              <li>Borrowed Date: {book.borrowedDate}</li>
+              <li>Due Date: {book.dueDate}</li>
+              <li>Status: {book.status}</li>
+            </ul>
+          </div>
+        ))}
 
-            <li key="title">Title: </li>
-            <li key="borrowedDate">Borrowed Date: </li>
-            <li key="dueDate">Due Date: </li>
-            <li key="status">Status: </li>
-          </ul>
-        </div>
-        <div className={`info-box media-box ${activeTab !== 'media' ? 'hidden' : ''}`}>
-          <h3>Media Borrowed</h3>
-          <ul>
-            <li key="title">Title: </li>
-            <li key="borrowedDate">Borrowed Date: </li>
-            <li key="dueDate">Due Date: </li>
-            <li key="status">Status: </li>
-          </ul>
-        </div>
-        <div className={`info-box devices-box ${activeTab !== 'devices' ? 'hidden' : ''}`}>
-          <h3>Devices Borrowed</h3>
-          <ul>
-            <li key="device">Device: </li>
-            <li key="borrowedDate">Borrowed Date: </li>
-            <li key="dueDate">Due Date:</li>
-            <li key="status">Status: </li>
-          </ul>
-        </div>
-        <div className={`info-box fines-box ${activeTab !== 'fines' ? 'hidden' : ''}`}>
-          <h3>Fines</h3>
-          <ul>
-            <li key="fine">Fine: $</li>
-           
-          </ul>
-        </div>
-        <div className={`info-box notifications-box ${activeTab !== 'notifications' ? 'hidden' : ''}`}>
-          <h3>Notifications</h3>
-          <ul>
-            <li key="reminder">Reminder: </li>
-          </ul>
-        </div>
-        <div className={`info-box item-requested-box ${activeTab !== 'itemRequested' ? 'hidden' : ''}`}>
-          <h3>Item Requested</h3>
-          <ul>
-            <li key="requestedTitle">Requested Title: </li>
-            <li key="requestDate">Request Date: </li>
-            <li key="status">Status: </li> {/* Corrected 'Status' to 'status' for consistency */}
-          </ul>
-        </div>
-        
-         <div className={`info-box item-Hold-box ${activeTab !== 'itemHold' ? 'hidden' : ''}`}>
-          <h3>Item Hold</h3>
-          <ul>
-            <li key="holdTitle">Hold Title:</li>
-            <li key="holdDate">Hold Date:</li>
-            <li key="status">Status:</li>
-          </ul>
-        </div>
+        {activeTab === 'media' && mediaData.map((media, index) => (
+          <div key={index} className="info-box media-box">
+            <h3>{media.title}</h3>
+            <ul>
+              <li>Borrowed Date: {media.borrowedDate}</li>
+              <li>Due Date: {media.dueDate}</li>
+              <li>Status: {media.status}</li>
+            </ul>
+          </div>
+        ))}
+
+        {activeTab === 'devices' && devicesData.map((device, index) => (
+          <div key={index} className="info-box devices-box">
+            <h3>{device.title}</h3>
+            <ul>
+              <li>Borrowed Date: {device.borrowedDate}</li>
+              <li>Due Date: {device.dueDate}</li>
+              <li>Status: {device.status}</li>
+            </ul>
+          </div>
+        ))}
+
+        {activeTab === 'fines' && finesData.map((fine, index) => (
+          <div key={index} className="info-box fines-box">
+            <h3>Fine</h3>
+            <ul>
+              <li>Amount: ${fine.fine}</li>
+            </ul>
+          </div>
+        ))}
+
+        {activeTab === 'itemRequested' && itemRequestedData.map((item, index) => (
+          <div key={index} className="info-box item-requested-box">
+            <h3>{item.title}</h3>
+            <ul>
+              <li>Request Date: {item.requestDate}</li>
+              <li>Status: {item.status}</li>
+            </ul>
+          </div>
+        ))}
+
+        {activeTab === 'itemHold' && itemHoldData.map((item, index) => (
+          <div key={index} className="info-box item-Hold-box">
+            <h3>{item.title}</h3>
+            <ul>
+              <li>Hold Date: {item.holdDate}</li>
+              <li>Status: {item.status}</li>
+            </ul>
+          </div>
+        ))}
+
+{activeTab === 'notifications' && notificationsData.map((notification, index) => (
+          <div key={index} className="info-box notifications-box">
+            <h3>Notification</h3>
+            <ul>
+              <li>{notification.reminder}</li>
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default UserPage;
-

@@ -129,10 +129,7 @@ body {
   background-image: url('https://img.icons8.com/?size=100&id=21448&format=png&color=000000');
 }
 
-/* Notifications Box with Envelope Icon */
-.notifications-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=8OqTN9Qyurt6&format=png&color=000000');
-}
+
 
 /* Item Requested Box with Request Icon */
 .item-requested-box::before {
@@ -141,6 +138,10 @@ body {
 
 .item-Hold-box::before {
   background-image: url('https://img.icons8.com/?size=100&id=Efp1UfqxGKqd&format=png&color=000000');
+}
+/* Notifications Box with Envelope Icon */
+.notifications-box::before {
+  background-image: url('https://img.icons8.com/?size=100&id=8OqTN9Qyurt6&format=png&color=000000');
 }
 /* Ensure the list items appear vertically */
 .info-box ul {
