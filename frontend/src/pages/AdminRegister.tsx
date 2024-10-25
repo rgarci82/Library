@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminRegister: React.FC = () => {
     const [step, setStep] = useState(1);
@@ -8,6 +9,7 @@ const AdminRegister: React.FC = () => {
     const [lastName, setLastName] = useState<string>("");
     const [phoneNum, setPhoneNum] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const navigate = useNavigate();
   
     const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -30,6 +32,34 @@ const AdminRegister: React.FC = () => {
         if (phoneNum.length !== 10){
           setError("Phone number must be exactly 10 digits");
           return;
+        }
+        try {
+          const response = await fetch('http://localhost:3000/api/admin/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              email,
+              phoneNum,
+              password,
+            }),
+          });
+    
+          const data = await response.json();
+    
+          if (response.ok) {
+            console.log("Admin created successfully", data);
+            navigate('/adminRegister');
+            // Handle successful user creation, e.g., redirect or display success message
+          } else {
+            setError(data.message || "An error occurred");
+          }
+        } catch (error) {
+          setError("Failed to create admin. Please try again.");
+          console.error("Error:", error);
         }
       }
     };
@@ -133,7 +163,7 @@ const AdminRegister: React.FC = () => {
             {step === 1 ? "Next" : "Create Account"}
           </button>
           <div style={styles.links}>
-            <a href="/login" style={styles.link}>
+            <a href="/AdminLogin" style={styles.link}>
               Already have an account? Login here
             </a>
           </div>
@@ -204,6 +234,7 @@ const styles : { [key: string]: React.CSSProperties }= {
       boxSizing: "border-box",
       backgroundColor: "#f9f9f9",
       color: "#333333",
+      margin: "0",
     },
     textarea: {
       width: "100%",

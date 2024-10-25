@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Both email and password are required.");
@@ -13,6 +15,32 @@ const AdminLogin: React.FC = () => {
       setError("");
       console.log("Email:", email);
       console.log("Password:", password);
+    }
+    try {
+      const response = await fetch('http://localhost:3000/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Admin logged in successfully", data);
+        localStorage.setItem("token", data.token);
+        navigate('/');
+        // Handle successful user creation, e.g., redirect or display success message
+      } else {
+        setError(data.message || "An error occurred");
+      }
+    } catch (error) {
+      setError("Failed to log in admin. Please try again.");
+      console.error("Error:", error);
     }
   };
 
