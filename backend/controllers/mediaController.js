@@ -10,23 +10,42 @@ export async function getMedia(req, res){
     }
 }
 
-export async function createMedia(req, res){
-    const { MediaID, mTitle, mAuthor, publisher, genre, edition } = req.body;
-
-    if(!MediaID || !mTitle || !mAuthor || !publisher || !genre){
-        return res.status(400).json({ message: 'MediaID, Title, Author, Publisher, and Genre are required.' });
-    }
-
-    try{
-        const [result] = await pool.query('INSERT INTO media (MediaID, mTitle, mAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?, ?)',
-        [MediaID, mTitle, mAuthor, publisher, genre, edition || null]
+export async function createMedia(req, res) {
+    const { MediaID, mTitle, mAuthor, mPublisher, mGenre, mEdition, mQuantity } =
+      req.body;
+  
+    try {
+      const [existingMedia] = await pool.query(
+        "SELECT * FROM media WHERE MediaID = ?",
+        [MediaID]
+      );
+  
+      if (existingMedia.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "A media with this MediaID already exists." });
+      }
+  
+      const [result] = await pool.query(
+        "INSERT INTO media (MediaID, mTitle, mAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?, ?)",
+        [MediaID, mTitle, mAuthor, mPublisher, mGenre, mEdition || null]
+      );
+  
+      const mediaCopyPromises = [];
+  
+      for (let i = 0; i < mQuantity; i++) {
+        mediaCopyPromises.push(
+          pool.query("INSERT INTO mediacopy (MediaID) VALUES (?)", [MediaID])
         );
-        
-        res.status(201).json({message: "Media created successfully", MediaID: MediaID})
-    }catch (error){
-        res.status(500).json({message: error.message})
+      }
+  
+      await Promise.all(mediaCopyPromises);
+  
+      res.status(201).json({ message: "Media created successfully", MediaID: MediaID });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-}
+  }
 
 export async function getMediaByID(req, res){
     try{

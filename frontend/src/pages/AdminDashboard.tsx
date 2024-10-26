@@ -15,6 +15,15 @@ const AdminDashboard = () => {
     const [edition, setEdition] = useState('');
     const [quantity, setQuantity] = useState(1);
 
+    //media
+    const [MediaID, setMediaID] = useState('');
+    const [mTitle, setMTitle] = useState('');
+    const [mAuthor, setMAuthor] = useState('');
+    const [mPublisher, setMPublisher] = useState('');
+    const [mGenre, setMGenre] = useState('');
+    const [mEdition, setMEdition] = useState('');
+    const [mQuantity, setMQuantity] = useState(1);
+
     //devices
     const [serialNumber, setSerialNumber] = useState('');
     const [dName, setDname] = useState('');
@@ -61,6 +70,50 @@ const AdminDashboard = () => {
             setGenre('');
             setEdition('');
             setQuantity(1);
+        } catch (error) {
+            console.error('Error:', error);
+            setErrorMessage('An unexpected error occurred.');
+        }
+    };
+
+    const handleMediaSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        const formData = {
+            MediaID,
+            mTitle,
+            mAuthor,
+            mPublisher,
+            mGenre,
+            mEdition: mEdition || null,
+            mQuantity,
+        };
+    
+        try {
+            const response = await fetch('http://localhost:3000/api/media', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setErrorMessage(errorData.message);
+                return;
+            }
+
+            setErrorMessage(null);
+            setSuccessMessage("Book created successfully!");
+
+            setMediaID('');
+            setMTitle('');
+            setMAuthor('');
+            setMPublisher('');
+            setMGenre('');
+            setMEdition('');
+            setMQuantity(1);
         } catch (error) {
             console.error('Error:', error);
             setErrorMessage('An unexpected error occurred.');
@@ -220,6 +273,93 @@ const AdminDashboard = () => {
                                     value={quantity}
                                     min="1"
                                     onChange={(e) => setQuantity(Number(e.target.value))}
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="submit-button">Create Media</button>
+                        </form>
+                        {successMessage && <div className="success-message">{successMessage}</div>}
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
+                    </div>
+            )}
+            {activeTab === 'media' && (
+                        <div className="create-media-form">
+                        <h2>Create a New Media</h2>
+                        <form onSubmit={handleMediaSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="MediaID">MediaID:</label>
+                                <input
+                                    type="text"
+                                    id="MediaID"
+                                    name="MediaID"
+                                    value={MediaID}
+                                    onChange={(e) => setMediaID(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mTitle">Title:</label>
+                                <input
+                                    type="text"
+                                    id="mTitle"
+                                    name="mTitle"
+                                    value={mTitle}
+                                    onChange={(e) => setMTitle(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mAuthor">Author:</label>
+                                <input
+                                    type="text"
+                                    id="mAuthor"
+                                    name="mAuthor"
+                                    value={mAuthor}
+                                    onChange={(e) => setMAuthor(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mPublisher">Publisher:</label>
+                                <input
+                                    type="text"
+                                    id="mPublisher"
+                                    name="mPublisher"
+                                    value={mPublisher}
+                                    onChange={(e) => setMPublisher(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mGenre">Genre:</label>
+                                <input
+                                    type="text"
+                                    id="mGenre"
+                                    name="mGenre"
+                                    value={mGenre}
+                                    onChange={(e) => setMGenre(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mEdition">Edition (optional):</label>
+                                <input
+                                    type="text"
+                                    id="mEdition"
+                                    name="mEdition"
+                                    value={mEdition}
+                                    onChange={(e) => setMEdition(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="mQuantity">Quantity:</label>
+                                <input
+                                    type="number"
+                                    id="mQuantity"
+                                    name="mQuantity"
+                                    value={mQuantity}
+                                    min="1"
+                                    onChange={(e) => setMQuantity(Number(e.target.value))}
                                     required
                                 />
                             </div>

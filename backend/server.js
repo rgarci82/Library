@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", bookRoutes);
-app.use("api", mediaRoutes);
+app.use("/api", mediaRoutes);
 app.use("/api", deviceRoutes);
 app.use('/api', usersRoutes)
 app.use('/api', adminRoutes);
