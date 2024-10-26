@@ -1,8 +1,15 @@
 import React, { useState , useEffect} from 'react';
 import './User.css';
+import { jwtDecode } from 'jwt-decode';
+
+interface JwtPayload {
+  id: number; 
+}
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
+  const [userData, setUserData] = useState<any>(null);
+  const [userFine, setUserFine] = useState<any>(null);
 
   //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
@@ -68,14 +75,65 @@ const UserPage: React.FC = () => {
   useEffect(() => {
     checkOverdueItems(); 
   }, []);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No token found");
 
+            const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
+            if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+            // Use decoded.id directly for fetching user data
+            const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch user data");
+
+            const data = await response.json();
+            setUserData(data);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
+    fetchUserData();
+}, []);
+
+useEffect(() => {
+  const fetchUserFine = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch user fine");
+
+      const data = await response.json();
+      setUserFine(data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  }
+  fetchUserFine();
+}, [userData]);
 
   //END OF DUMMY DATA
   //****************************************************************************** 
+
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
-
+  
 
   return (
     <div>
@@ -113,76 +171,82 @@ const UserPage: React.FC = () => {
       </div>
 
       <div className="info-boxes">
-        {activeTab === 'books' && booksData.map((book, index) => (
-          <div key={index} className="info-box books-box">
-            <h3>{book.title}</h3>
-            <ul>
-              <li>Borrowed Date: {book.borrowedDate}</li>
-              <li>Due Date: {book.dueDate}</li>
-              <li>Status: {book.status}</li>
-            </ul>
-          </div>
-        ))}
+        {userData ? (
+          <>
+            {activeTab === 'books' && booksData.map((book, index) => (
+              <div key={index} className="info-box books-box">
+                <h3>{book.title}</h3>
+                <ul>
+                  <li>FIRST NAME: {userData.firstName}</li>
+                  <li>Due Date: {book.dueDate}</li>
+                  <li>Status: {book.status}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'media' && mediaData.map((media, index) => (
-          <div key={index} className="info-box media-box">
-            <h3>{media.title}</h3>
-            <ul>
-              <li>Borrowed Date: {media.borrowedDate}</li>
-              <li>Due Date: {media.dueDate}</li>
-              <li>Status: {media.status}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'media' && mediaData.map((media, index) => (
+              <div key={index} className="info-box media-box">
+                <h3>{media.title}</h3>
+                <ul>
+                  <li>Borrowed Date: {media.borrowedDate}</li>
+                  <li>Due Date: {media.dueDate}</li>
+                  <li>Status: {media.status}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'devices' && devicesData.map((device, index) => (
-          <div key={index} className="info-box devices-box">
-            <h3>{device.title}</h3>
-            <ul>
-              <li>Borrowed Date: {device.borrowedDate}</li>
-              <li>Due Date: {device.dueDate}</li>
-              <li>Status: {device.status}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'devices' && devicesData.map((device, index) => (
+              <div key={index} className="info-box devices-box">
+                <h3>{device.title}</h3>
+                <ul>
+                  <li>Borrowed Date: {device.borrowedDate}</li>
+                  <li>Due Date: {device.dueDate}</li>
+                  <li>Status: {device.status}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'fines' && finesData.map((fine, index) => (
-          <div key={index} className="info-box fines-box">
-            <h3>Fine</h3>
-            <ul>
-              <li>Amount: ${fine.fine}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'fines' && finesData.map((fine, index) => (
+              <div key={index} className="info-box fines-box">
+                <h3>Fine</h3>
+                <ul>
+                  <li>Amount: ${fine.fine}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'itemRequested' && itemRequestedData.map((item, index) => (
-          <div key={index} className="info-box item-requested-box">
-            <h3>{item.title}</h3>
-            <ul>
-              <li>Request Date: {item.requestDate}</li>
-              <li>Status: {item.status}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'itemRequested' && itemRequestedData.map((item, index) => (
+              <div key={index} className="info-box item-requested-box">
+                <h3>{item.title}</h3>
+                <ul>
+                  <li>Request Date: {item.requestDate}</li>
+                  <li>Status: {item.status}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'itemHold' && itemHoldData.map((item, index) => (
-          <div key={index} className="info-box item-Hold-box">
-            <h3>{item.title}</h3>
-            <ul>
-              <li>Hold Date: {item.holdDate}</li>
-              <li>Status: {item.status}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'itemHold' && itemHoldData.map((item, index) => (
+              <div key={index} className="info-box item-hold-box">
+                <h3>{item.title}</h3>
+                <ul>
+                  <li>Hold Date: {item.holdDate}</li>
+                  <li>Status: {item.status}</li>
+                </ul>
+              </div>
+            ))}
 
-        {activeTab === 'notifications' && notificationsData.map((notification, index) => (
-          <div key={index} className="info-box notifications-box">
-            <h3>Notification</h3>
-            <ul>
-              <li>{notification.reminder}</li>
-            </ul>
-          </div>
-        ))}
+            {activeTab === 'notifications' && notificationsData.map((notification, index) => (
+              <div key={index} className="info-box notifications-box">
+                <h3>Notification</h3>
+                <ul>
+                  <li>{notification.reminder}</li>
+                </ul>
+              </div>
+            ))}
+          </>
+        ) : (
+          <p>Loading user data...</p>
+        )}
       </div>
     </div>
   );

@@ -81,3 +81,24 @@ export async function getUserProfile(req, res){
         res.status(500).json({message: error.message})
     }
 }
+
+export async function getUserFine(req, res) {
+    try {
+        const { userID } = req.params;
+        
+        console.log(`Fetching fine for userID: ${userID}`); // Log userID for debugging
+        
+        const fineAmountResult = await pool.query(
+            `SELECT SUM(fineAmount) AS totalFine 
+             FROM bookborrowed, mediaBorrowed, deviceBorrowed
+             WHERE bookborrowed.userID = ? OR mediaBorrowed.userID = ? OR deviceBorrowed.userID = ?`, 
+            [userID]
+        );
+
+        const totalFine = fineAmountResult[0]?.totalFine || 0;
+        res.json(totalFine);
+    } catch (error) {
+        console.error("Error fetching user fine:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
