@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AdminLogin: React.FC = () => {
+interface AdminLoginProps {
+  onLogin: () => void;
+}
+
+const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -33,8 +37,9 @@ const AdminLogin: React.FC = () => {
       if (response.ok) {
         console.log("Admin logged in successfully", data);
         localStorage.setItem("token", data.token);
-        navigate('/');
-        // Handle successful user creation, e.g., redirect or display success message
+        onLogin()
+        navigate('/adminDashboard');
+
       } else {
         setError(data.message || "An error occurred");
       }
