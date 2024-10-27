@@ -30,14 +30,14 @@ const AdminDashboard = () => {
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState(''); 
 
-    const handleQuantityChange = (e) => {
+    const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setQuantity(value); // Allow empty input, convert to number otherwise
+        setQuantity(value === '' ? '' : Number(value)); // Allow empty input, convert to number otherwise
     };
 
-    const handleMQuantityChange = (e) => {
+    const handleMQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setMQuantity(value); // Default to 1 if cleared
+        setMQuantity(value === '' ? '' : Number(value)); // Default to 1 if cleared
     };
 
     const handleBookSubmit = async (event: React.FormEvent) => {
