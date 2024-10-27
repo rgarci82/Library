@@ -75,78 +75,91 @@ const BrowsePage: React.FC = () => {
   };
 
   return (
-    <div style={styles.browseContainer}>
-      <header style={styles.textContainer}>
-        {/*browsing header texts*/}
-        <h1 style={styles.headerTitle}>Browse Items</h1>
-        <p style={styles.headerSubtitle}>Find the perfect item for you!</p>
-
-        {/*drop down selections*/}
-        <select
-          value={searchBy}
-          onChange={(e) => setSearchBy(e.target.value)}
-          style={styles.dropdown}
-        >
-          <option value="book">Book</option>
-          <option value="media">Media</option>
-          <option value="device">Device</option>
-        </select>
-
-        {/*request button*/}
-        <button
-          style={styles.requestButton}
-          onClick={() => alert('Redirecting to request page...')}
-        >
-          Request an Item
-        </button>
-
-        {/*search bar*/}
-        <div style={styles.searchBar}>
-          <input
-            type="text"
-            placeholder={`Search by ${searchBy}...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={styles.searchInput}
-            onFocus={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.3)'}
-            onBlur={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.15)'}
-          />
-        </div>
-
-        {/*items grid*/}
-        <div style={styles.itemsGrid}>
-          {filteredItems.length > 0 ? (
-            filteredItems.map(item => (
-              <div key={item.id} style={styles.itemCard}>
-                <h3 style={styles.itemTitle}>{item.name}</h3>
-                <div style={styles.checkboxContainer}>
-                  <input type="checkbox" id={`borrow-${item.id}`} style={{ marginRight: '5px' }} />
-                  <label htmlFor={`borrow-${item.id}`}>Borrow</label>
-                  <input type="checkbox" id={`hold-${item.id}`} style={{ marginLeft: '10px', marginRight: '5px' }} />
-                  <label htmlFor={`hold-${item.id}`}>Hold</label>
-                </div>
-                <button onClick={() => openDetails(item)} style={styles.detailsButton}>Details</button>
-              </div>
-            ))
-          ) : (
-            <p style={styles.noItemsText}>No items found.</p>
-          )}
-        </div>
+    <div>
+      <div>
+      <div style={styles.navbar}>
+        <div style={styles.libraryName}>My Library</div>
         
-        {/*details button*/}
-        {selectedItem && (
-          <div style={styles.detailsPopupOverlay}>
-            <div style={styles.detailsPopup}>
-              <h2 style={styles.itemTitle}>{selectedItem.name}</h2>
-              <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Author: {selectedItem.author}</p>
-              <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Publisher: {selectedItem.publisher}</p>
-              <p style={{ fontSize: '1.2rem', color: '#777' }}>Status: {selectedItem.status}</p>
-              <button onClick={closeDetails} style={styles.closeButton}>Close</button>
-            </div>
+        <div style={styles.navIcons}>
+          <span>🔧</span>
+          <span>👤</span>
+        </div>
+      </div>
+      </div>
+      <div style={styles.browseContainer}>
+        <header style={styles.textContainer}>
+          {/*browsing header texts*/}
+          <h1 style={styles.headerTitle}>Browse Items</h1>
+          <p style={styles.headerSubtitle}>Find the perfect item for you!</p>
+
+          {/*drop down selections*/}
+          <select
+            value={searchBy}
+            onChange={(e) => setSearchBy(e.target.value)}
+            style={styles.dropdown}
+          >
+            <option value="book">Book</option>
+            <option value="media">Media</option>
+            <option value="device">Device</option>
+          </select>
+
+          {/*request button*/}
+          <button
+            style={styles.requestButton}
+            onClick={() => alert('Redirecting to request page...')}
+          >
+            Request an Item
+          </button>
+
+          {/*search bar*/}
+          <div style={styles.searchBar}>
+            <input
+              type="text"
+              placeholder={`Search by ${searchBy}...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={styles.searchInput}
+              onFocus={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.3)'}
+              onBlur={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.15)'}
+            />
           </div>
-        )}
-      </header>
+
+          {/*items grid*/}
+          <div style={styles.itemsGrid}>
+            {filteredItems.length > 0 ? (
+              filteredItems.map(item => (
+                <div key={item.id} style={styles.itemCard}>
+                  <h3 style={styles.itemTitle}>{item.name}</h3>
+                  <div style={styles.checkboxContainer}>
+                    <input type="checkbox" id={`borrow-${item.id}`} style={{ marginRight: '5px' }} />
+                    <label htmlFor={`borrow-${item.id}`}>Borrow</label>
+                    <input type="checkbox" id={`hold-${item.id}`} style={{ marginLeft: '10px', marginRight: '5px' }} />
+                    <label htmlFor={`hold-${item.id}`}>Hold</label>
+                  </div>
+                  <button onClick={() => openDetails(item)} style={styles.detailsButton}>Details</button>
+                </div>
+              ))
+            ) : (
+              <p style={styles.noItemsText}>No items found.</p>
+            )}
+          </div>
+          
+          {/*details button*/}
+          {selectedItem && (
+            <div style={styles.detailsPopupOverlay}>
+              <div style={styles.detailsPopup}>
+                <h2 style={styles.itemTitle}>{selectedItem.name}</h2>
+                <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Author: {selectedItem.author}</p>
+                <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Publisher: {selectedItem.publisher}</p>
+                <p style={{ fontSize: '1.2rem', color: '#777' }}>Status: {selectedItem.status}</p>
+                <button onClick={closeDetails} style={styles.closeButton}>Close</button>
+              </div>
+            </div>
+          )}
+        </header>
+      </div>
     </div>
+    
   );
 };
 
