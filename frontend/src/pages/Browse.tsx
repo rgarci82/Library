@@ -125,23 +125,25 @@ const BrowsePage: React.FC = () => {
           </div>
 
           {/*items grid*/}
-          <div style={styles.itemsGrid}>
-            {filteredItems.length > 0 ? (
-              filteredItems.map(item => (
-                <div key={item.id} style={styles.itemCard}>
-                  <h3 style={styles.itemTitle}>{item.name}</h3>
-                  <div style={styles.checkboxContainer}>
-                    <input type="checkbox" id={`borrow-${item.id}`} style={{ marginRight: '5px' }} />
-                    <label htmlFor={`borrow-${item.id}`}>Borrow</label>
-                    <input type="checkbox" id={`hold-${item.id}`} style={{ marginLeft: '10px', marginRight: '5px' }} />
-                    <label htmlFor={`hold-${item.id}`}>Hold</label>
+          <div style={styles.itemsGridContainer}>
+            <div style={styles.itemsGrid}>
+              {filteredItems.length > 0 ? (
+                filteredItems.map(item => (
+                  <div key={item.id} style={styles.itemCard}>
+                    <h3 style={styles.itemTitle}>{item.name}</h3>
+                    <div style={styles.checkboxContainer}>
+                      <input type="checkbox" id={`borrow-${item.id}`} style={{ marginRight: '5px' }} />
+                      <label htmlFor={`borrow-${item.id}`}>Borrow</label>
+                      <input type="checkbox" id={`hold-${item.id}`} style={{ marginLeft: '10px', marginRight: '5px' }} />
+                      <label htmlFor={`hold-${item.id}`}>Hold</label>
+                    </div>
+                    <button onClick={() => openDetails(item)} style={styles.detailsButton}>Details</button>
                   </div>
-                  <button onClick={() => openDetails(item)} style={styles.detailsButton}>Details</button>
-                </div>
-              ))
-            ) : (
-              <p style={styles.noItemsText}>No items found.</p>
-            )}
+                ))
+              ) : (
+                <p style={styles.noItemsText}>No items found.</p>
+              )}
+            </div>
           </div>
           
           {/*details button*/}
@@ -188,15 +190,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
     backgroundImage: `url('/Background.png')`,
-    minHeight: '100vh',
+    height: '100%',
   },
   textContainer: {
+    height: '100%',
     textAlign: 'center',
     marginBottom: '10px',
     backgroundColor: 'white',
     padding: '20px',
     borderRadius: '8px',
     position: 'relative',
+    
   },
   headerTitle: {
     fontSize: '2.5rem',
@@ -249,18 +253,34 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'box-shadow 0.3s ease',
     backgroundColor: '#f7f7f7',
   },
+  itemsGridContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start', // Aligns grid at the top of the container
+    height: '500px', // Set height to control scroll area
+    overflowY: 'auto', // Adds vertical scroll
+    padding: '10px',
+    width: '100%',
+    backgroundColor: '#f5f5f5', // Optional background color
+  },
   itemsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+    display: 'flex',
+    flexDirection: 'column',
     gap: '20px',
+    alignItems: 'center', // Centers each card horizontally
+    width: '100%', // Ensures full width within the container
   },
   itemCard: {
     border: '1px solid #ddd',
     borderRadius: '8px',
     padding: '15px',
-    textAlign: 'center',
+    textAlign: 'left',
     backgroundColor: '#fff',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    width: '80%', // Adjust width as desired for a long rectangle look
+    maxWidth: '600px', // Optional max width to limit stretch on large screens
+    display: 'flex',
+    flexDirection: 'column',
   },
   itemTitle: {
     fontSize: '1.5rem',
