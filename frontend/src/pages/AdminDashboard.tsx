@@ -13,7 +13,7 @@ const AdminDashboard = () => {
     const [publisher, setPublisher] = useState('');
     const [genre, setGenre] = useState('');
     const [edition, setEdition] = useState('');
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState<number | ''>(1); // Allow number or empty string
 
     //media
     const [MediaID, setMediaID] = useState('');
@@ -22,7 +22,7 @@ const AdminDashboard = () => {
     const [mPublisher, setMPublisher] = useState('');
     const [mGenre, setMGenre] = useState('');
     const [mEdition, setMEdition] = useState('');
-    const [mQuantity, setMQuantity] = useState(1);
+    const [mQuantity, setMQuantity] = useState<number | ''>(1); // Allow number or empty string
 
     //devices
     const [serialNumber, setSerialNumber] = useState('');
@@ -30,6 +30,15 @@ const AdminDashboard = () => {
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState(''); 
 
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        setQuantity(value); // Allow empty input, convert to number otherwise
+    };
+
+    const handleMQuantityChange = (e) => {
+        const value = e.target.value;
+        setMQuantity(value); // Default to 1 if cleared
+    };
 
     const handleBookSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -105,7 +114,7 @@ const AdminDashboard = () => {
             }
 
             setErrorMessage(null);
-            setSuccessMessage("Book created successfully!");
+            setSuccessMessage("Media created successfully!");
 
             setMediaID('');
             setMTitle('');
@@ -272,7 +281,7 @@ const AdminDashboard = () => {
                                     name="quantity"
                                     value={quantity}
                                     min="1"
-                                    onChange={(e) => setQuantity(Number(e.target.value))}
+                                    onChange={handleQuantityChange}
                                     required
                                 />
                             </div>
@@ -359,7 +368,7 @@ const AdminDashboard = () => {
                                     name="mQuantity"
                                     value={mQuantity}
                                     min="1"
-                                    onChange={(e) => setMQuantity(Number(e.target.value))}
+                                    onChange={handleMQuantityChange}
                                     required
                                 />
                             </div>
