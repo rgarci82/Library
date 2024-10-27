@@ -1,161 +1,118 @@
-/* General Styles */
-body {
-  margin: 0;
+/* User.css */
+
+.user-page {
   font-family: Arial, sans-serif;
+  margin: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.navbar {
-  display: flex;
-  flex-direction: column;
-  color: white;
+.navigation {
+  margin-bottom: 20px;
+}
+.search-section { 
+
+  background-color: #333; 
+  
+  } 
+  
+   
+  
+  .search-bar { 
+  
+  width: 60%; 
+  
+  padding: 8px; 
+  
+  font-size: 16px; 
+  
+  border: none; 
+  
+  border-radius: 4px; 
+  
+  } 
+  
+   
+  
+  .nav-icons { 
+  
+  display: flex; 
+  
+  gap: 20px; 
+  
+  font-size: 24px; 
+  
+  } 
+.navigation h1 {
+  color: #C8102E; /* Change this color as needed */
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
-.navbar-section {
-  display: flex;
-  align-items: center;
+.navigation nav {
+  background-color: #C8102E;
   padding: 10px;
+  border-radius: 5px;
+}
+
+.navigation ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
   justify-content: space-between;
 }
 
-/* First Bar - Library Name */
-.library-name {
-  background-color: #C8102E; /* Red background for the library name */
-  font-weight: bold;
-  font-size: 24px;
-  justify-content: center;
-  padding: 10px; /* Added padding for better spacing */
-}
-
-/* Second Bar - Search Bar, Settings, Profile */
-.search-section {
-  background-color: #333;
-}
-
-.search-bar {
-  width: 60%;
-  padding: 8px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-}
-
-.nav-icons {
-  display: flex;
-  gap: 20px;
-  font-size: 24px;
-}
-
-/* Third Bar - Tabs */
-.tabs {
-  background-color: #444;
-  justify-content: center;
-  gap: 20px;
-}
-
-.tab {
-  padding: 10px 20px;
+.navigation li {
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+  color: white;
+  padding: 10px 20px;
+  transition: background-color 0.3s;
 }
 
-.tab:hover {
-  border-bottom: 2px solid white;
+.navigation li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.active {
-  border-bottom: 2px solid white;
+.navigation li.active {
+  background-color: #A61228; /* Darker shade for active tab */
 }
 
-/* Information Boxes */
-.info-boxes {
-  display: flex;
-  flex-direction: row; /* Display boxes horizontally */
+.content {
   padding: 20px;
-  justify-content: flex-start; /* Align boxes to the left */
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.info-box {
-  position: relative;
-  background-color: lightgray;
-  color: black;
-  padding: 15px;
-  margin: 10px;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  width: 25%; /* Adjust width for smaller boxes */
-  height: 250px; /* Adjust height */
-  overflow: hidden; /* Ensure the icon stays inside the box */
-  display: block; /* Display all boxes initially */
+.tab-content {
+  margin-top: 20px;
 }
 
-.info-box.hidden {
-  display: none; /* Hide when not active */
+.tab-content h2 {
+  color: #C8102E; /* Same color for consistency */
+  font-size: 20px;
 }
 
-.info-box::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.1;
-  filter: grayscale(100%); /* Make the icon light grey */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100px; /* Adjust size of the icon */
-  width: 100px;
-  height: 100px;
-  z-index: 0; /* Ensure it stays behind the text */
+.tab-content ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-/* Book Borrowed Box with Book Icon */
-.books-box::before {
-  background-image: url('https://img.icons8.com/ios-filled/100/000000/book.png');
+.tab-content li {
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
-/* Devices Borrowed Box with Laptop Icon */
-.devices-box::before {
-  background-image: url('https://img.icons8.com/ios-filled/100/000000/laptop.png');
+.tab-content li:hover {
+  background-color: #e0e0e0;
 }
 
-/* Media Borrowed Box with Movie Icon */
-.media-box::before {
-  background-image: url('https://img.icons8.com/ios-filled/100/000000/clapperboard.png');
-}
-
-/* Fines Box with Dollar Icon */
-.fines-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=21448&format=png&color=000000');
-}
-
-
-
-/* Item Requested Box with Request Icon */
-.item-requested-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=Xz9oqe2aw9AM&format=png&color=000000');
-}
-
-.item-Hold-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=Efp1UfqxGKqd&format=png&color=000000');
-}
-/* Notifications Box with Envelope Icon */
-.notifications-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=8OqTN9Qyurt6&format=png&color=000000');
-}
-/* Ensure the list items appear vertically */
-.info-box ul {
-  list-style-type: none; /* Remove bullet points */
-  padding: 0; /* Remove default padding */
-}
-
-.info-box li {
-  margin: 5px 0; /* Space between items */
-  display: block; /* Ensures each item takes a full line */
-}
-
-.bookborrowed
-{
-  display: flex;
-  flex-direction:column
+.tab-content h3 {
+  margin-top: 20px;
+  color: #C8102E; /* Consistent color */
 }
