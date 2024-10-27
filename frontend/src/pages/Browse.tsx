@@ -172,6 +172,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '10px 20px',
     backgroundColor: '#333',
     color: '#fff',
+    position: 'fixed',
+    left: '0',
+    right: '0',
+    zIndex: 100,
   },
   libraryName: {
     backgroundColor: '#C8102E',
@@ -179,6 +183,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '24px',
     justifyContent: 'center',
     padding: '10px',
+    borderRadius: '10px',
   },
   navIcons: {
     display: 'flex',
@@ -193,14 +198,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '100%',
   },
   textContainer: {
+    marginTop: '5%',
     height: '100%',
     textAlign: 'center',
     marginBottom: '10px',
-    backgroundColor: 'white',
+    backgroundColor: '#A0A0A0',
     padding: '20px',
     borderRadius: '8px',
     position: 'relative',
-    
   },
   headerTitle: {
     fontSize: '2.5rem',
@@ -261,7 +266,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflowY: 'auto', // Adds vertical scroll
     padding: '10px',
     width: '100%',
-    backgroundColor: '#f5f5f5', // Optional background color
+    backgroundColor: 'lightgray', // Optional background color
+    borderRadius: '10px',
   },
   itemsGrid: {
     display: 'flex',
