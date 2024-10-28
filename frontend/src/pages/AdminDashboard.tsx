@@ -6,7 +6,7 @@ import DeleteModal from "./DeleteModal";
 type ItemType = 'books' | 'media' | 'devices';
 
 export interface Book {
-    itemType: ItemType; // Add this line
+    itemType: ItemType;
     ISBN: string;
     bTitle: string;
     bAuthor: string;
@@ -16,7 +16,7 @@ export interface Book {
 }
 
 export interface Media {
-    itemType: ItemType; // Add this line
+    itemType: ItemType;
     MediaID: number;
     mTitle: string;
     mAuthor: string;
@@ -26,7 +26,7 @@ export interface Media {
 }
 
 export interface Device {
-    itemType: ItemType; // Add this line
+    itemType: ItemType;
     dName: string;
     brand: string;
     model: string;
@@ -50,7 +50,7 @@ const AdminDashboard = () => {
     const [publisher, setPublisher] = useState('');
     const [genre, setGenre] = useState('');
     const [edition, setEdition] = useState('');
-    const [quantity, setQuantity] = useState<number | ''>(1); // Allow number or empty string
+    const [quantity, setQuantity] = useState<number | ''>(1);
 
     const [books, setBooks] = useState<Book[]>([]);
 
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
     const [mPublisher, setMPublisher] = useState('');
     const [mGenre, setMGenre] = useState('');
     const [mEdition, setMEdition] = useState('');
-    const [mQuantity, setMQuantity] = useState<number | ''>(1); // Allow number or empty string
+    const [mQuantity, setMQuantity] = useState<number | ''>(1);
 
     const [media, setMedia] = useState<Media[]>([]);
 
@@ -75,12 +75,12 @@ const AdminDashboard = () => {
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setQuantity(value === '' ? '' : Number(value)); // Allow empty input, convert to number otherwise
+        setQuantity(value === '' ? '' : Number(value));
     };
 
     const handleMQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setMQuantity(value === '' ? '' : Number(value)); // Default to 1 if cleared
+        setMQuantity(value === '' ? '' : Number(value));
     };
 
     const handleBookSubmit = async (event: React.FormEvent) => {
@@ -225,8 +225,8 @@ const AdminDashboard = () => {
                        'devices' as ItemType
         };
     
-        setSelectedItem(itemWithType); // Set the item being edited
-        setIsEditing(true); // Open the modal
+        setSelectedItem(itemWithType);
+        setIsEditing(true);
     };
 
     const confirmDelete = async () => {
@@ -276,11 +276,11 @@ const AdminDashboard = () => {
 
     const fetchBooks = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/books'); // Replace with your actual endpoint
+        const response = await fetch('http://localhost:3000/api/books');
         if (!response.ok) {
           throw new Error('Failed to fetch books');
         }
-        const data: Book[] = await response.json(); // Type the fetched data as `Book[]`
+        const data: Book[] = await response.json();
         setBooks(data);
       } catch (error) {
         console.error(error);
@@ -289,11 +289,11 @@ const AdminDashboard = () => {
 
     const fetchMedia = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/media'); // Replace with your actual endpoint
+          const response = await fetch('http://localhost:3000/api/media');
           if (!response.ok) {
             throw new Error('Failed to fetch books');
           }
-          const data: Media[] = await response.json(); // Type the fetched data as `Book[]`
+          const data: Media[] = await response.json();
           setMedia(data);
         } catch (error) {
           console.error(error);
@@ -302,11 +302,11 @@ const AdminDashboard = () => {
 
     const fetchDevies = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/devices'); // Replace with your actual endpoint
+          const response = await fetch('http://localhost:3000/api/devices');
           if (!response.ok) {
             throw new Error('Failed to fetch books');
           }
-          const data: Device[] = await response.json(); // Type the fetched data as `Book[]`
+          const data: Device[] = await response.json();
           setDevices(data);
         } catch (error) {
           console.error(error);
