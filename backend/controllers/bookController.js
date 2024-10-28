@@ -47,6 +47,98 @@ export async function createBook(req, res) {
   }
 }
 
+export async function getBookCopy(req, res){
+  try {
+    const { ISBN } = req.params;
+
+    if (!ISBN){
+      return res.status(400).json({message: "ISBN is required"});
+    }
+
+    const [bookCopies] = await pool.query(`
+      SELECT bookcopy.itemID, bookcopy.status
+      FROM bookcopy
+      WHERE bookcopy.ISBN = ? AND bookcopy.status = 'available'
+      `,
+      [ISBN]
+    );
+
+    res.json(bookCopies);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function borrowBook(req, res) {
+  const { userData, book } = req.body;
+
+  try {
+    // Check if the user has already borrowed a copy of this book
+    const [existingBorrow] = await pool.query(
+      `SELECT * FROM bookborrowed 
+       JOIN bookcopy ON bookborrowed.itemID = bookcopy.itemID
+       WHERE bookborrowed.userID = ? AND bookcopy.ISBN = ?`,
+      [userData.userID, book.ISBN]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingBorrow.length > 0) {
+      return res.status(400).json({
+        message: "You have already borrowed this book.",
+      });
+    }
+
+    // Find the first available itemID for the book ISBN
+    const [availableCopy] = await pool.query(
+      `SELECT itemID FROM bookcopy 
+       WHERE ISBN = ? AND status = 'available' 
+       ORDER BY itemID ASC 
+       LIMIT 1`,
+      [book.ISBN]
+    );
+
+    // If no available copy is found, return a 404 status with a message
+    if (availableCopy.length === 0) {
+      return res.status(404).json({
+        message: "No available copies of this book.",
+      });
+    }
+
+    const userID = userData.userID;
+    const itemID = availableCopy[0].itemID;
+
+    console.log(userID);
+    console.log(itemID);
+    // Insert the borrow record into the 'bookborrowed' table
+    /*const [borrowResult] = await pool.query(
+      `INSERT INTO bookborrowed (userID, itemID) VALUES (?, ?)`,
+      [userID, itemID]
+    );
+
+    // Update the status of the borrowed book copy in the 'bookcopy' table
+    const [updateResult] = await pool.query(
+      `UPDATE bookcopy SET status = 'borrowed' WHERE itemID = ?`,
+      [itemID]
+    );*/
+
+    // Return a success response with a 201 status
+    res.status(201).json({
+      message: "Book borrowed successfully",
+      itemID: itemID
+    });
+  } catch (error) {
+    console.error("Error occurred while borrowing this book:", error); // Log the error for debugging
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+
+
+export async function holdBook(req, res){
+
+}
+
 export async function requestBook(req, res) {
   const {
     userID,

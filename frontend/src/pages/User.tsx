@@ -209,6 +209,14 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
+
+
+
+
+
+
+
+
   //END OF DUMMY DATA
   //****************************************************************************** 
 
