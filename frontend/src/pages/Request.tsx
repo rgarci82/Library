@@ -53,6 +53,7 @@ const Request: React.FC = () => {
           setError("Please fill in all fields");
         }
         
+        console.log(userID);
         if (itemType === 'Book'){
           try {
             const response = await fetch('http://localhost:3000/api/books/request', {
@@ -68,7 +69,7 @@ const Request: React.FC = () => {
                 bookPublisher,
                 bookGenre,
                 bookEdition,
-                status: "pending",
+                status: "pending"
               }),
             });
       

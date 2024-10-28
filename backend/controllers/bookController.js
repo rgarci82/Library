@@ -48,13 +48,13 @@ export async function createBook(req, res) {
 }
 
 export async function requestBook(req, res) {
-  const { userID, bTitle, ISBN, bAuthor, publisher, genre, edition, status } = req.body;
+  const { userID, bookISBN, bookTitle, bookAuthor, bookPublisher, bookGenre, bookEdition, status } = req.body;
 
   try {
     // Check if the book already exists in the 'book' table
     const [existingBook] = await pool.query(
       "SELECT * FROM book WHERE ISBN = ?",
-      [ISBN]
+      [bookISBN]
     );
 
     // If a book with this ISBN exists, return a 400 status with a message
@@ -64,16 +64,27 @@ export async function requestBook(req, res) {
       });
     }
 
+    // Corrected syntax for checking existing requests
+    const [existingRequest] = await pool.query(
+      "SELECT * FROM bookrequest WHERE ISBN = ? AND userID = ?",
+      [bookISBN, userID] // Combine the parameters into a single array
+    );
+
+    if (existingRequest.length > 0) {
+      return res.status(400).json({
+        message: "A book with this ISBN request already exists.",
+      });
+    }
+
     // Insert the book request into the 'bookrequest' table
     const [result] = await pool.query(
       "INSERT INTO bookrequest (userID, ISBN, bTitle, bAuthor, publisher, genre, edition, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [userID, ISBN, bTitle, bAuthor, publisher, genre, edition || null, status]
+      [userID, bookISBN, bookTitle, bookAuthor, bookPublisher, bookGenre, bookEdition || null, status]
     );
 
     // Return a success response with a 201 status
     res.status(201).json({
       message: "Book request created successfully",
-      ISBN: ISBN,
     });
   } catch (error) {
     console.error("Error occurred while requesting a book:", error); // Log the error for debugging
