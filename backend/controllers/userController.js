@@ -85,31 +85,44 @@ export async function getUserProfile(req, res){
 export async function getUserFine(req, res) {
     try {
         const { userID } = req.params;
-        
-        console.log(`Fetching fine for userID: ${userID}`); // Log userID for debugging
-        
+
+        // Calculate total fine for the specific userID across all borrowing tables
         const fineAmountResult = await pool.query(
-            `SELECT 
-                COALESCE(SUM(bookborrowed.fineAmount), 0) +
-                COALESCE(SUM(mediaBorrowed.fineAmount), 0) +
-                COALESCE(SUM(deviceBorrowed.fineAmount), 0) AS totalFine 
-             FROM bookborrowed 
-             LEFT JOIN mediaBorrowed ON mediaBorrowed.userID = bookborrowed.userID
-             LEFT JOIN deviceBorrowed ON deviceBorrowed.userID = bookborrowed.userID
-             WHERE bookborrowed.userID = ? OR mediaBorrowed.userID = ? OR deviceBorrowed.userID = ?`, 
+            `SELECT COALESCE(SUM(TotalFine), 0) AS TotalFine
+             FROM (
+                 SELECT bb.userID, COALESCE(SUM(bb.fineAmount), 0) AS TotalFine
+                 FROM bookborrowed bb
+                 WHERE bb.userID = ?
+                 GROUP BY bb.userID
+        
+                 UNION ALL
+        
+                 SELECT mb.userID, COALESCE(SUM(mb.fineAmount), 0) AS TotalFine
+                 FROM mediaborrowed mb
+                 WHERE mb.userID = ?
+                 GROUP BY mb.userID
+        
+                 UNION ALL
+        
+                 SELECT db.userID, COALESCE(SUM(db.fineAmount), 0) AS TotalFine
+                 FROM deviceborrowed db
+                 WHERE db.userID = ?
+                 GROUP BY db.userID
+             ) AS fines`,
             [userID, userID, userID]
         );
-        
 
-        // Ensure totalFine is 0 if fineAmountResult is null or undefined
-        const totalFine = fineAmountResult[0]?.totalFine ?? 0;
-        
-        res.json(totalFine);
+        // Accessing the TotalFine value correctly
+        const totalFine = parseFloat(fineAmountResult[0][0]?.TotalFine) || 0;
+
+        res.json({ totalFine }); // Return the total fine as a JSON response
     } catch (error) {
         console.error("Error fetching user fine:", error); // Detailed error logging
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+
 
 
 

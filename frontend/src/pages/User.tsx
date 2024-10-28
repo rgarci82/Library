@@ -9,7 +9,10 @@ interface JwtPayload {
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
   const [userData, setUserData] = useState<any>(null);
+  const [userDataLoading, setUserDataLoading] = useState(true);
   const [userFine, setUserFine] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
@@ -76,61 +79,80 @@ const UserPage: React.FC = () => {
     checkOverdueItems(); 
   }, []);
   
+  // First useEffect to fetch user data
   useEffect(() => {
-    const fetchUserDataAndFines = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("No token found");
+    const fetchUserData = async () => {
+      setUserDataLoading(true);
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found");
 
-            const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
-            if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+        const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
+        if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
-            // Fetch user data
-            const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+        // Fetch user data
+        const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-            if (!response.ok) throw new Error("Failed to fetch user data");
+        if (!response.ok) throw new Error("Failed to fetch user data");
 
-            const userData = await response.json();
-            setUserData(userData);
+        const userData = await response.json();
+        setUserData(userData);
 
-            // Fetch user fines
-            if (!userData.userID) {
-                console.error("User data is not available.");
-                return; // Return early if userID is undefined
-            }
-
-            const finesResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
-
-            const finesData = await finesResponse.json();
-            // Assuming you have a state for user fines, set it here
-            setUserFine(finesData);
-
-        } catch (error) {
-            console.error("Error:", error);
+        if (!userData.userID) {
+          console.error("User data is not available.");
+          return; // Return early if userID is undefined
         }
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+        setUserDataLoading(false);
+      }
     };
+    fetchUserData();
+  }, []);
 
-    fetchUserDataAndFines();
-}, []);
+  // Second useEffect to fetch user fines after userData is fetched
+  useEffect(() => {
+    if (userDataLoading || !userData?.userID) return;
 
+    const fetchUserFine = async () => {
+      setLoading(true);
+      try {
+        const finesResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
+
+        const finesData = await finesResponse.json();
+        setUserFine(finesData);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  fetchUserFine();
+}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
 
   //END OF DUMMY DATA
   //****************************************************************************** 
+
+      // Render loading state or error state if needed
+      if (loading) return <div>Loading...</div>;
+      if (error) return <div>Error: {error}</div>;
 
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
@@ -212,7 +234,7 @@ const UserPage: React.FC = () => {
               <div key={index} className="info-box fines-box">
                 <h3>Fine</h3>
                 <ul>
-                  <li>Amount: ${fine.fine}</li>
+                  <li>Amount: ${userFine.totalFine}</li>
                 </ul>
               </div>
             ))}
