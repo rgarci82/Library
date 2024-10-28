@@ -46,6 +46,18 @@ interface BookRequest {
     userID: number;
   }
 
+interface MediaRequest{
+    requestID: number;
+    userID: number;
+    ISBN: string;
+    mTitle: string;
+    mAuthor: string;
+    publisher: string;
+    genre: string;
+    edition: number;
+    status: string;
+}
+
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('books');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -77,6 +89,8 @@ const AdminDashboard = () => {
     const [mQuantity, setMQuantity] = useState<number | ''>(1);
 
     const [media, setMedia] = useState<Media[]>([]);
+    const [mediaRequests, setMediaRequests] = useState<MediaRequest[]>([])
+
 
     //devices
     const [serialNumber, setSerialNumber] = useState('');
@@ -300,6 +314,32 @@ const AdminDashboard = () => {
           }
         };
 
+    const handleMediaAccept = async (requestID: number) =>{
+        try {
+            const response = await fetch(`http://localhost:3000/api/media/request/accept/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+              fetchMediaRequests(); // Refresh the list after accepting
+            }
+          } catch (error) {
+            console.error(error);
+          }
+    }
+
+    const handleMediaDeny = async (requestID: number) => {
+        try{
+            const response = await fetch(`http://localhost:3000/api/media/request/deny/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+                fetchMediaRequests(); // Refresh the list after accepting
+              }
+            } catch (error) {
+              console.error(error);
+            }
+    }
+
     const handleDeny = async (requestID: number) => {
         try{
             const response = await fetch(`http://localhost:3000/api/books/request/deny/${requestID}`, {
@@ -352,7 +392,7 @@ const AdminDashboard = () => {
         }
       };
     
-    const fetchBookRequests = async() => {
+    const fetchBookRequests = async () => {
         try {
             const response = await fetch('http://localhost:3000/api/books/request');
             if (!response.ok) {
@@ -360,6 +400,19 @@ const AdminDashboard = () => {
             }
             const data = await response.json();
             setBookRequests(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchMediaRequests = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/media/request');
+            if (!response.ok) {
+              throw new Error('Failed to fetch books');
+            }
+            const data = await response.json();
+            setMediaRequests(data);
         } catch (error) {
             console.error(error);
         }
@@ -376,6 +429,7 @@ const AdminDashboard = () => {
         fetchMedia();
         fetchDevies();
         fetchBookRequests();
+        fetchMediaRequests();
     }, []);
 
     return (
@@ -714,6 +768,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
                 {activeTab == 'itemRequests' && (
+                    <>
                     <div className="book-requests">
                     <h1>Book Requests</h1>
                     <table className="requests-table">
@@ -750,6 +805,43 @@ const AdminDashboard = () => {
                       </tbody>
                     </table>
                   </div>
+                  <div className="media-requests">
+                    <h1>Media Requests</h1>
+                    <table className="requests-table">
+                        <thead>
+                            <tr>
+                                <th>ISBN</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Edition</th>
+                                <th>Genre</th>
+                                <th>Publisher</th>
+                                <th>Status</th>
+                                <th>User ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {mediaRequests.map((request) => (
+                                <tr key={request.requestID}>
+                                    <td>{request.ISBN}</td>
+                                    <td>{request.mTitle}</td>
+                                    <td>{request.mAuthor}</td>
+                                    <td>{request.edition}</td>
+                                    <td>{request.genre}</td>
+                                    <td>{request.publisher}</td>
+                                    <td>{request.status.toUpperCase()}</td> {/* Capitalized status */}
+                                    <td>{request.userID}</td>
+                                    <td>
+                                        <button className="accept-btn" onClick={() => handleMediaAccept(request.requestID)}>Accept</button>
+                                        <button className="deny-btn" onClick={() => handleMediaDeny(request.requestID)}>Deny</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    </div>
+                </>
                 )}
             </div>
         </div>
