@@ -235,6 +235,7 @@ const BrowsePage: React.FC = () => {
 
           <button
             style={styles.requestButton}
+            onClick={() => window.location.href = "/request"}
           >
             Request an Item
           </button>

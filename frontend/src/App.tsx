@@ -7,6 +7,7 @@ import AdminLogin from "./pages/AdminLogin"; // Capitalized
 import AdminRegister from "./pages/AdminRegister"; // Capitalized
 import User from "./pages/User"; // Renamed to Users (should match your actual filename)
 import Browse from "./pages/Browse";
+import Request from "./pages/Request";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./pages/ProtectedRouteAdmin";
 
@@ -29,6 +30,7 @@ const App: React.FC = () => {
         <Route path="/adminRegister" element={<AdminRegister />} />
         <Route path="/adminDashboard" element={<ProtectedRoute isAdmin={isAdmin} element={<AdminDashboard />} />} />
         <Route path="/browse" element={<Browse />} />
+        <Route path="/request" element={<Request />} />
       </Routes>
     </Router>
   );
