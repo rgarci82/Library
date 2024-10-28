@@ -140,6 +140,15 @@ export async function bookRequestAccepted(req, res) {
     const { ISBN, bTitle, bAuthor, publisher, genre, edition, userID } =
       requestDetails[0];
 
+    if (
+      requestDetails[0].status === "approved" ||
+      requestDetails[0].status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
+
     // Insert the new book into the 'book' table
     await pool.query(
       "INSERT INTO book (ISBN, bTitle, bAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?, ?)",
@@ -165,6 +174,20 @@ export async function bookRequestDeny(req, res) {
   const { requestID } = req.params;
 
   try {
+    const [requestDetails] = await pool.query(
+      "SELECT * FROM bookrequest WHERE requestID = ?",
+      [requestID]
+    );
+
+    if (
+      requestDetails[0].status === "approved" ||
+      requestDetails[0].status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
+
     await pool.query(
       "UPDATE bookrequest SET status = 'denied' WHERE requestID = ?",
       [requestID]
@@ -172,7 +195,7 @@ export async function bookRequestDeny(req, res) {
 
     res.status(200).json({ message: "Book denied" });
   } catch (error) {
-    json.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 

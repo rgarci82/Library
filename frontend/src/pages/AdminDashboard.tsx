@@ -58,6 +58,16 @@ interface MediaRequest{
     status: string;
 }
 
+interface DeviceRequest{
+    requestID: number;
+    userID: number;
+    serialNumber: string;
+    dName: string;
+    brand: string;
+    model: string;
+    Status: string;
+}
+
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('books');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -99,6 +109,8 @@ const AdminDashboard = () => {
     const [model, setModel] = useState(''); 
 
     const [devices, setDevices] = useState<Device[]>([]);
+    const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([])
+
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -309,6 +321,9 @@ const AdminDashboard = () => {
             if (response.status === 200) {
               fetchBookRequests(); // Refresh the list after accepting
             }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
           } catch (error) {
             console.error(error);
           }
@@ -322,9 +337,44 @@ const AdminDashboard = () => {
             if (response.status === 200) {
               fetchMediaRequests(); // Refresh the list after accepting
             }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
           } catch (error) {
             console.error(error);
           }
+    }
+
+    const handleDeviceAccept = async (requestID: number) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/devices/request/accept/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+              fetchDeviceRequests(); // Refresh the list after accepting
+            }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
+          } catch (error) {
+            console.error(error);
+          }
+    }
+
+    const handleDeviceDeny = async (requestID: number) => {
+        try{
+            const response = await fetch(`http://localhost:3000/api/devices/request/deny/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+                fetchDeviceRequests(); // Refresh the list after accepting
+              }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
+            } catch (error) {
+              alert(error);
+            }
     }
 
     const handleMediaDeny = async (requestID: number) => {
@@ -335,6 +385,9 @@ const AdminDashboard = () => {
             if (response.status === 200) {
                 fetchMediaRequests(); // Refresh the list after accepting
               }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
             } catch (error) {
               console.error(error);
             }
@@ -348,6 +401,9 @@ const AdminDashboard = () => {
             if (response.status === 200) {
                 fetchBookRequests(); // Refresh the list after accepting
               }
+            if(response.status == 400){
+                alert("This request has already been processed")
+            }
             } catch (error) {
               console.error(error);
             }
@@ -417,6 +473,19 @@ const AdminDashboard = () => {
             console.error(error);
         }
     }
+
+    const fetchDeviceRequests = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/devices/request');
+            if (!response.ok) {
+              throw new Error('Failed to fetch books');
+            }
+            const data = await response.json();
+            setDeviceRequests(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     
     const refreshItems = async () => {
         await fetchBooks();
@@ -430,6 +499,7 @@ const AdminDashboard = () => {
         fetchDevies();
         fetchBookRequests();
         fetchMediaRequests();
+        fetchDeviceRequests();
     }, []);
 
     return (
@@ -835,6 +905,38 @@ const AdminDashboard = () => {
                                     <td>
                                         <button className="accept-btn" onClick={() => handleMediaAccept(request.requestID)}>Accept</button>
                                         <button className="deny-btn" onClick={() => handleMediaDeny(request.requestID)}>Deny</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    </div>
+                    <div className="media-requests">
+                    <h1>Device Requests</h1>
+                    <table className="requests-table">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Device Name</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Status</th>
+                                <th>User ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {deviceRequests.map((request) => (
+                                <tr key={request.requestID}>
+                                    <td>{request.serialNumber}</td>
+                                    <td>{request.dName}</td>
+                                    <td>{request.brand}</td>
+                                    <td>{request.model}</td>
+                                    <td>{request.Status.toUpperCase()}</td>
+                                    <td>{request.userID}</td>
+                                    <td>
+                                        <button className="accept-btn" onClick={() => handleDeviceAccept(request.requestID)}>Accept</button>
+                                        <button className="deny-btn" onClick={() => handleDeviceDeny(request.requestID)}>Deny</button>
                                     </td>
                                 </tr>
                             ))}

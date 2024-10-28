@@ -62,13 +62,11 @@ export async function requestMedia(req, res) {
   } = req.body;
 
   try {
-    // Check if the book already exists in the 'book' table
     const [existingMedia] = await pool.query(
       "SELECT * FROM media WHERE MediaID = ?",
       [mediaISBN]
     );
 
-    // If a book with this ISBN exists, return a 400 status with a message
     if (existingMedia.length > 0) {
       return res.status(400).json({
         message:
@@ -88,7 +86,6 @@ export async function requestMedia(req, res) {
       });
     }
 
-    // Insert the book request into the 'bookrequest' table
     const [result] = await pool.query(
       "INSERT INTO mediarequest (userID, ISBN, mTitle, mAuthor, publisher, genre, edition, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
@@ -115,13 +112,11 @@ export async function requestMedia(req, res) {
 
 export async function getAllMediaRequests(req, res) {
   try {
-    // Query to fetch all book requests
     const [mediaRequests] = await pool.query("SELECT * FROM mediarequest");
 
-    // Return the list of book requests
     res.status(200).json(mediaRequests);
   } catch (error) {
-    console.error("Error occurred while fetching book requests:", error);
+    console.error("Error occurred while fetching media requests:", error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -140,6 +135,15 @@ export async function mediaRequestAccepted(req, res) {
 
     const { ISBN, mTitle, mAuthor, publisher, genre, edition, userID } =
       requestDetails[0];
+
+    if (
+      requestDetails[0].status === "approved" ||
+      requestDetails[0].status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
 
     await pool.query(
       "INSERT INTO media (mTitle, mAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?)",
@@ -164,6 +168,20 @@ export async function mediaRequestDeny(req, res) {
   const { requestID } = req.params;
 
   try {
+    const [requestDetails] = await pool.query(
+      "SELECT * FROM mediarequest WHERE requestID = ?",
+      [requestID]
+    );
+
+    if (
+      requestDetails[0].status === "approved" ||
+      requestDetails[0].status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
+
     await pool.query(
       "UPDATE mediarequest SET status = 'denied' WHERE requestID = ?",
       [requestID]
@@ -171,7 +189,7 @@ export async function mediaRequestDeny(req, res) {
 
     res.status(200).json({ message: "Media denied" });
   } catch (error) {
-    json.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 

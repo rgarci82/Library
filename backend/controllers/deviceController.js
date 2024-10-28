@@ -52,7 +52,8 @@ export async function requestDevice(req, res) {
     // If a book with this ISBN exists, return a 400 status with a message
     if (existingDevice.length > 0) {
       return res.status(400).json({
-        message: "A device with this serial number already exists, try borrowing it instead.",
+        message:
+          "A device with this serial number already exists, try borrowing it instead.",
       });
     }
 
@@ -80,6 +81,90 @@ export async function requestDevice(req, res) {
     });
   } catch (error) {
     console.error("Error occurred while requesting a device:", error); // Log the error for debugging
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getAllDeviceRequests(req, res) {
+  try {
+    // Query to fetch all book requests
+    const [deviceRequests] = await pool.query("SELECT * FROM devicerequest");
+
+    // Return the list of book requests
+    res.status(200).json(deviceRequests);
+  } catch (error) {
+    console.error("Error occurred while fetching device requests:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function deviceRequestAccepted(req, res) {
+  const { requestID } = req.params;
+  try {
+    const [requestDetails] = await pool.query(
+      "SELECT * FROM devicerequest WHERE requestID = ?",
+      [requestID]
+    );
+
+    if (requestDetails.length === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    const { serialNumber, dName, brand, model, userID } = requestDetails[0];
+
+    if (
+      requestDetails[0].Status === "approved" ||
+      requestDetails[0].Status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
+
+    await pool.query(
+      "INSERT INTO device (serialNumber, dName, brand, model) VALUES (?, ?, ?, ?)",
+      [serialNumber, dName, brand || null, model || null]
+    );
+
+    await pool.query(
+      "UPDATE devicerequest SET Status = 'approved' WHERE requestID = ?",
+      [requestID]
+    );
+
+    res
+      .status(200)
+      .json({ message: "Device request accepted and Device created." });
+  } catch (error) {
+    console.error("Error while accepting device request:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function deviceRequestDeny(req, res) {
+  const { requestID } = req.params;
+
+  try {
+    const [requestDetails] = await pool.query(
+      "SELECT * FROM devicerequest WHERE requestID = ?",
+      [requestID]
+    );
+
+    if (
+      requestDetails[0].Status === "approved" ||
+      requestDetails[0].Status === "denied"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "This request has already been processed." });
+    }
+
+    await pool.query(
+      "UPDATE devicerequest SET Status = 'denied' WHERE requestID = ?",
+      [requestID]
+    );
+
+    res.status(200).json({ message: "Device denied" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
