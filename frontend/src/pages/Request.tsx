@@ -123,8 +123,6 @@ const Request: React.FC = () => {
   }, []);
 
 
-  console.log(userID);
-  console.log(bookISBN);
   return (
     <div style={styles.container}>
       <div style={styles.registrationBox}>
