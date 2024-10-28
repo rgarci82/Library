@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './User.css';
 import { jwtDecode } from 'jwt-decode';
 
 enum ItemStatus {
@@ -533,4 +532,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 }
   
 export default BrowsePage;
-
