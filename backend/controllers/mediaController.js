@@ -109,22 +109,6 @@ export async function getMediaByID(req, res){
     }
 }
 
-export async function getMediaByID(req, res) {
-  try {
-    const { MediaID } = req.params;
-    const [result] = await pool.query(
-      "SELECT * FROM device WHERE MediaID = ?",
-      [MediaID]
-    );
-    if (result.length == 0) {
-      return res.status(404).json({ message: "Media not found" });
-    }
-    res.json(result[0]);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
-
 export async function updateMedia(req, res) {
   try {
     const { MediaID } = req.params;
