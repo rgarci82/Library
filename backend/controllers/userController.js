@@ -89,18 +89,27 @@ export async function getUserFine(req, res) {
         console.log(`Fetching fine for userID: ${userID}`); // Log userID for debugging
         
         const fineAmountResult = await pool.query(
-            `SELECT SUM(fineAmount) AS totalFine 
-             FROM bookborrowed, mediaBorrowed, deviceBorrowed
+            `SELECT 
+                COALESCE(SUM(bookborrowed.fineAmount), 0) +
+                COALESCE(SUM(mediaBorrowed.fineAmount), 0) +
+                COALESCE(SUM(deviceBorrowed.fineAmount), 0) AS totalFine 
+             FROM bookborrowed 
+             LEFT JOIN mediaBorrowed ON mediaBorrowed.userID = bookborrowed.userID
+             LEFT JOIN deviceBorrowed ON deviceBorrowed.userID = bookborrowed.userID
              WHERE bookborrowed.userID = ? OR mediaBorrowed.userID = ? OR deviceBorrowed.userID = ?`, 
-            [userID]
+            [userID, userID, userID]
         );
+        
 
-        const totalFine = fineAmountResult[0]?.totalFine || 0;
+        // Ensure totalFine is 0 if fineAmountResult is null or undefined
+        const totalFine = fineAmountResult[0]?.totalFine ?? 0;
+        
         res.json(totalFine);
     } catch (error) {
         console.error("Error fetching user fine:", error); // Detailed error logging
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
 
 

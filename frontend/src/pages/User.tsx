@@ -77,7 +77,7 @@ const UserPage: React.FC = () => {
   }, []);
   
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserDataAndFines = async () => {
         try {
             const token = localStorage.getItem("token");
             if (!token) throw new Error("No token found");
@@ -85,7 +85,7 @@ const UserPage: React.FC = () => {
             const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
             if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
-            // Use decoded.id directly for fetching user data
+            // Fetch user data
             const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
                 method: 'GET',
                 headers: {
@@ -96,36 +96,38 @@ const UserPage: React.FC = () => {
 
             if (!response.ok) throw new Error("Failed to fetch user data");
 
-            const data = await response.json();
-            setUserData(data);
+            const userData = await response.json();
+            setUserData(userData);
+
+            // Fetch user fines
+            if (!userData.userID) {
+                console.error("User data is not available.");
+                return; // Return early if userID is undefined
+            }
+
+            const finesResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
+
+            const finesData = await finesResponse.json();
+            // Assuming you have a state for user fines, set it here
+            setUserFine(finesData);
+
         } catch (error) {
             console.error("Error:", error);
         }
     };
 
-    fetchUserData();
+    fetchUserDataAndFines();
 }, []);
 
-useEffect(() => {
-  const fetchUserFine = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
 
-      if (!response.ok) throw new Error("Failed to fetch user fine");
-
-      const data = await response.json();
-      setUserFine(data);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-  }
-  fetchUserFine();
-}, [userData]);
 
   //END OF DUMMY DATA
   //****************************************************************************** 
