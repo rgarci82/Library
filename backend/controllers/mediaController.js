@@ -47,6 +47,51 @@ export async function createMedia(req, res) {
     }
   }
 
+export async function requestMedia(req, res) {
+  const { userID, mediaISBN, mediaTitle, mediaAuthor, mediaPublisher, mediaGenre, mediaEdition, status } = req.body;
+
+  try {
+    // Check if the book already exists in the 'book' table
+    const [existingMedia] = await pool.query(
+      "SELECT * FROM media WHERE MediaID = ?",
+      [mediaISBN]
+    );
+
+    // If a book with this ISBN exists, return a 400 status with a message
+    if (existingMedia.length > 0) {
+      return res.status(400).json({
+        message: "A media with this ISBN already exists, try borrowing it instead.",
+      });
+    }
+
+    // Corrected syntax for checking existing requests
+    const [existingRequest] = await pool.query(
+      "SELECT * FROM mediarequest WHERE ISBN = ? AND userID = ?",
+      [mediaISBN, userID] // Combine the parameters into a single array
+    );
+
+    if (existingRequest.length > 0) {
+      return res.status(400).json({
+        message: "A media with this ISBN request already exists.",
+      });
+    }
+
+    // Insert the book request into the 'bookrequest' table
+    const [result] = await pool.query(
+      "INSERT INTO mediarequest (userID, ISBN, mTitle, mAuthor, publisher, genre, edition, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [userID, mediaISBN, mediaTitle, mediaAuthor, mediaPublisher, mediaGenre, mediaEdition || null, status]
+    );
+
+    // Return a success response with a 201 status
+    res.status(201).json({
+      message: "Media request created successfully",
+    });
+  } catch (error) {
+    console.error("Error occurred while requesting a media:", error); // Log the error for debugging
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export async function getMediaByID(req, res){
     try{
         const { MediaID } = req.params;

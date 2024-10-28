@@ -39,6 +39,51 @@ export async function createDevice(req, res) {
   }
 }
 
+export async function requestDevice(req, res) {
+  const { userID, serialNumber, deviceTitle, brand, model, status } = req.body;
+
+  try {
+    // Check if the book already exists in the 'book' table
+    const [existingDevice] = await pool.query(
+      "SELECT * FROM device WHERE serialNumber = ?",
+      [serialNumber]
+    );
+
+    // If a book with this ISBN exists, return a 400 status with a message
+    if (existingDevice.length > 0) {
+      return res.status(400).json({
+        message: "A device with this serial number already exists, try borrowing it instead.",
+      });
+    }
+
+    // Corrected syntax for checking existing requests
+    const [existingRequest] = await pool.query(
+      "SELECT * FROM devicerequest WHERE serialNumber = ? AND userID = ?",
+      [serialNumber, userID] // Combine the parameters into a single array
+    );
+
+    if (existingRequest.length > 0) {
+      return res.status(400).json({
+        message: "A device with this serial number request already exists.",
+      });
+    }
+
+    // Insert the book request into the 'bookrequest' table
+    const [result] = await pool.query(
+      "INSERT INTO devicerequest (userID, serialNumber, dName, brand, model, Status) VALUES (?, ?, ?, ?, ?, ?)",
+      [userID, serialNumber, deviceTitle, brand, model, status]
+    );
+
+    // Return a success response with a 201 status
+    res.status(201).json({
+      message: "Device request created successfully",
+    });
+  } catch (error) {
+    console.error("Error occurred while requesting a device:", error); // Log the error for debugging
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export async function getDeviceBySN(req, res) {
   try {
     const { serialNumber } = req.params;

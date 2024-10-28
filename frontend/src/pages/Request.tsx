@@ -87,6 +87,70 @@ const Request: React.FC = () => {
             console.error("Error:", error);
           }
         }
+        else if (itemType === 'Media'){
+          try {
+            const response = await fetch('http://localhost:3000/api/media/request', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userID,
+                mediaTitle,
+                mediaISBN,
+                mediaAuthor,
+                mediaPublisher,
+                mediaGenre,
+                mediaEdition,
+                status: "pending"
+              }),
+            });
+      
+            const data = await response.json();
+      
+            if (response.ok) {
+              console.log("Media request created successfully", data);
+              navigate('/user/');
+              // Handle successful user creation, e.g., redirect or display success message
+            } else {
+              setError(data.message || "An error occurred");
+            }
+          } catch (error) {
+            setError("Failed to create media request. Please try again.");
+            console.error("Error:", error);
+          }
+        }
+        else if (itemType === 'Device'){
+          try {
+            const response = await fetch('http://localhost:3000/api/devices/request', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userID,
+                serialNumber,
+                deviceTitle,
+                brand,
+                model,
+                status: "pending"
+              }),
+            });
+      
+            const data = await response.json();
+      
+            if (response.ok) {
+              console.log("Device request created successfully", data);
+              navigate('/user/');
+              // Handle successful user creation, e.g., redirect or display success message
+            } else {
+              setError(data.message || "An error occurred");
+            }
+          } catch (error) {
+            setError("Failed to create device request. Please try again.");
+            console.error("Error:", error);
+          }
+        }
       }
     };
     
@@ -242,8 +306,165 @@ const Request: React.FC = () => {
               </div>
             </>
           )}
+          {step === 2 && itemType === 'Media' && (
+            <>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Media Title</label>
+                  <input
+                    type="text"
+                    value={mediaTitle}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setMediaTitle(sanitizedValue);
+                    }}
+                    placeholder="Enter the media title"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>ISBN</label>
+                  <input
+                    type="text"
+                    value={mediaISBN}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setMediaISBN(sanitizedValue);
+                    }}
+                    placeholder="Enter the ISBN"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Media Author</label>
+                  <input
+                    type="text"
+                    value={mediaAuthor}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setMediaAuthor(sanitizedValue);
+                    }}
+                    placeholder="Enter the author"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Media Publisher</label>
+                  <input
+                    type="text"
+                    value={mediaPublisher}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setMediaPublisher(sanitizedValue);
+                    }}
+                    placeholder="Enter the publisher"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Genre</label>
+                  <input
+                    type="text"
+                    value={mediaGenre}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setMediaGenre(sanitizedValue);
+                    }}
+                    placeholder="Enter the genre"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Edition (Optional)</label>
+                  <input
+                    type="text"
+                    value={mediaEdition}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+                      setMediaEdition(sanitizedValue);
+                    }}
+                    placeholder="Enter the edition"
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+          {step === 2 && itemType === 'Device' && (
+            <>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Device Title</label>
+                  <input
+                    type="text"
+                    value={deviceTitle}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setDeviceTitle(sanitizedValue);
+                    }}
+                    placeholder="Enter the device title"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Serial Number</label>
+                  <input
+                    type="text"
+                    value={serialNumber}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setSerialNumber(sanitizedValue);
+                    }}
+                    placeholder="Enter the serial number"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Brand</label>
+                  <input
+                    type="text"
+                    value={brand}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setBrand(sanitizedValue);
+                    }}
+                    placeholder="Enter the brand"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Model</label>
+                  <input
+                    type="text"
+                    value={model}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setModel(sanitizedValue);
+                    }}
+                    placeholder="Enter the model"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <button type="submit" style={styles.button}>
-            {step === 1 ? "Next" : "Request Book"}
+            {step === 1 ? "Next" : "Request Item"}
           </button>
         </form>
       </div>
