@@ -1,10 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './AdminDashboard.css';
+import EditModal from "./EditModal";
+import DeleteModal from "./DeleteModal";
+
+type ItemType = 'books' | 'media' | 'devices';
+
+export interface Book {
+    itemType: ItemType; // Add this line
+    ISBN: string;
+    bTitle: string;
+    bAuthor: string;
+    publisher: string;
+    genre: string;
+    edition?: string;
+}
+
+export interface Media {
+    itemType: ItemType; // Add this line
+    MediaID: number;
+    mTitle: string;
+    mAuthor: string;
+    publisher: string;
+    genre: string;
+    edition?: number;
+}
+
+export interface Device {
+    itemType: ItemType; // Add this line
+    dName: string;
+    brand: string;
+    model: string;
+    serialNumber: string;
+    status: string;
+}
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('books');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [selectedItem, setSelectedItem] = useState<Book | Media | Device | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedItemDelete, setSelectedItemDelete] = useState<Book | Media | Device | null>(null);
 
     //books
     const [ISBN, setISBN] = useState('');
@@ -15,6 +52,8 @@ const AdminDashboard = () => {
     const [edition, setEdition] = useState('');
     const [quantity, setQuantity] = useState<number | ''>(1); // Allow number or empty string
 
+    const [books, setBooks] = useState<Book[]>([]);
+
     //media
     const [MediaID, setMediaID] = useState('');
     const [mTitle, setMTitle] = useState('');
@@ -24,11 +63,15 @@ const AdminDashboard = () => {
     const [mEdition, setMEdition] = useState('');
     const [mQuantity, setMQuantity] = useState<number | ''>(1); // Allow number or empty string
 
+    const [media, setMedia] = useState<Media[]>([]);
+
     //devices
     const [serialNumber, setSerialNumber] = useState('');
     const [dName, setDname] = useState('');
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState(''); 
+
+    const [devices, setDevices] = useState<Device[]>([]);
 
     const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -174,6 +217,115 @@ const AdminDashboard = () => {
         setActiveTab(tab);
     };
 
+    const handleEditClick = (item: Book | Media | Device) => {
+        const itemWithType = {
+            ...item,
+            itemType: item.hasOwnProperty('bTitle') ? 'books' as ItemType : 
+                       item.hasOwnProperty('mTitle') ? 'media' as ItemType : 
+                       'devices' as ItemType
+        };
+    
+        setSelectedItem(itemWithType); // Set the item being edited
+        setIsEditing(true); // Open the modal
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedItemDelete) return;
+
+
+        let id: string | number | undefined;
+        if ('ISBN' in selectedItemDelete) id = selectedItemDelete.ISBN;
+        else if ('MediaID' in selectedItemDelete) id = selectedItemDelete.MediaID;
+        else if ('serialNumber' in selectedItemDelete) id = selectedItemDelete.serialNumber;
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/${selectedItemDelete.itemType}/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete item');
+
+
+            setIsDeleting(false)
+            setSelectedItemDelete(null);
+            await fetchBooks()
+            await fetchDevies()
+            await fetchMedia()
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+        }
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleting(false);
+        setSelectedItem(null);
+    };
+
+    const handleDeleteClick = (item: Book | Media | Device) => {
+        
+        const itemWithType = {
+            ...item,
+            itemType: item.hasOwnProperty('bTitle') ? 'books' as ItemType : 
+                       item.hasOwnProperty('mTitle') ? 'media' as ItemType : 
+                       'devices' as ItemType
+        };
+
+        setSelectedItemDelete(itemWithType);
+        setIsDeleting(true);
+    };
+
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/books'); // Replace with your actual endpoint
+        if (!response.ok) {
+          throw new Error('Failed to fetch books');
+        }
+        const data: Book[] = await response.json(); // Type the fetched data as `Book[]`
+        setBooks(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchMedia = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/api/media'); // Replace with your actual endpoint
+          if (!response.ok) {
+            throw new Error('Failed to fetch books');
+          }
+          const data: Media[] = await response.json(); // Type the fetched data as `Book[]`
+          setMedia(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+    const fetchDevies = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/api/devices'); // Replace with your actual endpoint
+          if (!response.ok) {
+            throw new Error('Failed to fetch books');
+          }
+          const data: Device[] = await response.json(); // Type the fetched data as `Book[]`
+          setDevices(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+    const refreshItems = async () => {
+        await fetchBooks();
+        await fetchDevies();
+        await fetchMedia();
+    };
+    
+
+    useEffect(() => {
+        fetchBooks();
+        fetchMedia();
+        fetchDevies();
+      }, []);
+
     return (
         <div>
             <div className="navbar">
@@ -202,6 +354,7 @@ const AdminDashboard = () => {
                 <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Create Book</div>
                 <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Create Media</div>
                 <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Create Device</div>
+                <div className={`tab ${activeTab === 'manageItems' ? 'active' : ''}`} onClick={() => handleTabClick('manageItems')}>Manage Items</div>
             </div>
             <div className="info-boxes">
             {activeTab === 'books' && (
@@ -434,6 +587,79 @@ const AdminDashboard = () => {
                     {errorMessage && <div className="error-message">{errorMessage}</div>}
                 </div>
             )}
+            {activeTab === 'manageItems' && (
+                <div className="manage-items">
+                    <h2>Manage Books, Media, and Devices</h2>
+                
+                    {/* Books Section */}
+                    <div className="category-section">
+                        <h3>Books</h3>
+                        <div className="items-row">
+                            {books.map(book => (
+                            <div key={book.ISBN} className="card">
+                                <p><strong>Title:</strong> {book.bTitle}</p>
+                                <p><strong>Author:</strong> {book.bAuthor}</p>
+                                <p><strong>Publisher:</strong> {book.publisher}</p>
+                                <p><strong>Genre:</strong> {book.genre}</p>
+                                <p><strong>Edition:</strong> {book.edition || 'N/A'}</p>
+                                <button onClick={() => handleEditClick(book)}>Edit</button>
+                                <button onClick={() => handleDeleteClick(book)}>Delete</button>
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+                
+                    {/* Media Section */}
+                    <div className="category-section">
+                        <h3>Media</h3>
+                        <div className="items-row">
+                            {media.map(item => (
+                            <div key={item.MediaID} className="card">
+                                <p><strong>Title:</strong> {item.mTitle}</p>
+                                <p><strong>Author:</strong> {item.mAuthor}</p>
+                                <p><strong>Publisher:</strong> {item.publisher}</p>
+                                <p><strong>Genre:</strong> {item.genre}</p>
+                                <p><strong>Edition:</strong> {item.edition || 'N/A'}</p>
+                                <button onClick={() => handleEditClick(item)}>Edit</button>
+                                <button onClick={() => handleDeleteClick(item)}>Delete</button>
+                            </div>
+                        ))}
+                        </div>
+                    </div>
+                
+                    {/* Devices Section */}
+                    <div className="category-section">
+                        <h3>Devices</h3>
+                        <div className="items-row">
+                            {devices.map(device => (
+                            <div key={device.serialNumber} className="card">
+                                <p><strong>Device Name:</strong> {device.dName}</p>
+                                <p><strong>Brand:</strong> {device.brand}</p>
+                                <p><strong>Model:</strong> {device.model}</p>
+                                <p><strong>Serial Number:</strong> {device.serialNumber}</p>
+                                <p><strong>Status:</strong> {device.status}</p>
+                                <button onClick={() => handleEditClick(device)}>Edit</button>
+                                <button onClick={() => handleDeleteClick(device)}>Delete</button>
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+                    {isEditing && selectedItem && (
+                        <EditModal
+                            selectedItem={selectedItem}
+                            onClose={() => setIsEditing(false)}
+                            onRefresh={refreshItems}
+                        />
+                        )}
+                    {isDeleting && selectedItemDelete && (
+                        <DeleteModal
+                            onDeleteConfirm={confirmDelete}
+                            onClose={closeDeleteModal}
+                            itemName={selectedItemDelete.itemType}
+                        />
+                    )}
+                    </div>
+                )}
             </div>
         </div>
     )
