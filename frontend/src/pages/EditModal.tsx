@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Book, Media, Device } from './AdminDashboard'; // Adjust the import based on your file structure
+import { Book, Media, Device } from './AdminDashboard';
 
 interface EditModalProps {
     selectedItem: Book | Media | Device | null;
@@ -26,42 +26,38 @@ const EditModal: React.FC<EditModalProps> = ({ selectedItem, onClose, onRefresh 
       setFormData(selectedItem);
     }, [selectedItem]);
   
-    // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
           ...prevData,
           [name]: value,
-        }) as Book | Media | Device | null); // Ensure the correct type is returned
+        }) as Book | Media | Device | null);
       };
   
     const handleSubmitEdit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Ensure formData is defined
         if (!formData) {
             console.error("Form data is not defined");
-            return; // Prevent the request if form data is undefined
+            return;
         }
 
-        // Determine the ID to use based on itemType
         let id: string | number | undefined;
 
         if (isBook(formData)) {
-            id = formData.ISBN; // Use ISBN for books
+            id = formData.ISBN;
         } else if (isMedia(formData)) {
-            id = formData.MediaID; // Use MediaID for media
+            id = formData.MediaID;
         } else if (isDevice(formData)) {
-            id = formData.serialNumber; // Use serialNumber for devices
+            id = formData.serialNumber;
         } else {
             console.error("Invalid item type");
-            return; // Prevent the request if item type is invalid
+            return;
         }
 
-        // Check if id is defined
         if (!id) {
             console.error("Item ID is not defined");
-            return; // Prevent the request if ID is undefined
+            return;
         }
 
         try {
@@ -80,14 +76,13 @@ const EditModal: React.FC<EditModalProps> = ({ selectedItem, onClose, onRefresh 
             onRefresh()
             onClose()
 
-            // Handle successful update here
         } catch (error) {
             console.error("Failed to update item:", error);
         }
     };
 
   
-    if (!selectedItem) return null; // If no item is selected, return null
+    if (!selectedItem) return null;
   
     return (
         <div className="edit-modal">

@@ -72,18 +72,18 @@
 }
 
 .info-boxes {
-    width: 100%;               /* Allow full width */
+    width: 100%;
     padding: 20px;
-    box-sizing: border-box;    /* Ensure padding doesn’t affect width */
-    display: block;            /* Ensure no flex styling is applied */
+    box-sizing: border-box;
+    display: block;
   }
 
 .items-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
-    width: 100%; /* Ensure full width */
-    margin-top: 20px; /* Optional margin adjustment */
+    width: 100%; 
+    margin-top: 20px; 
   }
   
   .category-section {
@@ -98,14 +98,12 @@
     margin-bottom: 10px;
   }
   
-  /* Row for each section */
   .items-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
   
-  /* Card styling */
   .card {
     padding: 15px;
     border: 1px solid #ccc;
@@ -188,3 +186,49 @@
 .edit__button:hover{
     background-color: #c8102f7c;
 }
+
+.book-requests {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  .requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .requests-table th, .requests-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .requests-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .accept-btn, .deny-btn {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    margin-right: 8px;
+    border-radius: 4px;
+  }
+  
+  .accept-btn {
+    background-color: #28a745; /* Green */
+  }
+  
+  .deny-btn {
+    background-color: #dc3545; /* Red */
+  }
+  
+  .accept-btn:hover, .deny-btn:hover {
+    opacity: 0.8;
+  }

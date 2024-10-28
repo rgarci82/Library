@@ -34,6 +34,18 @@ export interface Device {
     status: string;
 }
 
+interface BookRequest {
+    ISBN: string;
+    bAuthor: string;
+    bTitle: string;
+    edition: number;
+    genre: string;
+    publisher: string;
+    requestID: number;
+    status: string;
+    userID: number;
+  }
+
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('books');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,6 +65,7 @@ const AdminDashboard = () => {
     const [quantity, setQuantity] = useState<number | ''>(1);
 
     const [books, setBooks] = useState<Book[]>([]);
+    const [bookRequests, setBookRequests] = useState<BookRequest[]>([])
 
     //media
     const [MediaID, setMediaID] = useState('');
@@ -274,6 +287,32 @@ const AdminDashboard = () => {
         setIsDeleting(true);
     };
 
+    const handleAccept = async (requestID: number) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/books/request/accept/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+              fetchBookRequests(); // Refresh the list after accepting
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        };
+
+    const handleDeny = async (requestID: number) => {
+        try{
+            const response = await fetch(`http://localhost:3000/api/books/request/deny/${requestID}`, {
+                method: 'PUT'
+            })
+            if (response.status === 200) {
+                fetchBookRequests(); // Refresh the list after accepting
+              }
+            } catch (error) {
+              console.error(error);
+            }
+        };
+
     const fetchBooks = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/books');
@@ -312,19 +351,32 @@ const AdminDashboard = () => {
           console.error(error);
         }
       };
-
+    
+    const fetchBookRequests = async() => {
+        try {
+            const response = await fetch('http://localhost:3000/api/books/request');
+            if (!response.ok) {
+              throw new Error('Failed to fetch books');
+            }
+            const data = await response.json();
+            setBookRequests(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
     const refreshItems = async () => {
         await fetchBooks();
         await fetchDevies();
         await fetchMedia();
     };
     
-
     useEffect(() => {
         fetchBooks();
         fetchMedia();
         fetchDevies();
-      }, []);
+        fetchBookRequests();
+    }, []);
 
     return (
         <div>
@@ -355,6 +407,7 @@ const AdminDashboard = () => {
                 <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Create Media</div>
                 <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Create Device</div>
                 <div className={`tab ${activeTab === 'manageItems' ? 'active' : ''}`} onClick={() => handleTabClick('manageItems')}>Manage Items</div>
+                <div className={`tab ${activeTab === 'itemRequests' ? 'active' : ''}`} onClick={() => handleTabClick('itemRequests')}>Item Requests</div>
             </div>
             <div className="info-boxes">
             {activeTab === 'books' && (
@@ -659,6 +712,44 @@ const AdminDashboard = () => {
                         />
                     )}
                     </div>
+                )}
+                {activeTab == 'itemRequests' && (
+                    <div className="book-requests">
+                    <h1>Book Requests</h1>
+                    <table className="requests-table">
+                      <thead>
+                        <tr>
+                          <th>ISBN</th>
+                          <th>Title</th>
+                          <th>Author</th>
+                          <th>Edition</th>
+                          <th>Genre</th>
+                          <th>Publisher</th>
+                          <th>Status</th>
+                          <th>User ID</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bookRequests.map((request) => (
+                          <tr key={request.requestID}>
+                            <td>{request.ISBN}</td>
+                            <td>{request.bTitle}</td>
+                            <td>{request.bAuthor}</td>
+                            <td>{request.edition}</td>
+                            <td>{request.genre}</td>
+                            <td>{request.publisher}</td>
+                            <td>{request.status.toUpperCase()}</td>
+                            <td>{request.userID}</td>
+                            <td>
+                              <button className="accept-btn" onClick={() => handleAccept(request.requestID)}>Accept</button>
+                              <button className="deny-btn" onClick={() => handleDeny(request.requestID)}>Deny</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
             </div>
         </div>
