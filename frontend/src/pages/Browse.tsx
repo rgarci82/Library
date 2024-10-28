@@ -1,101 +1,219 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './User.css';
+import { jwtDecode } from 'jwt-decode';
 
-// Define the type for each item
-interface Item {
-  id: number;
-  name: string;
-  author: string; // New field for author
-  publisher: string; // New field for publisher
-  status: string; // New field for status
-  type: 'book' | 'media' | 'device'; // New field for item type
-  description: string; // Description will be generated based on type
+enum ItemStatus {
+  Available = 'available',
+  Borrowed = 'borrowed',
 }
 
-// Sample data - Replace this with data from an API
-const mockItems: Item[] = [
-  { id: 1, name: 'Item 1', author: 'Book Author 1', publisher: 'Publisher 1', status: 'Available', type:
-  'book', description: 'Book Title, Book Author, Book Publisher, Available' },
-  { id: 2, name: 'Item 2', author: 'Book Author 2', publisher: 'Publisher 2', status: 'Borrowed', type:
-  'book', description: 'Book Title, Book Author, Book Publisher, Borrowed' },
-  { id: 3, name: 'Item 3', author: 'Book Author 3', publisher: 'Publisher 3', status: 'Available', type:
-  'book', description: 'Book Title, Book Author, Book Publisher, Available' },
-  { id: 4, name: 'Item 4', author: 'Book Author 4', publisher: 'Publisher 4', status: 'Available', type:
-  'book', description: 'Book Title, Book Author, Book Publisher, Available' },
-  { id: 5, name: 'Item 5', author: 'Book Author 5', publisher: 'Publisher 5', status: 'Available', type:
-  'book', description: 'Book Title, Book Author, Book Publisher, Available' },
-  { id: 6, name: 'Item 6', author: 'Media Author 1', publisher: 'Publisher 6', status: 'Available', type:
-  'media', description: 'Media Title, Media Author, Media Publisher, Available' },
-  { id: 7, name: 'Item 7', author: 'Media Author 2', publisher: 'Publisher 7', status: 'Available', type:
-  'media', description: 'Media Title, Media Author, Media Publisher, Available' },
-  { id: 8, name: 'Item 8', author: 'Media Author 3', publisher: 'Publisher 8', status: 'Available', type:
-  'media', description: 'Media Title, Media Author, Media Publisher, Available' },
-  { id: 9, name: 'Item 9', author: 'Media Author 4', publisher: 'Publisher 9', status: 'Available', type:
-  'media', description: 'Media Title, Media Author, Media Publisher, Available' },
-  { id: 10, name: 'Item 10', author: 'Media Author 5', publisher: 'Publisher 10', status: 'Available',
-  type: 'media', description: 'Media Title, Media Author, Media Publisher, Available' },
-  { id: 11, name: 'Item 11', author: 'Device Brand 1', publisher: 'Publisher 11', status: 'Available',
-  type: 'device', description: 'Device Title, Device Brand, Device Model, Available' },
-  { id: 12, name: 'Item 12', author: 'Device Brand 2', publisher: 'Publisher 12', status: 'Available',
-  type: 'device', description: 'Device Title, Device Brand, Device Model, Available' },
-  { id: 13, name: 'Item 13', author: 'Device Brand 3', publisher: 'Publisher 13', status: 'Available',
-  type: 'device', description: 'Device Title, Device Brand, Device Model, Available' },
-  { id: 14, name: 'Item 14', author: 'Device Brand 4', publisher: 'Publisher 14', status: 'Available',
-  type: 'device', description: 'Device Title, Device Brand, Device Model, Available' },
-  { id: 15, name: 'Item 15', author: 'Device Brand 5', publisher: 'Publisher 15', status: 'Available',
-  type: 'device', description: 'Device Title, Device Brand, Device Model, Available' },
-  ];
+// Define the type for each item
+interface Book {
+  ISBN: string;
+  bTitle: string;
+  bAuthor: string;
+  publisher: string;
+  genre: string;
+  edition: number | null;
+}
 
+interface Media {
+  MediaID: number;
+  mTitle: string;
+  mAuthor: string;
+  publisher: string;
+  genre: string;
+  edition: number | null;
+}
+
+interface Device {
+  serialNumber: string;
+  dName: string;
+  brand: string;
+  model: string;
+  status: ItemStatus;
+}
+
+interface JwtPayload {
+  id: number; 
+}
+
+type Item = Book | Media | Device;
 
 const BrowsePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchBy, setSearchBy] = useState<string>('book'); // Default search option
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null); // State for selected item
+  const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
+  
+  const [userData, setUserData] = useState<any>(null);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [allMedia, setAllMedia] = useState<Media[]>([]);
+  const [allDevices, setAllDevices] = useState<Device[]>([]);
+  const [filteredItems, setFilteredItems] = useState<(Book | Media | Device)[]>([]);
 
-  // Filter items based on search term and type
-  const filteredItems = mockItems.filter(item => {
-    const searchValue = searchTerm.toLowerCase();
-    const matchesType = (searchBy === 'book' && item.type === 'book') ||
-    (searchBy === 'media' && item.type === 'media') ||
-    (searchBy === 'device' && item.type === 'device');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-    return matchesType && (item.name.toLowerCase().includes(searchValue) ||
-      item.author.toLowerCase().includes(searchValue) ||
-      item.publisher.toLowerCase().includes(searchValue));
-    });
-
-    // Function to handle opening the details popup
-    const openDetails = (item: Item) => {
+  const openPopup = (item: Item) => {
     setSelectedItem(item);
+    setIsPopupOpen(true);
+  };
+  
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedItem(null); // Reset selected book
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No token found");
+
+            const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
+            if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+            // Use decoded.id directly for fetching user data
+            const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch user data");
+
+            const data = await response.json();
+            setUserData(data);
+        } catch (error) {
+            console.error("Error:", error);
+        }
     };
 
-    // Function to close the details popup
-    const closeDetails = () => {
-    setSelectedItem(null);
-  };
+    fetchUserData();
+}, []);
+
+  useEffect(() => {
+    const fetchAllBooks = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/books', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+  
+        if (!response.ok) throw new Error("Failed to fetch all books");
+  
+        const data = await response.json();
+        setAllBooks(data);
+      } catch (error) {
+          console.error("Error:", error);
+      }
+    }
+    fetchAllBooks();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllMedia = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/media', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+  
+        if (!response.ok) throw new Error("Failed to fetch all media");
+  
+        const data = await response.json();
+        setAllMedia(data);
+      } catch (error) {
+          console.error("Error:", error);
+      }
+    }
+    fetchAllMedia();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllDevices = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/devices', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+  
+        if (!response.ok) throw new Error("Failed to fetch all devices");
+  
+        const data = await response.json();
+        setAllDevices(data);
+      } catch (error) {
+          console.error("Error:", error);
+      }
+    }
+    fetchAllDevices();
+  }, []);
+
+  // Function to filter items based on the search term and selected type
+  useEffect(() => {
+    // Determine which array to filter based on the selected search type
+    let itemsToFilter: Book[] | Media[] | Device[] = [];
+  
+    switch (searchBy) {
+      case 'book':
+        itemsToFilter = allBooks;
+        break;
+      case 'media':
+        itemsToFilter = allMedia;
+        break;
+      case 'device':
+        itemsToFilter = allDevices;
+        break;
+      default:
+        itemsToFilter = [];
+    }
+  
+    // Filter items based on the search term
+    const filtered = itemsToFilter.filter((item) => {
+      if (searchBy === 'book' && 'bTitle' in item) {
+        return (item as Book).bTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      } else if (searchBy === 'media' && 'mTitle' in item) {
+        return (item as Media).mTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      } else if (searchBy === 'device' && 'dName' in item) {
+        return (item as Device).dName.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      return false; // Fallback in case none of the conditions match
+    });
+  
+    // Update the state with the filtered items
+    setFilteredItems(filtered);
+  }, [searchTerm, searchBy, allBooks, allMedia, allDevices]);
+
+
+  console.log(allBooks);
+  
 
   return (
     <div>
       <div>
-      <div style={styles.navbar}>
-        <div style={styles.libraryName}>My Library</div>
-        
-        <div style={styles.navIcons}>
-          <span>🔧</span>
-          <span>👤</span>
+        <div style={styles.navbar}>
+          <div style={styles.libraryName}>My Library</div>
+          <div style={styles.navIcons}>
+            <span>🔧</span>
+            <span>👤</span>
+          </div>
         </div>
-      </div>
       </div>
       <div style={styles.browseContainer}>
         <header style={styles.textContainer}>
-          {/*browsing header texts*/}
           <h1 style={styles.headerTitle}>Browse Items</h1>
           <p style={styles.headerSubtitle}>Find the perfect item for you!</p>
 
-          {/*drop down selections*/}
           <select
             value={searchBy}
-            onChange={(e) => setSearchBy(e.target.value)}
+            onChange={(e) => setSearchBy(e.target.value as 'book' | 'media' | 'device')}
             style={styles.dropdown}
           >
             <option value="book">Book</option>
@@ -103,15 +221,6 @@ const BrowsePage: React.FC = () => {
             <option value="device">Device</option>
           </select>
 
-          {/*request button*/}
-          <button
-            style={styles.requestButton}
-            onClick={() => alert('Redirecting to request page...')}
-          >
-            Request an Item
-          </button>
-
-          {/*search bar*/}
           <div style={styles.searchBar}>
             <input
               type="text"
@@ -124,44 +233,114 @@ const BrowsePage: React.FC = () => {
             />
           </div>
 
-          {/*items grid*/}
+          <button
+            style={styles.requestButton}
+          >
+            Request an Item
+          </button>
+
           <div style={styles.itemsGridContainer}>
             <div style={styles.itemsGrid}>
               {filteredItems.length > 0 ? (
-                filteredItems.map(item => (
-                  <div key={item.id} style={styles.itemCard}>
-                    <h3 style={styles.itemTitle}>{item.name}</h3>
-                    <div style={styles.checkboxContainer}>
-                      <input type="checkbox" id={`borrow-${item.id}`} style={{ marginRight: '5px' }} />
-                      <label htmlFor={`borrow-${item.id}`}>Borrow</label>
-                      <input type="checkbox" id={`hold-${item.id}`} style={{ marginLeft: '10px', marginRight: '5px' }} />
-                      <label htmlFor={`hold-${item.id}`}>Hold</label>
-                    </div>
-                    <button onClick={() => openDetails(item)} style={styles.detailsButton}>Details</button>
-                  </div>
-                ))
+                filteredItems.map((item) => {
+                  if (searchBy === 'book' && 'ISBN' in item) {
+                    const book = item as Book; // Cast to Book type
+                    const publisherText = book.publisher ? ` | ${book.publisher.trim()}` : '';
+                    return (
+                      <div key={book.ISBN} style={styles.itemCard}>
+                        <h3 style={styles.itemTitle}>{book.bTitle}</h3>
+                        <p>
+                          {book.bAuthor}
+                          {publisherText}
+                        </p>
+                        <p style={styles.genreText}>
+                          Genre: {book.genre}
+                        </p>
+                        <div style={styles.buttonContainer}>
+                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.detailsButton} onClick = {() => openPopup(book)}>Details</button>
+                        </div>
+                      </div>
+                    );
+                  } else if (searchBy === 'media' && 'MediaID' in item) {
+                    const media = item as Media; // Cast to Media type
+                    const publisherText = media.publisher ? ` | ${media.publisher.trim()}` : '';
+                    return (
+                      <div key={media.MediaID} style={styles.itemCard}>
+                        <h3 style={styles.itemTitle}>{media.mTitle}</h3>
+                        <p>
+                          {media.mAuthor}
+                          {publisherText}
+                        </p>
+                        <p style={styles.genreText}>
+                          Genre: {media.genre}
+                        </p>
+                        <div style={styles.buttonContainer}>
+                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.detailsButton} onClick = {() => openPopup(media)}>Details</button>
+                        </div>
+                      </div>
+                    );
+                  } else if (searchBy === 'device' && 'serialNumber' in item) {
+                    const device = item as Device; // Cast to Device type
+                    return (
+                      <div key={device.serialNumber} style={styles.itemCard}>
+                        <h3 style={styles.itemTitle}>{device.dName}</h3>
+                        <p>
+                          {device.brand} {device.model}
+                        </p>
+                        <div style={styles.buttonContainer}>
+                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.detailsButton} onClick = {() => openPopup(device)}>Details</button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null; // Fallback if no item type matches
+                })
               ) : (
                 <p style={styles.noItemsText}>No items found.</p>
               )}
             </div>
           </div>
-          
-          {/*details button*/}
-          {selectedItem && (
+          {isPopupOpen && selectedItem && (
             <div style={styles.detailsPopupOverlay}>
               <div style={styles.detailsPopup}>
-                <h2 style={styles.itemTitle}>{selectedItem.name}</h2>
-                <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Author: {selectedItem.author}</p>
-                <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '5px' }}>Publisher: {selectedItem.publisher}</p>
-                <p style={{ fontSize: '1.2rem', color: '#777' }}>Status: {selectedItem.status}</p>
-                <button onClick={closeDetails} style={styles.closeButton}>Close</button>
+                {'ISBN' in selectedItem ? (
+                  <>
+                    <h3>{selectedItem.bTitle}</h3>
+                    <p>ISBN: {selectedItem.ISBN}</p>
+                    <p>Author: {selectedItem.bAuthor}</p>
+                    <p>Publisher: {selectedItem.publisher}</p>
+                    <p>Genre: {selectedItem.genre}</p>
+                    <p>Edition: {selectedItem.edition ?? 'N/A'}</p>
+                  </>
+                ) : 'MediaID' in selectedItem ? (
+                  <>
+                    <h3>{selectedItem.mTitle}</h3>
+                    <p>MediaID: {selectedItem.MediaID}</p>
+                    <p>Director: {selectedItem.mAuthor}</p>
+                    <p>Genre: {selectedItem.genre}</p>
+                    <p>Edition: {selectedItem.edition ?? 'N/A'}</p>
+                  </>
+                ) : 'serialNumber' in selectedItem ? (
+                  <>
+                    <h3>{selectedItem.dName}</h3>
+                    <p>Serial Number: {selectedItem.serialNumber}</p>
+                    <p>Brand: {selectedItem.brand}</p>
+                    <p>Model: {selectedItem.model}</p>
+                    <p>Status: {selectedItem.status}</p>
+                  </>
+                ) : null}
+                <button style={styles.closeButton} onClick={closePopup}>
+                  Close
+                </button>
               </div>
             </div>
           )}
         </header>
       </div>
     </div>
-    
   );
 };
 
@@ -258,11 +437,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'box-shadow 0.3s ease',
     backgroundColor: '#f7f7f7',
   },
+  genreText: {
+    marginTop: '5px',
+  },
   itemsGridContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start', // Aligns grid at the top of the container
-    height: '500px', // Set height to control scroll area
+    maxHeight: '80vh',
     overflowY: 'auto', // Adds vertical scroll
     padding: '10px',
     width: '100%',
@@ -293,11 +475,22 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#333',
     margin: '10px 0',
   },
-  checkboxContainer: {
-    marginBottom: '10px',
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end', // Aligns buttons to the right
+    marginTop: '10px', // Optional margin to space buttons from the content above
+  },
+  borrowButton: {
+    padding: '10px 25px',
+    backgroundColor: '#C8102E',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginRight: '10px', // Adds space between buttons
   },
   detailsButton: {
-    padding: '5px 10px',
+    padding: '10px 20px',
     backgroundColor: '#C8102E',
     color: '#fff',
     border: 'none',
