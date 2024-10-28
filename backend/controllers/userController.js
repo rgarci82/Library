@@ -122,6 +122,58 @@ export async function getUserFine(req, res) {
     }
 }
 
+export async function getUserBorrowedBooks(req, res) {
+    try {
+        const { userID } = req.params;
+
+        // SQL query to get all books borrowed by the user
+        const borrowedBooksResult = await pool.query(
+            `SELECT b.ISBN, b.bTitle, b.bAuthor, b.publisher, b.genre, b.edition, bc.ItemID
+             FROM bookborrowed bb
+             JOIN bookcopy bc ON bb.itemID = bc.ItemID
+             JOIN book b ON bc.ISBN = b.ISBN
+             WHERE bb.userID = ?`,
+            [userID]
+        );
+
+        // Extract the books from the result
+        const borrowedBooks = borrowedBooksResult[0] || []; // Ensure an empty array if no results
+
+        res.json({ borrowedBooks }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's borrowed books:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function getUserBorrowedMedia(req, res) {
+    try {
+        const { userID } = req.params;
+
+        // SQL query to get all books borrowed by the user
+        const borrowedMediaResult = await pool.query(
+            `SELECT m.MediaID, m.mTitle, m.mAuthor, m.publisher, m.genre, m.edition, mb.ItemID
+             FROM mediaborrowed mb
+             JOIN mediacopy mc ON mb.itemID = mc.itemID
+             JOIN media m ON mc.MediaID = m.MediaID
+             WHERE mb.userID = ?`,
+            [userID]
+        );
+
+        // Extract the books from the result
+        const borrowedMedia = borrowedMediaResult[0] || []; // Ensure an empty array if no results
+
+        console.log(borrowedMedia);
+        res.json({ borrowedMedia }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's borrowed books:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+
+
+
 
 
 

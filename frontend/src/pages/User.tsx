@@ -5,23 +5,39 @@ import { jwtDecode } from 'jwt-decode';
 interface JwtPayload {
   id: number; 
 }
+interface BorrowedBook {
+  ISBN: string;
+  bTitle: string;
+  bAuthor: string;
+  publisher: string;
+  genre: string;
+  edition: number | null; // edition can be a string or null
+  ItemID: number; // Assuming ItemID is a number
+}
+
+interface BorrowedMedia {
+  MediaID: number;
+  mTitle: string;
+  mAuthor: string;
+  publisher: string;
+  genre: string;
+  edition: number | null;
+  ItemID: number;
+}
+
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
   const [userData, setUserData] = useState<any>(null);
   const [userDataLoading, setUserDataLoading] = useState(true);
   const [userFine, setUserFine] = useState<any>(null);
+  const [userBorrowedBooks, setUserBorrowedBooks] = useState<BorrowedBook[]>([]);
+  const [userBorrowedMedia, setUserBorrowedMedia] = useState<BorrowedMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
-
-
-  const booksData = [
-    { title: 'Book 1', borrowedDate: '2024-01-01', dueDate: '2024-01-14', status: 'Borrowed' },
-    { title: 'Book 2', borrowedDate: '2024-01-01', dueDate: '2024-01-28', status: 'Borrowed' },
-  ];
 
   const mediaData = [
     { title: 'Media 1', borrowedDate: '2024-01-01', dueDate: '2024-01-14', status: 'Borrowed' },
@@ -33,9 +49,6 @@ const UserPage: React.FC = () => {
     { title: 'Device 2', borrowedDate: '2024-01-01', dueDate: '2024-01-28', status: 'Borrowed' },
   ];
 
-  const finesData = [
-    { fine: 0.0}
-  ];
 
   const itemRequestedData = [
     { title: 'Item 1', requestDate: '2024-01-01', status: 'Pending' },
@@ -51,12 +64,6 @@ const UserPage: React.FC = () => {
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     const notifications: { reminder: string }[] = [];
 
-    // Check books
-    booksData.forEach(book => {
-      if (book.dueDate < today) {
-        notifications.push({ reminder: `Your book "${book.title}" is overdue!` });
-      }
-    });
 
     // Check media
     mediaData.forEach(item => {
@@ -147,6 +154,61 @@ const UserPage: React.FC = () => {
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
 
+  // Second useEffect to fetch user fines after userData is fetched
+  useEffect(() => {
+    if (userDataLoading || !userData?.userID) return;
+
+    const fetchUserBorrowedBooks = async () => {
+      setLoading(true);
+      try {
+        const borrowedBooksResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/booksBorrowed`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!borrowedBooksResponse.ok) throw new Error("Failed to fetch borrowed books");
+
+        const booksBorrowedData = await borrowedBooksResponse.json();
+        setUserBorrowedBooks(booksBorrowedData.borrowedBooks);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  fetchUserBorrowedBooks();
+}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
+
+
+  // Second useEffect to fetch user fines after userData is fetched
+  useEffect(() => {
+    if (userDataLoading || !userData?.userID) return;
+
+    const fetchUserBorrowedMedia = async () => {
+      setLoading(true);
+      try {
+        const borrowedMediaResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaBorrowed`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!borrowedMediaResponse.ok) throw new Error("Failed to fetch borrowed media");
+
+        const mediaBorrowedData = await borrowedMediaResponse.json();
+        setUserBorrowedMedia(mediaBorrowedData.borrowedMedia);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  fetchUserBorrowedMedia();
+}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
+
   //END OF DUMMY DATA
   //****************************************************************************** 
 
@@ -170,7 +232,7 @@ const UserPage: React.FC = () => {
           <input
             type="text"
             className="search-bar"
-            placeholder="Search..."
+            placeholder="Browse for items..."
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 window.location.href = '/browse';
@@ -197,27 +259,35 @@ const UserPage: React.FC = () => {
       <div className="info-boxes">
         {userData ? (
           <>
-            {activeTab === 'books' && booksData.map((book, index) => (
-              <div key={index} className="info-box books-box">
-                <h3>{book.title}</h3>
-                <ul>
-                  <li>FIRST NAME: {userData.firstName}</li>
-                  <li>Due Date: {book.dueDate}</li>
-                  <li>Status: {book.status}</li>
-                </ul>
-              </div>
-            ))}
+            {activeTab === 'books' && userBorrowedBooks.length > 0 && (
+                userBorrowedBooks.map((book) => (
+                    <div key={book.ItemID} className="info-box books-box">
+                        <h3>Title: {book.bTitle}</h3>
+                        <ul>
+                            <li>Author: {book.bAuthor}</li>
+                            <li>Publisher: {book.publisher}</li>
+                            <li>Genre: {book.genre}</li>
+                            <li>Edition: {book.edition ? book.edition : 'N/A'}</li>
+                            <li>ItemID: {book.ItemID}</li>
+                        </ul>
+                    </div>
+                ))
+            )}
 
-            {activeTab === 'media' && mediaData.map((media, index) => (
-              <div key={index} className="info-box media-box">
-                <h3>{media.title}</h3>
-                <ul>
-                  <li>Borrowed Date: {media.borrowedDate}</li>
-                  <li>Due Date: {media.dueDate}</li>
-                  <li>Status: {media.status}</li>
-                </ul>
-              </div>
-            ))}
+            {activeTab === 'media' && userBorrowedMedia.length > 0 && (
+                userBorrowedMedia.map((media) => (
+                    <div key={media.ItemID} className="info-box books-box">
+                        <h3>Title: {media.mTitle}</h3>
+                        <ul>
+                            <li>Author: {media.mAuthor}</li>
+                            <li>Publisher: {media.publisher}</li>
+                            <li>Genre: {media.genre}</li>
+                            <li>Edition: {media.edition ? media.edition : 'N/A'}</li>
+                            <li>ItemID: {media.ItemID}</li>
+                        </ul>
+                    </div>
+                ))
+            )}  
 
             {activeTab === 'devices' && devicesData.map((device, index) => (
               <div key={index} className="info-box devices-box">
@@ -230,14 +300,14 @@ const UserPage: React.FC = () => {
               </div>
             ))}
 
-            {activeTab === 'fines' && finesData.map((fine, index) => (
-              <div key={index} className="info-box fines-box">
+            {activeTab === 'fines' && (
+              <div className="info-box fines-box">
                 <h3>Fine</h3>
                 <ul>
                   <li>Amount: ${userFine.totalFine}</li>
                 </ul>
               </div>
-            ))}
+            )}
 
             {activeTab === 'itemRequested' && itemRequestedData.map((item, index) => (
               <div key={index} className="info-box item-requested-box">
