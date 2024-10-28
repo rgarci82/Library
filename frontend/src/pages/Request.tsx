@@ -1,107 +1,256 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+
+interface JwtPayload {
+  id: number; 
+}
 
 const Request: React.FC = () => {
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [userType, setUserType] = useState<string>("Student");
-  const [phoneNum, setPhoneNum] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
+    const [step, setStep] = useState(1);
+    const [itemType, setItemType] = useState<string>("Book");
+    const [userID, setUserID] = useState<number>();
+    const [bookTitle, setBookTitle] = useState<string>("");
+    const [bookISBN, setISBN] = useState<string>("");
+    const [bookAuthor, setBookAuthor] = useState<string>("");
+    const [bookPublisher, setBookPublisher] = useState<string>("");
+    const [bookGenre, setBookGenre] = useState<string>("");
+    const [bookEdition, setBookEdition] = useState<string>("");
 
-  const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!firstName || !lastName || !userType || !phoneNum) {
-      setError("Please fill in all fields");
-      return;
-    }
-    if (phoneNum.length !== 10) {
-      setError("Phone number must be exactly 10 digits");
-      return;
-    }
+    const [mediaTitle, setMediaTitle] = useState<string>("");
+    const [mediaISBN, setMediaISBN] = useState<string>("");
+    const [mediaAuthor, setMediaAuthor] = useState<string>("");
+    const [mediaPublisher, setMediaPublisher] = useState<string>("");
+    const [mediaGenre, setMediaGenre] = useState<string>("");
+    const [mediaEdition, setMediaEdition] = useState<string>("");
 
-    try {
-      const response = await fetch('http://localhost:3000/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          phoneNum,
-          userType,
-        }),
-      });
+    const [deviceTitle, setDeviceTitle] = useState<string>("");
+    const [serialNumber, setSerialNumber] = useState<string>("");
+    const [brand, setBrand] = useState<string>("");
+    const [model, setModel] = useState<string>("");
 
-      const data = await response.json();
+    const [error, setError] = useState<string>("");
+    const navigate = useNavigate();
 
-      if (response.ok) {
-        console.log("User created successfully", data);
-        navigate('/login/');
-        // Handle successful user creation, e.g., redirect or display success message
+    const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+    
+      if (step === 1) {
+        if (!itemType) {
+          setError("Please fill in all fields");
+          return;
+        }
+        setStep(2);
       } else {
-        setError(data.message || "An error occurred");
+        if (itemType === 'Book' && (!bookTitle || !bookISBN || !bookAuthor || !bookPublisher || !bookGenre)) {
+          setError("Please fill in all fields");
+          return;
+        }
+        else if (itemType === 'Media' && (!mediaTitle || !mediaISBN || !mediaAuthor || !mediaPublisher || !mediaGenre)){
+          setError("Please fill in all fields");
+        }
+        else if (itemType === 'Device' && (!deviceTitle || !serialNumber || !brand || !model)){
+          setError("Please fill in all fields");
+        }
+        
+        if (itemType === 'Book'){
+          try {
+            const response = await fetch('http://localhost:3000/api/books/request', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userID,
+                bookTitle,
+                bookISBN,
+                bookAuthor,
+                bookPublisher,
+                bookGenre,
+                bookEdition,
+                status: "pending",
+              }),
+            });
+      
+            const data = await response.json();
+      
+            if (response.ok) {
+              console.log("Book request created successfully", data);
+              navigate('/user/');
+              // Handle successful user creation, e.g., redirect or display success message
+            } else {
+              setError(data.message || "An error occurred");
+            }
+          } catch (error) {
+            setError("Failed to create book request. Please try again.");
+            console.error("Error:", error);
+          }
+        }
       }
-    } catch (error) {
-      setError("Failed to create user. Please try again.");
-      console.error("Error:", error);
-    }
-  };
+    };
+    
+    useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const token = localStorage.getItem("token");
+              if (!token) throw new Error("No token found");
+  
+              const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
+              if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+  
+              // Use decoded.id directly for fetching user data
+              const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                  },
+              });
+  
+              if (!response.ok) {
+                const errorMessage = await response.text(); // Fetch the error message
+                throw new Error(`Failed to fetch user data: ${errorMessage}`);
+              }
+  
+              const data = await response.json();
+              setUserID(data.userID);
+          } catch (error) {
+              console.error("Error:", error);
+          }
+      };
+  
+      fetchUserData();
+  }, []);
 
+
+  console.log(userID);
+  console.log(bookISBN);
   return (
     <div style={styles.container}>
       <div style={styles.registrationBox}>
         <h1 style={styles.title}>Registration</h1>
         <form onSubmit={handleNext} style={styles.form}>
           {error && <p style={styles.error}>{error}</p>}
-          <div style={styles.row}>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Item Type</label>
-              <select
-                value={userType}
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  setUserType(e.target.value);
-                }}
-                required
-                style={styles.input}
-              >
-                <option value="Book">Book</option>
-                <option value="Media">Media</option>
-                <option value="Device">Media</option>
-              </select>
-            </div>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Phone Number</label>
-              <input
-                type="text"
-                value={phoneNum}
-                onChange={(e) => {
-                  // Allow only numeric values
-                  const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-                  setPhoneNum(sanitizedValue);
-                }}
-                placeholder="Enter your phone number"
-                required
-                style={styles.input}
-              />
-            </div>
-          </div>
+          {step === 1 && (
+            <>
+              <div style={styles.inputGroup}>
+                  <label style={styles.label}>Item Type</label>
+                  <select
+                    value={itemType}
+                    onChange={(e) => {
+                      setItemType(e.target.value);
+                    }}
+                    required
+                    style={styles.input}
+                  >
+                    <option value="Book">Book</option>
+                    <option value="Media">Media</option>
+                    <option value="Device">Device</option>
+                  </select>
+                </div>
+            </>
+          )}
+          {step === 2 && itemType === 'Book' && (
+            <>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Book Title</label>
+                  <input
+                    type="text"
+                    value={bookTitle}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setBookTitle(sanitizedValue);
+                    }}
+                    placeholder="Enter the book title"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>ISBN</label>
+                  <input
+                    type="text"
+                    value={bookISBN}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setISBN(sanitizedValue);
+                    }}
+                    placeholder="Enter the ISBN"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Book Author</label>
+                  <input
+                    type="text"
+                    value={bookAuthor}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setBookAuthor(sanitizedValue);
+                    }}
+                    placeholder="Enter the author"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Book Publisher</label>
+                  <input
+                    type="text"
+                    value={bookPublisher}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setBookPublisher(sanitizedValue);
+                    }}
+                    placeholder="Enter the publisher"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Genre</label>
+                  <input
+                    type="text"
+                    value={bookGenre}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value;
+                      setBookGenre(sanitizedValue);
+                    }}
+                    placeholder="Enter the genre"
+                    required
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>Edition (Optional)</label>
+                  <input
+                    type="text"
+                    value={bookEdition}
+                    onChange={(e) => {
+                      const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+                      setBookEdition(sanitizedValue);
+                    }}
+                    placeholder="Enter the edition"
+                    style={styles.input}
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <button type="submit" style={styles.button}>
-            {"Request Item"}
+            {step === 1 ? "Next" : "Request Book"}
           </button>
-          <div style={styles.links}>
-            <a href="/login" style={styles.link}>
-              Already have an account? Login here
-            </a>
-          </div>
         </form>
       </div>
     </div>
   );
 };
-
 
 
 const styles : { [key: string]: React.CSSProperties }= {
