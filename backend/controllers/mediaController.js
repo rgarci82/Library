@@ -47,7 +47,7 @@ export async function createMedia(req, res) {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-<<<<<<< HEAD
+}
 
 export async function requestMedia(req, res) {
   const { userID, mediaISBN, mediaTitle, mediaAuthor, mediaPublisher, mediaGenre, mediaEdition, status } = req.body;
@@ -107,8 +107,6 @@ export async function getMediaByID(req, res){
     } catch (error){
         res.status(500).json({message: error.message})
     }
-=======
->>>>>>> main
 }
 
 export async function getMediaByID(req, res) {
