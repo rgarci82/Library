@@ -25,6 +25,24 @@ interface BorrowedMedia {
   ItemID: number;
 }
 
+interface BorrowedDevice {
+  DeviceID: number;
+  dName: string;
+  borrowDate: Date;
+  dueDate: Date;
+}
+interface RequestedBooks {
+  bTitle: string;
+  RequestDate: Date;
+  status: string;
+}
+
+interface RequestedMedia {
+  dName: string;
+  RequestDate: Date;
+  status: string;
+}
+
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
@@ -33,6 +51,9 @@ const UserPage: React.FC = () => {
   const [userFine, setUserFine] = useState<any>(null);
   const [userBorrowedBooks, setUserBorrowedBooks] = useState<BorrowedBook[]>([]);
   const [userBorrowedMedia, setUserBorrowedMedia] = useState<BorrowedMedia[]>([]);
+  const [userBorrowedDevice, setUserBorrowedDevice] = useState<BorrowedDevice[]>([]);
+  const [userRequestedBooks, setUserRequestedBooks] = useState<RequestedBooks[]>([]);
+  const [userRequestedMedia, setUserRequestedMedia] = useState<RequestedMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -209,14 +230,6 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
-
-
-
-
-
-
-
-
   //END OF DUMMY DATA
   //****************************************************************************** 
 
@@ -227,7 +240,7 @@ const UserPage: React.FC = () => {
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
-  
+
 
   return (
     <div>
