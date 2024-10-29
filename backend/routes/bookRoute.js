@@ -2,6 +2,9 @@ import express from "express";
 import {
   getBooks,
   createBook,
+  getBookCopy,
+  borrowBook,
+  holdBook,
   requestBook,
   getBookByISBN,
   updateBook,
@@ -15,6 +18,9 @@ const route = express.Router();
 
 route.get("/books", getBooks);
 route.post("/books", createBook);
+route.get("/books/:ISBN/bookcopy", getBookCopy);
+route.post("/books/borrow", borrowBook);
+route.post("/books/hold", holdBook);
 route.post("/books/request", requestBook);
 route.get("/books/request", getAllBookRequests);
 route.put("/books/request/accept/:requestID", bookRequestAccepted);

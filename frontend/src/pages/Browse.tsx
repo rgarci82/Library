@@ -17,6 +17,10 @@ interface Book {
   edition: number | null;
 }
 
+interface BookCopy {
+  ItemID: number;
+  status: ItemStatus;
+}
 interface Media {
   MediaID: number;
   mTitle: string;
@@ -47,12 +51,66 @@ const BrowsePage: React.FC = () => {
   
   const [userData, setUserData] = useState<any>(null);
   const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [bookCopy, setBookCopy] = useState<BookCopy[]>([]);
   const [allMedia, setAllMedia] = useState<Media[]>([]);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [filteredItems, setFilteredItems] = useState<(Book | Media | Device)[]>([]);
 
+  const [showHoldPopup, setShowHoldPopup] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+
+  const [error, setError] = useState<string | null>(null); // Initialize error state
+
+  const fetchBookCopies = async (ISBN : string, book : Book) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/books/${ISBN}/bookCopy`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all books");
+
+      const data = await response.json();
+
+      if (data.length > 0){
+        borrowBook(book);
+        return;
+      }
+      else if (data.length === 0){
+        setShowHoldPopup(true);
+      }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  }
+
+  const borrowBook = async (book: Book) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/books/borrow', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData, book }), // Send book as JSON
+      });
+  
+      const data = await response.json(); // Parse JSON after fetch completes
+  
+      if (response.ok) {
+        console.log("Book borrowed successfully", data);
+      } else {
+        setError(data.message || "An error occurred");
+      }
+    } catch (error) {
+      setError("Failed to borrow book. Please try again.");
+      console.error("Error:", error);
+    }
+  };
+  
+
 
   const openPopup = (item: Item) => {
     setSelectedItem(item);
@@ -199,8 +257,6 @@ const BrowsePage: React.FC = () => {
     setFilteredItems(filtered);
   }, [searchTerm, searchBy, allBooks, allMedia, allDevices]);
 
-
-  console.log(allBooks);
   
 
   return (
@@ -266,7 +322,7 @@ const BrowsePage: React.FC = () => {
                           Genre: {book.genre}
                         </p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.borrowButton} onClick={() => fetchBookCopies(book.ISBN, book)}>Borrow</button>
                           <button style={styles.detailsButton} onClick = {() => openPopup(book)}>Details</button>
                         </div>
                       </div>
@@ -312,6 +368,23 @@ const BrowsePage: React.FC = () => {
               )}
             </div>
           </div>
+          {showHoldPopup && (
+            <div style={styles.detailsPopupOverlay}>
+              <div style={styles.detailsPopup}>
+                <h3>No copies available</h3>
+                <p style={styles.genreText}>This book is currently not available. Would you like to place it on hold?</p>
+                <div style={styles.holdCloseContainer}>
+                  <button onClick={() => {
+                    // Handle hold logic here
+                    setShowHoldPopup(false); // Close the popup
+                  }} style={styles.closeButton}>
+                    Hold
+                  </button>
+                  <button onClick={() => setShowHoldPopup(false)} style={styles.closeButton}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
           {isPopupOpen && selectedItem && (
             <div style={styles.detailsPopupOverlay}>
               <div style={styles.detailsPopup}>
@@ -534,6 +607,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#e94e77',
     color: '#fff',
     cursor: 'pointer',
+  },
+  holdCloseContainer:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '15px',
   },
   noItemsText: {
     textAlign: 'center',
