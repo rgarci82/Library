@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import './AdminDashboard.css';
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
+import { useNavigate } from "react-router-dom";
 
 type ItemType = 'books' | 'media' | 'devices';
 
@@ -69,6 +70,8 @@ interface DeviceRequest{
 }
 
 const AdminDashboard = () => {
+    const navigate = useNavigate()
+
     const [activeTab, setActiveTab] = useState('books');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -502,6 +505,12 @@ const AdminDashboard = () => {
         fetchDeviceRequests();
     }, []);
 
+    const handleSignOut = () => {
+        navigate('/')
+        localStorage.clear();
+        
+    }
+
     return (
         <div>
             <div className="navbar">
@@ -510,20 +519,7 @@ const AdminDashboard = () => {
                     </div>
                     
                     <div className="navbar-section search-section">
-                    <input
-                        type="text"
-                        className="search-bar"
-                        placeholder="Search..."
-                        onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            window.location.href = '/browse';
-                        }
-                        }}
-                    />
-                    <div className="nav-icons">
-                        <span>🔧</span>
-                        <span>👤</span>
-                    </div>
+                    <button onClick={() => handleSignOut()}>Sign Out</button>
                 </div>
             </div>
             <div className="navbar-section tabs">

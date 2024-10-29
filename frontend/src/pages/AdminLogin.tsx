@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 interface AdminLoginProps {
   onLogin: () => void;
@@ -48,6 +48,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       console.error("Error:", error);
     }
   };
+
 
   return (
     <div style={styles.container}>

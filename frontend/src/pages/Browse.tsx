@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useLocation } from 'react-router-dom';
 
 enum ItemStatus {
   Available = 'available',
@@ -40,6 +41,7 @@ interface JwtPayload {
 type Item = Book | Media | Device;
 
 const BrowsePage: React.FC = () => {
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
   
@@ -61,6 +63,13 @@ const BrowsePage: React.FC = () => {
     setIsPopupOpen(false);
     setSelectedItem(null); // Reset selected book
   };
+
+  useEffect(() => {
+    // Get the search term from the URL query parameter
+    const params = new URLSearchParams(location.search);
+    const search = params.get('search');
+    if (search) setSearchTerm(search);
+}, [location]);
 
   useEffect(() => {
     const fetchUserData = async () => {

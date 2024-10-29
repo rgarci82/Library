@@ -12,12 +12,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./pages/ProtectedRouteAdmin";
 
 const App: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleAdminLogin = () => {
-    setIsAdmin(true);
-  };
-
+    localStorage.setItem("isAdmin", "True")
+  }; 
 
   return (
     <Router>
@@ -28,7 +26,7 @@ const App: React.FC = () => {
         <Route path="/user" element={<User />} /> {/* Ensure your file is Users.tsx */}
         <Route path="/adminLogin" element={<AdminLogin onLogin={handleAdminLogin} />} />
         <Route path="/adminRegister" element={<AdminRegister />} />
-        <Route path="/adminDashboard" element={<ProtectedRoute isAdmin={isAdmin} element={<AdminDashboard />} />} />
+        <Route path="/adminDashboard" element={<ProtectedRoute element={<AdminDashboard />} />} />
         <Route path="/browse" element={<Browse />} />
         <Route path="/request" element={<Request />} />
       </Routes>
