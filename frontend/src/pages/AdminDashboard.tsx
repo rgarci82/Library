@@ -611,7 +611,7 @@ const AdminDashboard = () => {
                                     required
                                 />
                             </div>
-                            <button type="submit" className="submit-button">Create Media</button>
+                            <button type="submit" className="submit-button">Create Book</button>
                         </form>
                         {successMessage && <div className="success-message">{successMessage}</div>}
                         {errorMessage && <div className="error-message">{errorMessage}</div>}
@@ -698,7 +698,7 @@ const AdminDashboard = () => {
                                     required
                                 />
                             </div>
-                            <button type="submit" className="submit-button">Create Book</button>
+                            <button type="submit" className="submit-button">Create Media</button>
                         </form>
                         {successMessage && <div className="success-message">{successMessage}</div>}
                         {errorMessage && <div className="error-message">{errorMessage}</div>}
