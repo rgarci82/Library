@@ -64,7 +64,7 @@ const BrowsePage: React.FC = () => {
 
   const fetchBookCopies = async (ISBN : string, book : Book) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/books/${ISBN}/bookCopy`, {
+      const response = await fetch(`https://library-qlu6.onrender.com/api/books/${ISBN}/bookCopy`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const BrowsePage: React.FC = () => {
 
   const borrowBook = async (book: Book) => {
     try {
-      const response = await fetch('http://localhost:3000/api/books/borrow', {
+      const response = await fetch('https://library-qlu6.onrender.com/api/books/borrow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ const BrowsePage: React.FC = () => {
             if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
             // Use decoded.id directly for fetching user data
-            const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/users/${decoded.id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -162,7 +162,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllBooks = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/books', {
+        const response = await fetch('https://library-qlu6.onrender.com/api/books', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllMedia = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/media', {
+        const response = await fetch('https://library-qlu6.onrender.com/api/media', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllDevices = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/devices', {
+        const response = await fetch('https://library-qlu6.onrender.com/api/devices', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

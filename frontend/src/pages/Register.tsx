@@ -32,7 +32,7 @@ const Register: React.FC = () => {
         }
     
         try {
-          const response = await fetch('http://localhost:3000/api/users/register', {
+          const response = await fetch('https://library-qlu6.onrender.com/api/users/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

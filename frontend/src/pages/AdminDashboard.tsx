@@ -140,7 +140,7 @@ const AdminDashboard = () => {
     
 
         try {
-            const response = await fetch('http://localhost:3000/api/books', {
+            const response = await fetch('https://library-qlu6.onrender.com/api/books', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ const AdminDashboard = () => {
         };
     
         try {
-            const response = await fetch('http://localhost:3000/api/media', {
+            const response = await fetch('https://library-qlu6.onrender.com/api/media', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ const AdminDashboard = () => {
         };
     
         try {
-            const response = await fetch('http://localhost:3000/api/devices', {
+            const response = await fetch('https://library-qlu6.onrender.com/api/devices', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ const AdminDashboard = () => {
         else if ('serialNumber' in selectedItemDelete) id = selectedItemDelete.serialNumber;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/${selectedItemDelete.itemType}/${id}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/${selectedItemDelete.itemType}/${id}`, {
                 method: 'DELETE',
             });
 
@@ -318,7 +318,7 @@ const AdminDashboard = () => {
 
     const handleAccept = async (requestID: number) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/books/request/accept/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/books/request/accept/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -334,7 +334,7 @@ const AdminDashboard = () => {
 
     const handleMediaAccept = async (requestID: number) =>{
         try {
-            const response = await fetch(`http://localhost:3000/api/media/request/accept/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/media/request/accept/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -350,7 +350,7 @@ const AdminDashboard = () => {
 
     const handleDeviceAccept = async (requestID: number) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/devices/request/accept/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/devices/request/accept/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -366,7 +366,7 @@ const AdminDashboard = () => {
 
     const handleDeviceDeny = async (requestID: number) => {
         try{
-            const response = await fetch(`http://localhost:3000/api/devices/request/deny/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/devices/request/deny/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -382,7 +382,7 @@ const AdminDashboard = () => {
 
     const handleMediaDeny = async (requestID: number) => {
         try{
-            const response = await fetch(`http://localhost:3000/api/media/request/deny/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/media/request/deny/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -398,7 +398,7 @@ const AdminDashboard = () => {
 
     const handleDeny = async (requestID: number) => {
         try{
-            const response = await fetch(`http://localhost:3000/api/books/request/deny/${requestID}`, {
+            const response = await fetch(`https://library-qlu6.onrender.com/api/books/request/deny/${requestID}`, {
                 method: 'PUT'
             })
             if (response.status === 200) {
@@ -414,7 +414,7 @@ const AdminDashboard = () => {
 
     const fetchBooks = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/books');
+        const response = await fetch('https://library-qlu6.onrender.com/api/books');
         if (!response.ok) {
           throw new Error('Failed to fetch books');
         }
@@ -427,7 +427,7 @@ const AdminDashboard = () => {
 
     const fetchMedia = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/media');
+          const response = await fetch('https://library-qlu6.onrender.com/api/media');
           if (!response.ok) {
             throw new Error('Failed to fetch books');
           }
@@ -440,7 +440,7 @@ const AdminDashboard = () => {
 
     const fetchDevies = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/devices');
+          const response = await fetch('https://library-qlu6.onrender.com/api/devices');
           if (!response.ok) {
             throw new Error('Failed to fetch books');
           }
@@ -453,7 +453,7 @@ const AdminDashboard = () => {
     
     const fetchBookRequests = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/books/request');
+            const response = await fetch('https://library-qlu6.onrender.com/api/books/request');
             if (!response.ok) {
               throw new Error('Failed to fetch books');
             }
@@ -466,7 +466,7 @@ const AdminDashboard = () => {
 
     const fetchMediaRequests = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/media/request');
+            const response = await fetch('https://library-qlu6.onrender.com/api/media/request');
             if (!response.ok) {
               throw new Error('Failed to fetch books');
             }
@@ -479,7 +479,7 @@ const AdminDashboard = () => {
 
     const fetchDeviceRequests = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/devices/request');
+            const response = await fetch('https://library-qlu6.onrender.com/api/devices/request');
             if (!response.ok) {
               throw new Error('Failed to fetch books');
             }
