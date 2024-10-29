@@ -29,6 +29,4 @@ app.use("/api", deviceRoutes);
 app.use("/api", usersRoutes);
 app.use("/api", adminRoutes);
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+export default app;
