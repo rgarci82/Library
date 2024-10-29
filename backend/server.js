@@ -13,11 +13,10 @@ const port = 3000;
 dotenv.config();
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://library-pied-omega.vercel.app"],
-  })
-);
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://library-pied-omega.vercel.app' // Allow requests from your frontend
+}));
 
 app.get("/", (req, res) => {
   res.send("hello world!");
