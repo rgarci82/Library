@@ -105,21 +105,20 @@ export async function borrowBook(req, res) {
     }
 
     const userID = userData.userID;
+    const dueDate = '2024-10-30 18:00:00';
     const itemID = availableCopy[0].itemID;
 
-    console.log(userID);
-    console.log(itemID);
-    // Insert the borrow record into the 'bookborrowed' table
-    /*const [borrowResult] = await pool.query(
-      `INSERT INTO bookborrowed (userID, itemID) VALUES (?, ?)`,
-      [userID, itemID]
+    //Insert the borrow record into the 'bookborrowed' table
+    const [borrowResult] = await pool.query(
+      `INSERT INTO bookborrowed (userID, dueDate, itemID) VALUES (?, ?, ?)`,
+      [userID, dueDate, itemID]
     );
 
     // Update the status of the borrowed book copy in the 'bookcopy' table
     const [updateResult] = await pool.query(
       `UPDATE bookcopy SET status = 'borrowed' WHERE itemID = ?`,
       [itemID]
-    );*/
+    );
 
     // Return a success response with a 201 status
     res.status(201).json({
@@ -127,8 +126,9 @@ export async function borrowBook(req, res) {
       itemID: itemID
     });
   } catch (error) {
-    console.error("Error occurred while borrowing this book:", error); // Log the error for debugging
-    res.status(500).json({ message: error.message });
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
   }
 }
 

@@ -75,6 +75,7 @@ const BrowsePage: React.FC = () => {
 
       if (data.length > 0){
         borrowBook(book);
+        return;
       }
       else if (data.length === 0){
         setShowHoldPopup(true);
