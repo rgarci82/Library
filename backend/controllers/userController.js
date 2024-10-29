@@ -170,8 +170,80 @@ export async function getUserBorrowedMedia(req, res) {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+//hanna device borrowed
 
+export async function getUserBorrowedDevice(req, res) {
+  try {
+      const { userID } = req.params;
 
+      
+      const borrwedDeviceResult = await pool.query(
+          `SELECT device.dName,deviceborrowed.borrowDate,deviceborrowed.dueDate
+FROM 
+    device
+JOIN 
+    deviceborrowed ON device.serialNumber = deviceborrowed.serialNumber;
+
+           WHERE mb.userID = ?`,
+          [userID]
+      );
+
+      // Extract the books from the result
+      const borrowedDevice = borrwedDeviceResult[0] || []; // Ensure an empty array if no results
+
+      console.log(borrowedDevice);
+      res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
+  } catch (error) {
+      console.error("Error fetching user's borrowed device:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+//requestedbooks
+export async function getUserRequestedBooks(req, res) {
+  try {
+      const { userID } = req.params;
+
+     
+      const requestedBooksResult = await pool.query(
+        'SELECT * FROM bookrequest WHERE userID = ? ',
+    
+          [userID]
+      );
+
+     
+      const requestedBooks = requestedBooksResult[0] || []; // Ensure an empty array if no results
+
+      console.log(requestedBooks);
+      res.json({ requestedBooks });
+  } catch (error) {
+      console.error("Error fetching user's requested books:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+//requested media
+
+export async function getUserRequestedMedia(req, res) {
+  try {
+      const { userID } = req.params;
+
+     
+      const requestedMediaResult = await pool.query(
+        'SELECT device.dName,devicerequest.requestDate,devicerequest.status FROM devicerequest JOIN device ON devicerequest.serialNumber = device.serialNumber;'
+          [userID]
+      );
+
+     
+      const requestedMedia = requestedMediaResult[0] || []; // Ensure an empty array if no results
+
+      console.log(requestedMedia);
+      res.json({ requestedMedia }); se
+  } catch (error) {
+      console.error("Error fetching user's requested media:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 
 
 

@@ -25,6 +25,24 @@ interface BorrowedMedia {
   ItemID: number;
 }
 
+interface BorrowedDevice {
+  DeviceID: number;
+  dName: string;
+  borrowDate: Date;
+  dueDate: Date;
+}
+interface RequestedBooks {
+  bTitle: string;
+  RequestDate: Date;
+  status: string;
+}
+
+interface RequestedMedia {
+  dName: string;
+  RequestDate: Date;
+  status: string;
+}
+
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
@@ -33,6 +51,9 @@ const UserPage: React.FC = () => {
   const [userFine, setUserFine] = useState<any>(null);
   const [userBorrowedBooks, setUserBorrowedBooks] = useState<BorrowedBook[]>([]);
   const [userBorrowedMedia, setUserBorrowedMedia] = useState<BorrowedMedia[]>([]);
+  const [userBorrowedDevice, setUserBorrowedDevice] = useState<BorrowedDevice[]>([]);
+  const [userRequestedBooks, setUserRequestedBooks] = useState<RequestedBooks[]>([]);
+  const [userRequestedMedia, setUserRequestedMedia] = useState<RequestedMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -209,6 +230,36 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
+//hanna
+
+useEffect(() => {
+  if (userDataLoading || !userData?.userID) return;
+
+  const fetchUserRequestedBooks = async () => {
+    setLoading(true);
+    try {
+      const requestedBooksResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/booksRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (requestedBooksResponse!.ok) throw new Error("Failed to fetch requested book");
+
+      const requestedBooksData = await requestedBooksResponse.json();
+      console.log(requestedBooksData)
+      setUserRequestedBooks(requestedBooksData);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+fetchUserRequestedBooks();
+}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
+console.log(userRequestedBooks)
+
   //END OF DUMMY DATA
   //****************************************************************************** 
 
@@ -219,7 +270,7 @@ const UserPage: React.FC = () => {
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
-  
+
 
   return (
     <div>
