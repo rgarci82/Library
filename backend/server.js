@@ -13,7 +13,7 @@ const port = 3000;
 dotenv.config();
 
 app.use(express.json());
-const cors = require('cors');
+
 app.use(cors({
   origin: 'https://library-pied-omega.vercel.app' // Allow requests from your frontend
 }));
