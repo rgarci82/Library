@@ -15,7 +15,8 @@ dotenv.config();
 app.use(express.json());
 
 app.use(cors({
-  origin: 'https://library-pied-omega.vercel.app' // Allow requests from your frontend
+  origin: ['https://library-pied-omega.vercel.app', "http://localhost:5173" ],
+  credentials: true,
 }));
 
 app.get("/", (req, res) => {
