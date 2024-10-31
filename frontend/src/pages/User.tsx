@@ -1,6 +1,7 @@
 import React, { useState , useEffect} from 'react';
 import './User.css';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 interface JwtPayload {
   id: number; 
@@ -56,6 +57,8 @@ const UserPage: React.FC = () => {
   const [userRequestedMedia, setUserRequestedMedia] = useState<RequestedMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
@@ -230,6 +233,12 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
+const handleSignOut = () => {
+  navigate('/')
+  localStorage.clear();
+  
+}
+
   //END OF DUMMY DATA
   //****************************************************************************** 
 
@@ -263,6 +272,7 @@ const UserPage: React.FC = () => {
           <div className="nav-icons">
             <span>🔧</span>
             <span>👤</span>
+            <button onClick={() => handleSignOut()}>Sign out</button>
           </div>
         </div>
         
