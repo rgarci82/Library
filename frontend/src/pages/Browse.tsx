@@ -163,7 +163,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllBooks = async () => {
       try {
-        const response = await fetch('https://library-qlu6.onrender.com/api/books', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

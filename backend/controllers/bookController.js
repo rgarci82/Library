@@ -110,8 +110,8 @@ export async function borrowBook(req, res) {
 
     //Insert the borrow record into the 'bookborrowed' table
     const [borrowResult] = await pool.query(
-      `INSERT INTO bookborrowed (userID, dueDate, itemID) VALUES (?, ?, ?)`,
-      [userID, dueDate, itemID]
+      `INSERT INTO bookborrowed (userID, itemID) VALUES (?, ?)`,
+      [userID, itemID]
     );
 
     // Update the status of the borrowed book copy in the 'bookcopy' table
