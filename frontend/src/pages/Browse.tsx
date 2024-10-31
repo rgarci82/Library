@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { useLocation } from 'react-router-dom';
+import { useNavigate ,useLocation } from 'react-router-dom';
 
 enum ItemStatus {
   Available = 'available',
@@ -45,6 +45,7 @@ interface JwtPayload {
 type Item = Book | Media | Device;
 
 const BrowsePage: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
@@ -62,8 +63,38 @@ const BrowsePage: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null); // Initialize error state
 
+  const fetchUserData = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token){
+          navigate('/login');
+        }
+
+        const decoded: JwtPayload | null = jwtDecode(token!);  // Decode the token
+        if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+        // Use decoded.id directly for fetching user data
+        const response = await fetch(`https://library-qlu6.onrender.com/api/users/${decoded.id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch user data");
+
+        const data = await response.json();
+        setUserData(data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  };
+
   const fetchBookCopies = async (ISBN : string, book : Book) => {
     try {
+      fetchUserData();
+      
       const response = await fetch(`https://library-qlu6.onrender.com/api/books/${ISBN}/bookCopy`, {
           method: 'GET',
           headers: {
@@ -128,36 +159,6 @@ const BrowsePage: React.FC = () => {
     const search = params.get('search');
     if (search) setSearchTerm(search);
 }, [location]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) throw new Error("No token found");
-
-            const decoded: JwtPayload | null = jwtDecode(token);  // Decode the token
-            if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
-
-            // Use decoded.id directly for fetching user data
-            const response = await fetch(`https://library-qlu6.onrender.com/api/users/${decoded.id}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) throw new Error("Failed to fetch user data");
-
-            const data = await response.json();
-            setUserData(data);
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    };
-
-    fetchUserData();
-}, []);
 
   useEffect(() => {
     const fetchAllBooks = async () => {
