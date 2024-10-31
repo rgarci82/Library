@@ -61,7 +61,7 @@ const EditModal: React.FC<EditModalProps> = ({ selectedItem, onClose, onRefresh 
         }
 
         try {
-            const response = await fetch(`https://library-qlu6.onrender.com/api/${formData.itemType}/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/${formData.itemType}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
