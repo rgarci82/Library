@@ -123,7 +123,7 @@ const UserPage: React.FC = () => {
         if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
         // Fetch user data
-        const response = await fetch(`https://library-qlu6.onrender.com/api/users/${decoded.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -157,7 +157,7 @@ const UserPage: React.FC = () => {
     const fetchUserFine = async () => {
       setLoading(true);
       try {
-        const finesResponse = await fetch(`https://library-qlu6.onrender.com/api/users/${userData.userID}/fines`, {
+        const finesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/fines`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ const UserPage: React.FC = () => {
     const fetchUserBorrowedBooks = async () => {
       setLoading(true);
       try {
-        const borrowedBooksResponse = await fetch(`https://library-qlu6.onrender.com/api/users/${userData.userID}/booksBorrowed`, {
+        const borrowedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksBorrowed`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ const UserPage: React.FC = () => {
     const fetchUserBorrowedMedia = async () => {
       setLoading(true);
       try {
-        const borrowedMediaResponse = await fetch(`https://library-qlu6.onrender.com/api/users/${userData.userID}/mediaBorrowed`, {
+        const borrowedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaBorrowed`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

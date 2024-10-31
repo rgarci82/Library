@@ -74,7 +74,7 @@ const BrowsePage: React.FC = () => {
         if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
         // Use decoded.id directly for fetching user data
-        const response = await fetch(`https://library-qlu6.onrender.com/api/users/${decoded.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -95,7 +95,7 @@ const BrowsePage: React.FC = () => {
     try {
       fetchUserData();
       
-      const response = await fetch(`https://library-qlu6.onrender.com/api/books/${ISBN}/bookCopy`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ const BrowsePage: React.FC = () => {
 
   const borrowBook = async (book: Book) => {
     try {
-      const response = await fetch('https://library-qlu6.onrender.com/api/books/borrow', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllBooks = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -173,6 +173,7 @@ const BrowsePage: React.FC = () => {
         if (!response.ok) throw new Error("Failed to fetch all books");
   
         const data = await response.json();
+        
         setAllBooks(data);
       } catch (error) {
           console.error("Error:", error);
@@ -184,7 +185,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllMedia = async () => {
       try {
-        const response = await fetch('https://library-qlu6.onrender.com/api/media', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     const fetchAllDevices = async () => {
       try {
-        const response = await fetch('https://library-qlu6.onrender.com/api/devices', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
