@@ -163,7 +163,6 @@ export async function getUserBorrowedMedia(req, res) {
         // Extract the books from the result
         const borrowedMedia = borrowedMediaResult[0] || []; // Ensure an empty array if no results
 
-        console.log(borrowedMedia);
         res.json({ borrowedMedia }); // Return the borrowed books as a JSON response
     } catch (error) {
         console.error("Error fetching user's borrowed books:", error); // Detailed error logging
@@ -191,7 +190,6 @@ JOIN
       // Extract the books from the result
       const borrowedDevice = borrwedDeviceResult[0] || []; // Ensure an empty array if no results
 
-      console.log(borrowedDevice);
       res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
   } catch (error) {
       console.error("Error fetching user's borrowed device:", error); // Detailed error logging
@@ -214,7 +212,6 @@ export async function getUserRequestedBooks(req, res) {
      
       const requestedBooks = requestedBooksResult[0] || []; // Ensure an empty array if no results
 
-      console.log(requestedBooks);
       res.json({ requestedBooks });
   } catch (error) {
       console.error("Error fetching user's requested books:", error); // Detailed error logging
@@ -237,7 +234,6 @@ export async function getUserRequestedMedia(req, res) {
      
       const requestedMedia = requestedMediaResult[0] || []; // Ensure an empty array if no results
 
-      console.log(requestedMedia);
       res.json({ requestedMedia }); se
   } catch (error) {
       console.error("Error fetching user's requested media:", error); // Detailed error logging
