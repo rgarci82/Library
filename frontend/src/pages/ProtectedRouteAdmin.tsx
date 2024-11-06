@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
-  isAdmin: boolean;
   element: JSX.Element;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ isAdmin, element }) => {
-  return isAdmin ? element : <Navigate to="/adminLogin" />;
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
+
+  const token = localStorage.getItem("token")
+  return localStorage.getItem("isAdmin") == "True" ? element : <Navigate to="/adminLogin" />;
 };
 
 export default ProtectedRoute;

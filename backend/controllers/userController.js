@@ -186,11 +186,12 @@ export async function getUserBorrowedDevice(req, res) {
         // Extract the books from the result
         const borrowedDevice = borrowedDeviceResult[0] || []; // Ensure an empty array if no results
 
-        res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
-    } catch (error) {
-        console.error("Error fetching user's borrowed device:", error); // Detailed error logging
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+      console.log(borrowedDevice);
+      res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
+  } catch (error) {
+      console.error("Error fetching user's borrowed device:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
 
@@ -205,14 +206,15 @@ export async function getUserRequestedBooks(req, res) {
             [userID]
         );
 
-        // Extract the books from the result
-        const bookrequest = bookrequestResult[0] || []; // Ensure an empty array if no results
+     
+      const requestedBooks = requestedBooksResult[0] || []; // Ensure an empty array if no results
 
-        res.json({ userRequestedBooks: bookrequest }); // Return the borrowed books as a JSON response
-    } catch (error) {
-        console.error("Error fetching user's book request:", error); // Detailed error logging
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+      console.log(requestedBooks);
+      res.json({ requestedBooks });
+  } catch (error) {
+      console.error("Error fetching user's requested books:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 //media request
 export async function getUserRequestedMedia(req, res) {
@@ -247,14 +249,15 @@ export async function getUserRequestedDevice(req, res) {
             [userID]
         );
 
-        // Extract the books from the result
-        const devicerequest = deviceRequestResult[0] || []; // Ensure an empty array if no results
+     
+      const requestedMedia = requestedMediaResult[0] || []; // Ensure an empty array if no results
 
-        res.json({ userRequestedDevice: devicerequest }); // Return the borrowed books as a JSON response
-    } catch (error) {
-        console.error("Error fetching user's device request:", error); // Detailed error logging
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+      console.log(requestedMedia);
+      res.json({ requestedMedia }); se
+  } catch (error) {
+      console.error("Error fetching user's requested media:", error); // Detailed error logging
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
 

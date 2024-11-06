@@ -1,6 +1,7 @@
 import React, { useState , useEffect} from 'react';
 import './User.css';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 interface JwtPayload {
   id: number; 
@@ -85,6 +86,8 @@ const UserPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
 
@@ -101,7 +104,7 @@ const UserPage: React.FC = () => {
         if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
         // Fetch user data
-        const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -135,7 +138,7 @@ const UserPage: React.FC = () => {
     const fetchUserFine = async () => {
       setLoading(true);
       try {
-        const finesResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/fines`, {
+        const finesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/fines`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -162,7 +165,7 @@ const UserPage: React.FC = () => {
     const fetchUserBorrowedBooks = async () => {
       setLoading(true);
       try {
-        const borrowedBooksResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/booksBorrowed`, {
+        const borrowedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksBorrowed`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -189,7 +192,7 @@ const UserPage: React.FC = () => {
     const fetchUserBorrowedMedia = async () => {
       setLoading(true);
       try {
-        const borrowedMediaResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaBorrowed`, {
+        const borrowedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaBorrowed`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -210,6 +213,7 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
   }, [userData, userDataLoading]);
 
+ 
   //Device Borrowed
   useEffect(() => {
       if (userDataLoading || !userData?.userID) return;
@@ -341,6 +345,14 @@ const UserPage: React.FC = () => {
     };
     fetchUserItemHold();
   }, [userData, userDataLoading]);
+const handleSignOut = () => {
+  navigate('/')
+  localStorage.clear();
+  
+}
+
+  //END OF DUMMY DATA
+  //****************************************************************************** 
 
   // Render loading state or error state if needed
   if (loading) return <div>Loading...</div>;
@@ -370,6 +382,7 @@ const UserPage: React.FC = () => {
           <div className="nav-icons">
             <span>🔧</span>
             <span>👤</span>
+            <button onClick={() => handleSignOut()}>Sign out</button>
           </div>
         </div>
   

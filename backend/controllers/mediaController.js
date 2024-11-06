@@ -239,7 +239,7 @@ export async function deleteMedia(req, res) {
   try {
     const { MediaID } = req.params;
 
-    const [result] = await pool.query("DELETE FROM device WHERE MediaID = ?", [
+    const [result] = await pool.query("DELETE FROM media WHERE MediaID = ?", [
       MediaID,
     ]);
 

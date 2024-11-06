@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 interface AdminLoginProps {
   onLogin: () => void;
@@ -21,7 +21,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       console.log("Password:", password);
     }
     try {
-      const response = await fetch('http://localhost:3000/api/admin/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,6 +48,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       console.error("Error:", error);
     }
   };
+
 
   return (
     <div style={styles.container}>

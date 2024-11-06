@@ -56,7 +56,7 @@ const Request: React.FC = () => {
         console.log(userID);
         if (itemType === 'Book'){
           try {
-            const response = await fetch('http://localhost:3000/api/books/request', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/request`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const Request: React.FC = () => {
         }
         else if (itemType === 'Media'){
           try {
-            const response = await fetch('http://localhost:3000/api/media/request', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/request`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const Request: React.FC = () => {
         }
         else if (itemType === 'Device'){
           try {
-            const response = await fetch('http://localhost:3000/api/devices/request', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/request`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const Request: React.FC = () => {
               if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
   
               // Use decoded.id directly for fetching user data
-              const response = await fetch(`http://localhost:3000/api/users/${decoded.id}`, {
+              const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
                   method: 'GET',
                   headers: {
                       'Authorization': `Bearer ${token}`,
