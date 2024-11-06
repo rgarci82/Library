@@ -447,20 +447,19 @@ useEffect(() => {
       <div className="info-boxes">
         {userData ? (
           <>
-            {/* Borrowed Books */}
-            {activeTab === 'books' && (
-              userBorrowedBooks.length > 0 ? (
-                <div className="info-box">
-                  <h3>Borrowed Books</h3>
-                  <ul>
-                    {userBorrowedBooks.map((book, index) => (
-                      <li key={index}>{book.bTitle} by {book.bAuthor} (Due: {book.edition || 'N/A'})</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p>No borrowed books found.</p>
-              )
+{activeTab === 'books' && userBorrowedBooks.length > 0 && (
+                userBorrowedBooks.map((book) => (
+                    <div key={book.ItemID} className="info-box books-box">
+                        <h3>Title: {book.bTitle}</h3>
+                        <ul>
+                            <li>Author: {book.bAuthor}</li>
+                            <li>Publisher: {book.publisher}</li>
+                            <li>Genre: {book.genre}</li>
+                            <li>Edition: {book.edition ? book.edition : 'N/A'}</li>
+                            <li>ItemID: {book.ItemID}</li>
+                        </ul>
+                    </div>
+                ))
             )}
   
             {/* Borrowed Media */}
