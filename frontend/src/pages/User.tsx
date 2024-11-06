@@ -12,8 +12,8 @@ interface BorrowedBook {
   bAuthor: string;
   publisher: string;
   genre: string;
-  edition: number | null; // edition can be a string or null
-  itemID: number; // Assuming ItemID is a number
+  edition: number | null; 
+  itemID: number; 
   dueDate: string;
 }
 
@@ -88,7 +88,6 @@ const UserPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  //STARTING OF DUMMY DATA
   const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
 
   // First useEffect to fetch user data
@@ -213,7 +212,6 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
   }, [userData, userDataLoading]);
 
- 
   //Device Borrowed
   useEffect(() => {
       if (userDataLoading || !userData?.userID) return;
@@ -221,7 +219,7 @@ const UserPage: React.FC = () => {
       const fetchUserBorrowedDevice = async () => {
         setLoading(true);
         try {
-          const borrowedDeviceResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceBorrowed`, {
+          const borrowedDeviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceBorrowed`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -249,7 +247,7 @@ const UserPage: React.FC = () => {
       setLoading(true);
       try {
         // Fetch requested media
-        const requestedMediaResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaRequested`, {
+        const requestedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaRequested`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -262,7 +260,7 @@ const UserPage: React.FC = () => {
         setUserRequestedMedia(mediarequestedData.userRequestedMedia || []); // Ensure you access the correct property
 
         // You could also fetch requested books here if you have a similar API endpoint
-        const requestedBooksResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/booksRequested`, {
+        const requestedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksRequested`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -274,7 +272,7 @@ const UserPage: React.FC = () => {
         const booksRequestedData = await requestedBooksResponse.json();
         setUserRequestedBooks(booksRequestedData.userRequestedBooks || []); // Ensure you access the correct property
   //device
-        const requestedDeviceReponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceRequested`, {
+        const requestedDeviceReponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceRequested`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -302,7 +300,7 @@ const UserPage: React.FC = () => {
       setLoading(true);
       try {
         // Fetch bookhold
-        const bookHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/bookHold`, {
+        const bookHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/bookHold`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -314,7 +312,7 @@ const UserPage: React.FC = () => {
         const bookholdData = await bookHoldResponse.json();
         setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
         // Fetch devicehold
-        const deviceHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceHold`, {
+        const deviceHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceHold`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -326,7 +324,7 @@ const UserPage: React.FC = () => {
         const deviceholdData = await deviceHoldResponse.json();
         setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
         // Fetch mediahold
-        const mediaHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaHold`, {
+        const mediaHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaHold`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -345,22 +343,23 @@ const UserPage: React.FC = () => {
     };
     fetchUserItemHold();
   }, [userData, userDataLoading]);
-const handleSignOut = () => {
-  navigate('/')
-  localStorage.clear();
-  
-}
 
-  //END OF DUMMY DATA
-  //****************************************************************************** 
+  //Handle Signing Out
+  const handleSignOut = () => {
+    navigate('/')
+    localStorage.clear();
+    
+  }
+
+  //Handle Clicking Tabs
+  const handleTabClick = (tab: React.SetStateAction<string>) => {
+    setActiveTab(tab);
+  };
 
   // Render loading state or error state if needed
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const handleTabClick = (tab: React.SetStateAction<string>) => {
-    setActiveTab(tab);
-  };
   return (
     <div className="background-container">
       <div className="navbar">
