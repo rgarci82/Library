@@ -152,11 +152,8 @@ export async function getUserBorrowedMedia(req, res) {
 
         // SQL query to get all books borrowed by the user
         const borrowedMediaResult = await pool.query(
-            `SELECT m.MediaID, m.mTitle, m.mAuthor, m.publisher, m.genre, m.edition, mb.ItemID
-             FROM mediaborrowed mb
-             JOIN mediacopy mc ON mb.itemID = mc.itemID
-             JOIN media m ON mc.MediaID = m.MediaID
-             WHERE mb.userID = ?`,
+            `SELECT * FROM mediaborrowed
+             WHERE mediaborrowed.userID = ?`,
             [userID]
         );
 
@@ -166,87 +163,169 @@ export async function getUserBorrowedMedia(req, res) {
         console.log(borrowedMedia);
         res.json({ borrowedMedia }); // Return the borrowed books as a JSON response
     } catch (error) {
-        console.error("Error fetching user's borrowed books:", error); // Detailed error logging
+        console.error("Error fetching user's borrowed medias:", error); // Detailed error logging
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
-//hanna device borrowed
 
 export async function getUserBorrowedDevice(req, res) {
-  try {
-      const { userID } = req.params;
+    try {
+        const { userID } = req.params;
 
-      
-      const borrwedDeviceResult = await pool.query(
-          `SELECT device.dName,deviceborrowed.borrowDate,deviceborrowed.dueDate
-FROM 
-    device
-JOIN 
-    deviceborrowed ON device.serialNumber = deviceborrowed.serialNumber;
+        // SQL query to get all books borrowed by the user
+        const borrowedDeviceResult = await pool.query(
+            `SELECT d.dName, d.brand, db. dueDate
+                FROM device d
+                JOIN deviceborrowed db on db.serialNumber = d.serialNumber 
+                WHERE db.userID = ?`,
+            [userID]
+        );
 
-           WHERE mb.userID = ?`,
-          [userID]
-      );
+        // Extract the books from the result
+        const borrowedDevice = borrowedDeviceResult[0] || []; // Ensure an empty array if no results
 
-      // Extract the books from the result
-      const borrowedDevice = borrwedDeviceResult[0] || []; // Ensure an empty array if no results
-
-      console.log(borrowedDevice);
-      res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
-  } catch (error) {
-      console.error("Error fetching user's borrowed device:", error); // Detailed error logging
-      res.status(500).json({ message: "Internal Server Error" });
-  }
+        console.log(borrowedDevice);
+        res.json({ borrowedDevice }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's borrowed device:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 }
 
-//requestedbooks
+
 export async function getUserRequestedBooks(req, res) {
-  try {
-      const { userID } = req.params;
+    try {
+        const { userID } = req.params;
 
-     
-      const requestedBooksResult = await pool.query(
-        'SELECT * FROM bookrequest WHERE userID = ? ',
-    
-          [userID]
-      );
+        // SQL query to get all books borrowed by the user
+        const bookrequestResult = await pool.query(
+            `SELECT * FROM bookrequest
+             WHERE bookrequest.userID = ?`,
+            [userID]
+        );
 
-     
-      const requestedBooks = requestedBooksResult[0] || []; // Ensure an empty array if no results
+        // Extract the books from the result
+        const bookrequest = bookrequestResult[0] || []; // Ensure an empty array if no results
 
-      console.log(requestedBooks);
-      res.json({ requestedBooks });
-  } catch (error) {
-      console.error("Error fetching user's requested books:", error); // Detailed error logging
-      res.status(500).json({ message: "Internal Server Error" });
-  }
+        console.log(bookrequest);
+        res.json({ userRequestedBooks: bookrequest }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's book request:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 }
-
-//requested media
-
+//media request
 export async function getUserRequestedMedia(req, res) {
-  try {
-      const { userID } = req.params;
+    try {
+        const { userID } = req.params;
 
-     
-      const requestedMediaResult = await pool.query(
-        'SELECT device.dName,devicerequest.requestDate,devicerequest.status FROM devicerequest JOIN device ON devicerequest.serialNumber = device.serialNumber;'
-          [userID]
-      );
+        // SQL query to get all books borrowed by the user
+        const mediarequestResult = await pool.query(
+            `SELECT * FROM mediarequest
+             WHERE mediarequest.userID = ?`,
+            [userID]
+        );
 
-     
-      const requestedMedia = requestedMediaResult[0] || []; // Ensure an empty array if no results
+        // Extract the books from the result
+        const mediarequest = mediarequestResult[0] || []; // Ensure an empty array if no results
 
-      console.log(requestedMedia);
-      res.json({ requestedMedia }); se
-  } catch (error) {
-      console.error("Error fetching user's requested media:", error); // Detailed error logging
-      res.status(500).json({ message: "Internal Server Error" });
-  }
+        console.log(mediarequest);
+        res.json({ userRequestedMedia: mediarequest }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's media request:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function getUserRequestedDevice(req, res) {
+    try {
+        const { userID } = req.params;
+
+        // SQL query to get all books borrowed by the user
+        const deviceRequestResult = await pool.query(
+            `SELECT * FROM devicerequest
+             WHERE devicerequest.userID = ?`,
+            [userID]
+        );
+
+        // Extract the books from the result
+        const devicerequest = deviceRequestResult[0] || []; // Ensure an empty array if no results
+
+        console.log(devicerequest);
+        res.json({ userRequestedDevice: devicerequest }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's device request:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 }
 
 
+//book hold
+export async function getUserbookHold(req, res) {
+    try {
+        const { userID } = req.params;
+
+        // SQL query to get all books borrowed by the user
+        const bookHoldResult = await pool.query(
+            `SELECT * FROM bookhold
+             WHERE bookhold.userID = ?`,
+            [userID]
+        );
+
+        // Extract the books from the result
+        const bookhold = bookHoldResult[0] || []; // Ensure an empty array if no results
+
+        console.log(bookhold);
+        res.json({ userbookHold: bookhold }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's book hold:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
 
 
+//media hold
+export async function getUsermediaHold(req, res) {
+    try {
+        const { userID } = req.params;
 
+        // SQL query to get all books borrowed by the user
+        const mediaHoldResult = await pool.query(
+            `SELECT * FROM mediahold
+             WHERE mediahold.userID = ?`,
+            [userID]
+        );
 
+        // Extract the books from the result
+        const mediahold = mediaHoldResult[0] || []; // Ensure an empty array if no results
+
+        console.log(mediahold);
+        res.json({ usermediaHold: mediahold }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's media hold:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+//device hold
+export async function getUserdeviceHold(req, res) {
+    try {
+        const { userID } = req.params;
+
+        // SQL query to get all device hold by the user
+        const deviceHoldResult = await pool.query(
+            `SELECT * FROM devicehold
+             WHERE devicehold.userID = ?`,
+            [userID]
+        );
+
+        // Extract the books from the result
+        const devicehold = deviceHoldResult[0] || []; // Ensure an empty array if no results
+
+        console.log(devicehold);
+        res.json({ userdeviceHold: devicehold }); // Return the borrowed books as a JSON response
+    } catch (error) {
+        console.error("Error fetching user's device hold:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}

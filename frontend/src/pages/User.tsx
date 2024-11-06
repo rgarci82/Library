@@ -33,13 +33,35 @@ interface BorrowedDevice {
 }
 interface RequestedBooks {
   bTitle: string;
-  RequestDate: Date;
+  requestDate: Date;
   status: string;
 }
 
 interface RequestedMedia {
-  dName: string;
+  requestDate: string | number | Date;
+  mTitle: string;
   RequestDate: Date;
+  status: string;
+}
+
+interface RequestedDevice {
+  requestDate: string | number | Date;
+  dName: string;
+  status: string;
+}
+
+interface bookHold {
+  holddate: string | number | Date;
+  status: string;
+}
+
+interface mediaHold {
+  holddate: string | number | Date;
+  status: string;
+}
+
+interface deviceHold {
+  holddate: string | number | Date;
   status: string;
 }
 
@@ -54,6 +76,10 @@ const UserPage: React.FC = () => {
   const [userBorrowedDevice, setUserBorrowedDevice] = useState<BorrowedDevice[]>([]);
   const [userRequestedBooks, setUserRequestedBooks] = useState<RequestedBooks[]>([]);
   const [userRequestedMedia, setUserRequestedMedia] = useState<RequestedMedia[]>([]);
+  const [userRequestedDevice, setUserRequestedDevice] = useState<RequestedDevice[]>([]);
+  const [userbookHold, setUserbookHold] = useState<bookHold[]>([]);
+  const [usermediaHold, setUsermediaHold] = useState<mediaHold[]>([]);
+  const [userdeviceHold, setUserdeviceHold] = useState<deviceHold[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -174,8 +200,8 @@ const UserPage: React.FC = () => {
   fetchUserFine();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
+  //bookborrowed
 
-  // Second useEffect to fetch user fines after userData is fetched
   useEffect(() => {
     if (userDataLoading || !userData?.userID) return;
 
@@ -203,7 +229,8 @@ const UserPage: React.FC = () => {
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
 
-  // Second useEffect to fetch user fines after userData is fetched
+  // mediaborrowed
+
   useEffect(() => {
     if (userDataLoading || !userData?.userID) return;
 
@@ -230,14 +257,59 @@ const UserPage: React.FC = () => {
   fetchUserBorrowedMedia();
 }, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
 
-//hanna
+//device borrowed
+
+
+  
+  useEffect(() => {
+    if (userDataLoading || !userData?.userID) return;
+
+    const fetchUserBorrowedDevice = async () => {
+      setLoading(true);
+      try {
+        const borrowedDeviceResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceBorrowed`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!borrowedDeviceResponse.ok) throw new Error("Failed to fetch borrowed media");
+
+        const deviceBorrowedData = await borrowedDeviceResponse.json();
+        setUserBorrowedDevice(deviceBorrowedData.borrowedDevice);
+        console.log(deviceBorrowedData.borrowedDevice)
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  fetchUserBorrowedDevice();
+}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
+
 
 useEffect(() => {
   if (userDataLoading || !userData?.userID) return;
 
-  const fetchUserRequestedBooks = async () => {
+  const fetchUserRequestedItems = async () => {
     setLoading(true);
     try {
+      // Fetch requested media
+      const requestedMediaResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!requestedMediaResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const mediarequestedData = await requestedMediaResponse.json();
+      setUserRequestedMedia(mediarequestedData.userRequestedMedia || []); // Ensure you access the correct property
+      console.log(mediarequestedData);
+
+      // You could also fetch requested books here if you have a similar API endpoint
       const requestedBooksResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/booksRequested`, {
         method: 'GET',
         headers: {
@@ -245,21 +317,88 @@ useEffect(() => {
         },
       });
 
-      if (requestedBooksResponse!.ok) throw new Error("Failed to fetch requested book");
+      if (!requestedBooksResponse.ok) throw new Error("Failed to fetch requested books");
 
-      const requestedBooksData = await requestedBooksResponse.json();
-      console.log(requestedBooksData)
-      setUserRequestedBooks(requestedBooksData);
+      const booksRequestedData = await requestedBooksResponse.json();
+      setUserRequestedBooks(booksRequestedData.userRequestedBooks || []); // Ensure you access the correct property
+//device
+      const requestedDeviceReponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!requestedDeviceReponse.ok) throw new Error("Failed to fetch requested media");
+
+      const deviceRequestedData = await requestedDeviceReponse.json();
+      setUserRequestedDevice(deviceRequestedData.userRequestedDevice || []); // Ensure you access the correct property
+      console.log(deviceRequestedData);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error featching requested device data", error);
     } finally {
       setLoading(false);
     }
   };
-fetchUserRequestedBooks();
-}, [userData, userDataLoading]); // Dependencies include userData and userDataLoading
-console.log(userRequestedBooks)
+  fetchUserRequestedItems();
+}, [userData, userDataLoading]);
 
+// item holds
+//Bookhold
+
+useEffect(() => {
+  if (userDataLoading || !userData?.userID) return;
+
+  const fetchUserItemHold = async () => {
+    setLoading(true);
+    try {
+      // Fetch bookhold
+      const bookHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/bookHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!bookHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const bookholdData = await bookHoldResponse.json();
+      setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
+      console.log(bookholdData);
+      // Fetch devicehold
+      const deviceHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/deviceHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!deviceHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const deviceholdData = await deviceHoldResponse.json();
+      setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
+      console.log(deviceholdData);
+      // Fetch mediahold
+      const mediaHoldResponse = await fetch(`http://localhost:3000/api/users/${userData.userID}/mediaHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!mediaHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const mediaholdData = await mediaHoldResponse.json();
+      setUsermediaHold(mediaholdData.usermediaHold || []); // Ensure you access the correct property
+      console.log(mediaholdData);
+    } catch (error) {
+      console.error("Error featching requested device data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchUserItemHold();
+}, [userData, userDataLoading]);
   //END OF DUMMY DATA
   //****************************************************************************** 
 
@@ -270,15 +409,13 @@ console.log(userRequestedBooks)
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
-
-
   return (
     <div>
       <div className="navbar">
         <div className="navbar-section library-name">
           My Library
         </div>
-        
+  
         <div className="navbar-section search-section">
           <input
             type="text"
@@ -295,7 +432,7 @@ console.log(userRequestedBooks)
             <span>👤</span>
           </div>
         </div>
-        
+  
         <div className="navbar-section tabs">
           <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Books</div>
           <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
@@ -306,51 +443,60 @@ console.log(userRequestedBooks)
           <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
         </div>
       </div>
-
+  
       <div className="info-boxes">
         {userData ? (
           <>
-            {activeTab === 'books' && userBorrowedBooks.length > 0 && (
-                userBorrowedBooks.map((book) => (
-                    <div key={book.ItemID} className="info-box books-box">
-                        <h3>Title: {book.bTitle}</h3>
-                        <ul>
-                            <li>Author: {book.bAuthor}</li>
-                            <li>Publisher: {book.publisher}</li>
-                            <li>Genre: {book.genre}</li>
-                            <li>Edition: {book.edition ? book.edition : 'N/A'}</li>
-                            <li>ItemID: {book.ItemID}</li>
-                        </ul>
-                    </div>
-                ))
+            {/* Borrowed Books */}
+            {activeTab === 'books' && (
+              userBorrowedBooks.length > 0 ? (
+                <div className="info-box">
+                  <h3>Borrowed Books</h3>
+                  <ul>
+                    {userBorrowedBooks.map((book, index) => (
+                      <li key={index}>{book.bTitle} by {book.bAuthor} (Due: {book.edition || 'N/A'})</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p>No borrowed books found.</p>
+              )
             )}
-
-            {activeTab === 'media' && userBorrowedMedia.length > 0 && (
-                userBorrowedMedia.map((media) => (
-                    <div key={media.ItemID} className="info-box books-box">
-                        <h3>Title: {media.mTitle}</h3>
-                        <ul>
-                            <li>Author: {media.mAuthor}</li>
-                            <li>Publisher: {media.publisher}</li>
-                            <li>Genre: {media.genre}</li>
-                            <li>Edition: {media.edition ? media.edition : 'N/A'}</li>
-                            <li>ItemID: {media.ItemID}</li>
-                        </ul>
-                    </div>
-                ))
-            )}  
-
-            {activeTab === 'devices' && devicesData.map((device, index) => (
-              <div key={index} className="info-box devices-box">
-                <h3>{device.title}</h3>
-                <ul>
-                  <li>Borrowed Date: {device.borrowedDate}</li>
-                  <li>Due Date: {device.dueDate}</li>
-                  <li>Status: {device.status}</li>
-                </ul>
-              </div>
-            ))}
-
+  
+            {/* Borrowed Media */}
+            {activeTab === 'media' && (
+              userBorrowedMedia.length > 0 ? (
+                <div className="info-box">
+                  <h3>Borrowed Media</h3>
+                  <ul>
+                    {userBorrowedMedia.map((media, index) => (
+                      <li key={index}>{media.mTitle} by {media.mAuthor}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                !loading && <p>No borrowed media found.</p>
+              )
+            )}
+            {activeTab === 'media' && loading && <div>Loading borrowed media...</div>}
+  
+            {/* Borrowed Devices */}
+            {activeTab === 'devices' && (
+              userBorrowedDevice.length > 0 ? (
+                <div className="info-box">
+                  <h3>Borrowed Devices</h3>
+                  <ul>
+                    {userBorrowedDevice.map((device, index) => (
+                      <li key={index}>{device.dName} (Due: {new Date(device.dueDate).toLocaleDateString()})</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p>No borrowed devices found.</p>
+              )
+            )}
+  
+            {/* Fines */}
             {activeTab === 'fines' && (
               <div className="info-box fines-box">
                 <h3>Fine</h3>
@@ -359,42 +505,142 @@ console.log(userRequestedBooks)
                 </ul>
               </div>
             )}
-
-            {activeTab === 'itemRequested' && itemRequestedData.map((item, index) => (
-              <div key={index} className="info-box item-requested-box">
-                <h3>{item.title}</h3>
-                <ul>
-                  <li>Request Date: {item.requestDate}</li>
-                  <li>Status: {item.status}</li>
-                </ul>
+  
+            {/* Item Requests */}
+            {activeTab === 'itemRequested' && (
+              <div>
+                {loading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <>
+                    {/* Display requested books */}
+                    <h2>Requested Books</h2>
+                    {userRequestedBooks.length > 0 ? (
+                      userRequestedBooks.map((bookrequest, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <h3>{bookrequest.bTitle}</h3>
+                          <ul>
+                            <li>Request Date: {new Date(bookrequest.requestDate).toLocaleDateString()}</li>
+                            <li>Status: {bookrequest.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No requested books found.</p>
+                    )}
+  
+                    {/* Display requested devices */}
+                    <h2>Requested Devices</h2>
+                    {userRequestedDevice.length > 0 ? (
+                      userRequestedDevice.map((devicerequest, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <h3>{devicerequest.dName}</h3>
+                          <ul>
+                            <li>Request Date: {new Date(devicerequest.requestDate).toLocaleDateString()}</li>
+                            <li>Status: {devicerequest.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No requested devices found.</p>
+                    )}
+  
+                    {/* Display requested media */}
+                    <h2>Requested Media</h2>
+                    {userRequestedMedia.length > 0 ? (
+                      userRequestedMedia.map((mediarequest, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <h3>{mediarequest.mTitle}</h3>
+                          <ul>
+                            <li>Request Date: {new Date(mediarequest.requestDate).toLocaleDateString()}</li>
+                            <li>Status: {mediarequest.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No requested media found.</p>
+                    )}
+                  </>
+                )}
               </div>
-            ))}
+            )}
+  
+            {/* Item Hold */}
+            {activeTab === 'itemHold' && (
+              <div>
+                {loading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <>
+                    {/* Display book hold */}
+                    <h2>Book Holds</h2>
+                    {userbookHold.length > 0 ? (
+                      userbookHold.map((bookhold, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <ul>
+                            <li>Request Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
+                            <li>Status: {bookhold.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No books holds found.</p>
+                    )}
+                     {/* Display book hold */}
+                     <h2>Device Holds</h2>
+                    {userdeviceHold.length > 0 ? (
+                      userdeviceHold.map((devicehold, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <ul>
+                            <li>Hold Date: {new Date(devicehold.holddate).toLocaleDateString()}</li>
+                            <li>Status: {devicehold.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No device holds found.</p>
+                    )}           
 
-            {activeTab === 'itemHold' && itemHoldData.map((item, index) => (
-              <div key={index} className="info-box item-hold-box">
-                <h3>{item.title}</h3>
-                <ul>
-                  <li>Hold Date: {item.holdDate}</li>
-                  <li>Status: {item.status}</li>
-                </ul>
+                     {/* Display media holds*/}
+                     <h2>Media Holds</h2>
+                    {usermediaHold.length > 0 ? (
+                      usermediaHold.map((mediahold, index) => (
+                        <div key={index} className="info-box item-requested-box">
+                          <ul>
+                            <li>Request Date: {new Date(mediahold.holddate).toLocaleDateString()}</li>
+                            <li>Status: {mediahold.status}</li>
+                          </ul>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No media holds found.</p>
+                    )}
+                  </>
+                )}
               </div>
-            ))}
-
-            {activeTab === 'notifications' && notificationsData.map((notification, index) => (
-              <div key={index} className="info-box notifications-box">
-                <h3>Notification</h3>
-                <ul>
-                  <li>{notification.reminder}</li>
-                </ul>
-              </div>
-            ))}
+            )}
+             
+            {/* Notifications */}
+            {activeTab === 'notifications' && (
+              notificationsData.length > 0 ? (
+                notificationsData.map((notification, index) => (
+                  <div key={index} className="info-box notifications-box">
+                    <h3>Notification</h3>
+                    <ul>
+                      <li>{notification.reminder}</li>
+                    </ul>
+                  </div>
+                ))
+              ) : (
+                <p>No notifications found.</p>
+              )
+            )}
           </>
         ) : (
           <p>Loading user data...</p>
         )}
-      </div>
+      </div> 
     </div>
   );
-};
-
-export default UserPage;
+}
+  export default UserPage;
