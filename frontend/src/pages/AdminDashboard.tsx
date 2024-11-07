@@ -284,29 +284,33 @@ const AdminDashboard = () => {
 
   const confirmDelete = async () => {
     if (!selectedItemDelete) return;
-
+  
     let id: string | number | undefined;
     if ("ISBN" in selectedItemDelete) id = selectedItemDelete.ISBN;
     else if ("MediaID" in selectedItemDelete) id = selectedItemDelete.MediaID;
     else if ("serialNumber" in selectedItemDelete)
       id = selectedItemDelete.serialNumber;
-
+  
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/${
-          selectedItemDelete.itemType
-        }/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/${selectedItemDelete.itemType}/${id}/softDelete`,
         {
-          method: "DELETE",
+          method: "PUT",
         }
       );
-
+  
+      if (response.status === 409) {
+        const result = await response.json();
+        alert(result.message);
+        return;
+      }
+  
       if (!response.ok) throw new Error("Failed to delete item");
-
+  
       setIsDeleting(false);
       setSelectedItemDelete(null);
       await fetchBooks();
-      await fetchDevies();
+      await fetchDevices();
       await fetchMedia();
     } catch (error) {
       console.error("Failed to delete item:", error);
@@ -474,7 +478,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchDevies = async () => {
+  const fetchDevices = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/devices`
@@ -536,14 +540,14 @@ const AdminDashboard = () => {
 
   const refreshItems = async () => {
     await fetchBooks();
-    await fetchDevies();
+    await fetchDevices();
     await fetchMedia();
   };
 
   useEffect(() => {
     fetchBooks();
     fetchMedia();
-    fetchDevies();
+    fetchDevices();
     fetchBookRequests();
     fetchMediaRequests();
     fetchDeviceRequests();
