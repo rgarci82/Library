@@ -21,6 +21,6 @@ route.put("/media/request/accept/:requestID", mediaRequestAccepted);
 route.put("/media/request/deny/:requestID", mediaRequestDeny);
 route.get("/media/:MediaID", getMediaByID);
 route.put("/media/:MediaID", updateMedia);
-route.delete("/media/:MediaID", deleteMedia);
+route.put("/media/:MediaID/softDelete", deleteMedia);
 
 export default route;

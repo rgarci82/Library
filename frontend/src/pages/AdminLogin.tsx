@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AdminLoginProps {
   onLogin: () => void;
