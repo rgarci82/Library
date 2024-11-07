@@ -43,13 +43,13 @@ export async function requestDevice(req, res) {
   const { userID, serialNumber, deviceTitle, brand, model, status } = req.body;
 
   try {
-    // Check if the book already exists in the 'book' table
+    // Check if the device already exists in the 'device' table
     const [existingDevice] = await pool.query(
       "SELECT * FROM device WHERE serialNumber = ?",
       [serialNumber]
     );
 
-    // If a book with this ISBN exists, return a 400 status with a message
+    // If a device with this ISBN exists, return a 400 status with a message
     if (existingDevice.length > 0) {
       return res.status(400).json({
         message:
@@ -69,7 +69,7 @@ export async function requestDevice(req, res) {
       });
     }
 
-    // Insert the book request into the 'bookrequest' table
+    // Insert the device request into the 'devicerequest' table
     const [result] = await pool.query(
       "INSERT INTO devicerequest (userID, serialNumber, dName, brand, model, Status) VALUES (?, ?, ?, ?, ?, ?)",
       [userID, serialNumber, deviceTitle, brand, model, status]
@@ -87,10 +87,10 @@ export async function requestDevice(req, res) {
 
 export async function getAllDeviceRequests(req, res) {
   try {
-    // Query to fetch all book requests
+    // Query to fetch all device requests
     const [deviceRequests] = await pool.query("SELECT * FROM devicerequest");
 
-    // Return the list of book requests
+    // Return the list of device requests
     res.status(200).json(deviceRequests);
   } catch (error) {
     console.error("Error occurred while fetching device requests:", error);
@@ -225,5 +225,65 @@ export async function deleteDevice(req, res) {
     res.json({ message: "Device deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+}
+//borrow device funtion 1, copy paste, change
+export async function borrowDevice(req, res) {
+  const { userData, device } = req.body;
+
+  try {
+    // Check if the user has already borrowed a copy of this device
+    const [existingBorrow] = await pool.query(
+      `SELECT * FROM deviceborrowed 
+       JOIN serialNumber ON deviceborrowed.serialNumber = device.serialNumber
+       WHERE deviceborrowed.userID = ? AND serialNumber = ?`,
+      [userData.userID, device.serialNumber]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingBorrow.length > 0) {
+      return res.status(400).json({
+        message: "You have already borrowed this device.",
+      });
+    }
+
+    // Find the first available serialNumber
+    const [availableDevice] = await pool.query(
+      `select * from device where serialNumber = ? and status ='available'`,
+      [device.serialNumber]
+    );
+
+    // If no available device is found, return a 404 status with a message
+    if (availableDevice.length === 0) {
+      return res.status(404).json({
+        message: "This device is currently not available",
+      });
+    }
+
+    const userID = userData.userID;
+   
+    const serialNumber = availableDevice[0].serialNumber;
+
+    //Insert the borrow record into the 'deviceborrowed' table
+    const [borrowResult] = await pool.query(
+      `INSERT INTO deviceborrowed (userID, serialNumber) VALUES (?, ?)`,
+      [userID, serialNumber]
+    );
+
+    // Update the status of the borrowed device copy in the 'devicecopy' table
+    const [updateResult] = await pool.query(
+      `UPDATE device SET status = 'borrowed' WHERE serialNumber = ?`,
+      [serialNumber]
+    );
+
+    // Return a success response with a 201 status
+    res.status(201).json({
+      message: "Device borrowed successfully",
+      serialNumber: serialNumber
+    });
+  } catch (error) {
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
   }
 }
