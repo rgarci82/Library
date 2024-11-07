@@ -704,17 +704,6 @@ const AdminDashboard = () => {
             <h2>Create a New Media</h2>
             <form onSubmit={handleMediaSubmit}>
               <div className="form-group">
-                <label htmlFor="MediaID">MediaID:</label>
-                <input
-                  type="text"
-                  id="MediaID"
-                  name="MediaID"
-                  value={MediaID}
-                  onChange={(e) => setMediaID(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
                 <label htmlFor="mTitle">Title:</label>
                 <input
                   type="text"
