@@ -89,6 +89,18 @@ const UserPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
 
+  const returnItem = async (selectedItem: borrowedItem) => {   
+    if ("ISBN" in selectedItem){
+      console.log("BOOK!:", selectedItem);
+    }
+    else if ("MediaID" in selectedItem){
+      console.log("MEDIA!", selectedItem);
+    }
+    else if ("serialNumber" in selectedItem){
+      console.log("DEVICE!", selectedItem);
+    }
+  };
+
   const handleReturnClick = (item: borrowedItem) => {
     setSelectedItem(item);
     setShowModal(true);
@@ -96,7 +108,12 @@ const UserPage: React.FC = () => {
 
   const handleConfirmReturn = () => {
     // Proceed with the return action
-    console.log(selectedItem);
+    if (selectedItem){
+      returnItem(selectedItem);
+    }
+    else{
+      console.log("No item selected");
+    }
     setShowModal(false); // Close the modal
   };
 
@@ -434,7 +451,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">Due Date: {new Date(book.dueDate).toLocaleDateString()}</li>
                     </ul>
                     <div className="button-container" onClick={()=> handleReturnClick(book)}>
-                      <button className="button-text">
+                      <button className="button-text return-button">
                         Return
                       </button>
                     </div>
@@ -459,8 +476,8 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">ItemID: {media.itemID}</li>
                       <li className="info-text-css">Due Date: {new Date(media.dueDate).toLocaleDateString()}</li>
                     </ul>
-                    <div className="button-container">
-                      <button className="button-text">
+                    <div className="button-container" onClick={()=> handleReturnClick(media)}>
+                      <button className="button-text return-button">
                         Return
                       </button>
                     </div>
@@ -484,7 +501,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">Due Date: {new Date(device.dueDate).toLocaleDateString()}</li>
                     </ul>
                     <div className="button-container">
-                      <button className="button-text">
+                      <button className="button-text return-button" onClick={()=> handleReturnClick(device)}>
                         Return
                       </button>
                     </div>
@@ -499,9 +516,9 @@ const UserPage: React.FC = () => {
             {showModal && selectedItem && (
               <div className="modal">
                 <div className="modal-content">
-                  <p>Are you sure you want to return this item?</p>
-                  <button onClick={handleConfirmReturn}>Yes</button>
-                  <button onClick={handleCancel}>Cancel</button>
+                  <p className="confirmation-text">Are you sure you want to return this item?</p>
+                  <button onClick={handleConfirmReturn} className="yes-button">Yes</button>
+                  <button onClick={handleCancel} className="cancel-button">Cancel</button>
                 </div>
               </div>
             )}

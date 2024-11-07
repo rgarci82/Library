@@ -132,7 +132,7 @@ export async function getUserBorrowedBooks(req, res) {
              FROM bookborrowed bb
              JOIN bookcopy bc ON bb.itemID = bc.itemID
              JOIN book b ON bc.ISBN = b.ISBN
-             WHERE bb.userID = ?`,
+             WHERE bb.userID = ? AND bb.returnDate IS NULL`,
             [userID]
         );
 
@@ -156,7 +156,7 @@ export async function getUserBorrowedMedia(req, res) {
              FROM mediaborrowed mb
              JOIN mediacopy mc ON mb.itemID = mc.itemID
              JOIN media m ON mc.MediaID = m.MediaID
-             WHERE mb.userID = ?`,
+             WHERE mb.userID = ? AND mb.returnDate IS NULL`,
             [userID]
         );
 
@@ -179,7 +179,7 @@ export async function getUserBorrowedDevice(req, res) {
             `SELECT d.serialNumber, d.dName, d.brand, d.model, db.dueDate
                 FROM device d
                 JOIN deviceborrowed db on db.serialNumber = d.serialNumber 
-                WHERE db.userID = ?`,
+                WHERE db.userID = ? AND db.returnDate IS NULL`,
             [userID]
         );
 

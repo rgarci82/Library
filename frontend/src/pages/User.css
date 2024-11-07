@@ -191,7 +191,7 @@ body {
   margin-top: auto; /* Pushes the button to the bottom of the container */
 }
 
-button {
+.return-button {
   padding: 1rem 3rem;
   cursor: pointer;
   background-color: #C8102E;
@@ -238,3 +238,21 @@ button {
   width: 100%;
   text-align: center;
 }
+
+.confirmation-text{
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.yes-button, .cancel-button{
+  padding: 1rem 3rem;
+  cursor: pointer;
+  background-color: #C8102E;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin: 10px;
+  min-width: 130px;
+  font-size: 16px;
+}
+
