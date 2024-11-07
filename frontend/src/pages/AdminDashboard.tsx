@@ -601,7 +601,7 @@ const AdminDashboard = () => {
           Data Queries
         </div>
       </div>
-      <div className="info-boxes">
+      <div className="admin-info-boxes">
         {activeTab === "books" && (
           <div className="create-book-form">
             <h2>Create a New Book</h2>
