@@ -29,6 +29,6 @@ route.put("/books/request/accept/:requestID", bookRequestAccepted);
 route.put("/books/request/deny/:requestID", bookRequestDeny);
 route.get("/books/:ISBN", getBookByISBN);
 route.put("/books/:ISBN", updateBook);
-route.delete("/books/:ISBN", deleteBook);
+route.put("/books/:ISBN/softDelete", deleteBook);
 
 export default route;

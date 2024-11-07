@@ -23,6 +23,6 @@ route.put("/devices/request/accept/:requestID", deviceRequestAccepted);
 route.put("/devices/request/deny/:requestID", deviceRequestDeny);
 route.get("/devices/:serialNumber", getDeviceBySN);
 route.put("/devices/:serialNumber", updateDevice);
-route.delete("/devices/:serialNumber", deleteDevice);
+route.put("/devices/:serialNumber/softDelete", deleteDevice);
 
 export default route;

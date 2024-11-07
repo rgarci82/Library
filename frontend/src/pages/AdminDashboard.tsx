@@ -284,29 +284,33 @@ const AdminDashboard = () => {
 
   const confirmDelete = async () => {
     if (!selectedItemDelete) return;
-
+  
     let id: string | number | undefined;
     if ("ISBN" in selectedItemDelete) id = selectedItemDelete.ISBN;
     else if ("MediaID" in selectedItemDelete) id = selectedItemDelete.MediaID;
     else if ("serialNumber" in selectedItemDelete)
       id = selectedItemDelete.serialNumber;
-
+  
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/${
-          selectedItemDelete.itemType
-        }/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/${selectedItemDelete.itemType}/${id}/softDelete`,
         {
-          method: "DELETE",
+          method: "PUT",
         }
       );
-
+  
+      if (response.status === 409) {
+        const result = await response.json();
+        alert(result.message);
+        return;
+      }
+  
       if (!response.ok) throw new Error("Failed to delete item");
-
+  
       setIsDeleting(false);
       setSelectedItemDelete(null);
       await fetchBooks();
-      await fetchDevies();
+      await fetchDevices();
       await fetchMedia();
     } catch (error) {
       console.error("Failed to delete item:", error);
@@ -474,7 +478,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchDevies = async () => {
+  const fetchDevices = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/devices`
@@ -536,14 +540,14 @@ const AdminDashboard = () => {
 
   const refreshItems = async () => {
     await fetchBooks();
-    await fetchDevies();
+    await fetchDevices();
     await fetchMedia();
   };
 
   useEffect(() => {
     fetchBooks();
     fetchMedia();
-    fetchDevies();
+    fetchDevices();
     fetchBookRequests();
     fetchMediaRequests();
     fetchDeviceRequests();
@@ -699,17 +703,6 @@ const AdminDashboard = () => {
           <div className="create-media-form">
             <h2>Create a New Media</h2>
             <form onSubmit={handleMediaSubmit}>
-              <div className="form-group">
-                <label htmlFor="MediaID">MediaID:</label>
-                <input
-                  type="text"
-                  id="MediaID"
-                  name="MediaID"
-                  value={MediaID}
-                  onChange={(e) => setMediaID(e.target.value)}
-                  required
-                />
-              </div>
               <div className="form-group">
                 <label htmlFor="mTitle">Title:</label>
                 <input
@@ -933,7 +926,7 @@ const AdminDashboard = () => {
                       <strong>Serial Number:</strong> {device.serialNumber}
                     </p>
                     <p>
-                      <strong>Status:</strong> {device.status}
+                      <strong>Status:</strong> {device.status.charAt(0).toUpperCase() + device.status.slice(1)}
                     </p>
                     <button onClick={() => handleEditClick(device)}>
                       Edit
