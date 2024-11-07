@@ -3,7 +3,6 @@ import pool from "../config/db.js";
 export async function getBooks(req, res) {
   try {
     const [rows] = await pool.query("SELECT * FROM book");
-
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -110,8 +109,8 @@ export async function borrowBook(req, res) {
 
     //Insert the borrow record into the 'bookborrowed' table
     const [borrowResult] = await pool.query(
-      `INSERT INTO bookborrowed (userID, dueDate, itemID) VALUES (?, ?, ?)`,
-      [userID, dueDate, itemID]
+      `INSERT INTO bookborrowed (userID, itemID) VALUES (?, ?)`,
+      [userID, itemID]
     );
 
     // Update the status of the borrowed book copy in the 'bookcopy' table
