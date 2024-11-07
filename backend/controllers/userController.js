@@ -241,6 +241,26 @@ export async function getUserRequestedMedia(req, res) {
   }
 }
 
+export async function getMonthlyUserRegistrations(req, res) {
+    try {
+        const [results] = await pool.query(`
+            SELECT 
+                YEAR(created_at) AS year,
+                MONTH(created_at) AS month,
+                COUNT(*) AS user_count
+            FROM users
+            GROUP BY year, month
+            ORDER BY year DESC, month DESC;
+        `);
+
+        res.json(results);
+    } catch (error) {
+        console.error("Error fetching monthly user registrations:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+
 
 
 

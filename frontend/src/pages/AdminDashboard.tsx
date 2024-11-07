@@ -3,8 +3,8 @@ import "./AdminDashboard.css";
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import { useNavigate } from "react-router-dom";
-
 type ItemType = "books" | "media" | "devices";
+import axios from "axios";
 
 export interface Book {
   itemType: ItemType;
@@ -116,6 +116,28 @@ const AdminDashboard = () => {
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([]);
+
+  //dataQueries
+  interface MonthlyRegistrationRecord {
+    year: number;
+    month: number;
+    user_count: number;
+  }
+  const [monthlyRegistrations, setMonthlyRegistrations] = useState<
+    MonthlyRegistrationRecord[]
+  >([]);
+
+  useEffect(() => {
+    const fetchMonthlyRegistrations = async () => {
+      try {
+        const response = await axios.get("/users/monthly-registrations");
+        setMonthlyRegistrations(response.data);
+      } catch (error) {
+        console.error("Error fetching monthly registrations:", error);
+      }
+    };
+    fetchMonthlyRegistrations();
+  }, []);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -1097,6 +1119,35 @@ const AdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </>
+        )}
+
+        {activeTab == "dataQueries" && (
+          <>
+            <div>
+              <h1>Data Queries</h1>
+              <div id="dataQueries">
+                <h2>Monthly User Registrations</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Month</th>
+                      <th>User Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyRegistrations.map((record, index) => (
+                      <tr key={index}>
+                        <td>{record.year}</td>
+                        <td>{record.month}</td>
+                        <td>{record.user_count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}
