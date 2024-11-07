@@ -1,7 +1,13 @@
 /* General Styles */
 body {
   margin: 0;
+  height: 100%;
   font-family: Arial, sans-serif;
+}
+
+.background-container {
+  background-color: #bbabab;
+  min-height: 100vh;
 }
 
 .navbar {
@@ -69,25 +75,32 @@ body {
 }
 
 /* Information Boxes */
-.info-boxes {
+.user-info-boxes {
   display: flex;
-  flex-direction: row; /* Display boxes horizontally */
+  flex-direction: column;
   padding: 20px;
-  justify-content: flex-start; /* Align boxes to the left */
+  justify-content: center;
+  max-width: 90%; /* Use max-width for responsive scaling */
+  margin: 0 auto; /* Center the container */
+  margin-top: 20px;
+  border-radius: 5px;
+  background-color: #e7dddd;
+  padding: 20px;
 }
 
+
 .info-box {
-  position: relative;
   background-color: lightgray;
   color: black;
   padding: 15px;
-  margin: 10px;
+  margin: 25px;
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  width: 25%; /* Adjust width for smaller boxes */
-  height: 250px; /* Adjust height */
-  overflow: hidden; /* Ensure the icon stays inside the box */
-  display: block; /* Display all boxes initially */
+  flex: 1; /* Makes each box fill available width */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .info-box.hidden {
@@ -97,7 +110,7 @@ body {
 .info-box::before {
   content: '';
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   opacity: 0.1;
@@ -130,16 +143,6 @@ body {
   background-image: url('https://img.icons8.com/?size=100&id=21448&format=png&color=000000');
 }
 
-
-
-/* Item Requested Box with Request Icon */
-.item-requested-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=Xz9oqe2aw9AM&format=png&color=000000');
-}
-
-.item-Hold-box::before {
-  background-image: url('https://img.icons8.com/?size=100&id=Efp1UfqxGKqd&format=png&color=000000');
-}
 /* Notifications Box with Envelope Icon */
 .notifications-box::before {
   background-image: url('https://img.icons8.com/?size=100&id=8OqTN9Qyurt6&format=png&color=000000');
@@ -155,8 +158,61 @@ body {
   display: block; /* Ensures each item takes a full line */
 }
 
-.bookborrowed
-{
+.item-requested-box {
+  margin-bottom: 25px;
+}
+
+.title-container {
+  background-color: #b22b44;
+  padding: 2vh;
+  border-radius: 5px;
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+
+.title-css {
+  font-size: 45px;
+}
+
+.info-text-css {
+  font-family:'Times New Roman', Times, serif;
+  font-size: 20px;
+}
+
+.fine-text-css {
+  font-family:'Times New Roman', Times, serif;
+  font-size: 28px;
+}
+
+.button-container {
   display: flex;
-  flex-direction:column
+  justify-content: flex-end; /* Aligns the button to the right */
+  align-items: flex-end; /* Aligns the button to the bottom */
+  margin-top: auto; /* Pushes the button to the bottom of the container */
+}
+
+button {
+  padding: 1rem 3rem;
+  cursor: pointer;
+  background-color: #C8102E;
+  border: none;
+  border-radius: 5px;
+}
+
+.button-text {
+  font-family:'Times New Roman', Times, serif;
+  font-weight: 200;
+  font-size: 22px;
+}
+
+.requested-title, .hold-title {
+  font-size: 36px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.not-found-css {
+  text-align: center;
+  font-size: 25px;
 }
