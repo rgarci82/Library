@@ -49,6 +49,37 @@ export async function createMedia(req, res) {
   }
 }
 
+export async function returnMedia(req, res) {
+  const { selectedItem } = req.body;
+
+  try {
+    const returnDateResult = await pool.query(
+      `UPDATE mediaborrowed 
+      SET returnDate = NOW()
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
+
+    const returnStatusResult = await pool.query(
+      `UPDATE mediacopy
+      SET status = 'available'
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
+
+    // Return a success response with a 201 status
+    if (returnDateResult && returnStatusResult){
+      res.status(201).json({
+        message: "Media returned successfully",
+      });
+    }
+  } catch (error) {
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
+
 export async function requestMedia(req, res) {
   const {
     userID,

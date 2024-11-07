@@ -39,6 +39,37 @@ export async function createDevice(req, res) {
   }
 }
 
+export async function returnDevice(req, res) {
+  const { selectedItem } = req.body;
+
+  try {
+    const returnDateResult = await pool.query(
+      `UPDATE deviceborrowed 
+      SET returnDate = NOW()
+      WHERE serialNumber = ?`,
+      [selectedItem.serialNumber]
+    );
+
+    const returnStatusResult = await pool.query(
+      `UPDATE device
+      SET status = 'available'
+      WHERE serialNumber = ?`,
+      [selectedItem.serialNumber]
+    );
+
+    // Return a success response with a 201 status
+    if (returnDateResult && returnStatusResult){
+      res.status(201).json({
+        message: "Device returned successfully",
+      });
+    }
+  } catch (error) {
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
+
 export async function requestDevice(req, res) {
   const { userID, serialNumber, deviceTitle, brand, model, status } = req.body;
 

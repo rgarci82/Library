@@ -131,8 +131,36 @@ export async function borrowBook(req, res) {
   }
 }
 
+export async function returnBook(req, res) {
+  const { selectedItem } = req.body;
 
+  try {
+    const returnDateResult = await pool.query(
+      `UPDATE bookborrowed 
+      SET returnDate = NOW()
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
 
+    const returnStatusResult = await pool.query(
+      `UPDATE bookcopy
+      SET status = 'available'
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
+
+    // Return a success response with a 201 status
+    if (returnDateResult && returnStatusResult){
+      res.status(201).json({
+        message: "Book returned successfully",
+      });
+    }
+  } catch (error) {
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
 
 export async function holdBook(req, res){
 

@@ -91,13 +91,55 @@ const UserPage: React.FC = () => {
 
   const returnItem = async (selectedItem: borrowedItem) => {   
     if ("ISBN" in selectedItem){
-      console.log("BOOK!:", selectedItem);
+      try {
+        const bookResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/books/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!bookResponse.ok) throw new Error("Failed to return borrowed book");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
     else if ("MediaID" in selectedItem){
-      console.log("MEDIA!", selectedItem);
+      try {
+        const mediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/media/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!mediaResponse.ok) throw new Error("Failed to return borrowed media");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
     else if ("serialNumber" in selectedItem){
-      console.log("DEVICE!", selectedItem);
+      try {
+        const deviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!deviceResponse.ok) throw new Error("Failed to return borrowed device");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
