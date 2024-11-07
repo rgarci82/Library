@@ -2,7 +2,9 @@ import pool from "../config/db.js";
 
 export async function getDevices(req, res) {
   try {
-    const [rows] = await pool.query("SELECT * FROM device");
+    const [rows] = await pool.query(
+      "SELECT * FROM device WHERE is_deleted = 0"
+    );
 
     res.json(rows);
   } catch (error) {
@@ -213,14 +215,26 @@ export async function deleteDevice(req, res) {
   try {
     const { serialNumber } = req.params;
 
-    const [result] = await pool.query(
-      "DELETE FROM device WHERE serialNumber = ?",
+    const [device] = await pool.query(
+      "SELECT status FROM device WHERE serialNumber = ?",
       [serialNumber]
     );
 
-    if (result.affectedRows == 0) {
+    if (device.length === 0) {
       res.status(404).json({ message: "Device not found" });
     }
+
+    if (device[0].status === "borrowed") {
+      return res.status(409).json({
+        message:
+          "Device cannot be deleted because it is currently being borrowed.",
+      });
+    }
+
+    const [result] = await pool.query(
+      "UPDATE device SET is_deleted = 1, status = 'deleted' WHERE serialNumber = ?",
+      [serialNumber]
+    );
 
     res.json({ message: "Device deleted successfully" });
   } catch (error) {

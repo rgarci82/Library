@@ -926,7 +926,7 @@ const AdminDashboard = () => {
                       <strong>Serial Number:</strong> {device.serialNumber}
                     </p>
                     <p>
-                      <strong>Status:</strong> {device.status}
+                      <strong>Status:</strong> {device.status.charAt(0).toUpperCase() + device.status.slice(1)}
                     </p>
                     <button onClick={() => handleEditClick(device)}>
                       Edit
