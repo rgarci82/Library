@@ -396,7 +396,7 @@ const UserPage: React.FC = () => {
         </div>
       </div>
   
-      <div className="info-boxes">
+      <div className="user-info-boxes">
         {userData ? (
           <>
             {activeTab === 'books' && (
