@@ -4,7 +4,7 @@ import Logo from "../../public/undraw_Reading_re_29f8.png"
 import { FaSearch } from 'react-icons/fa'
 import '../components/Header.css'
 import '../components/SearchBar.css'
-
+import { jwtDecode } from 'jwt-decode';
 
 const Home: React.FC = () => {
     const [inputText, setInputText] = useState<string>("")
@@ -12,10 +12,30 @@ const Home: React.FC = () => {
 
     const navigate = useNavigate()
 
+    function isTokenExpired(token: string) {
+        try {
+            const decoded = jwtDecode(token);
+            if (!decoded.exp) return true; // No expiration field, consider it expired
+    
+            // Check if the current time is past the token expiration time
+            const currentTime = Date.now() / 1000;
+            return decoded.exp < currentTime;
+        } catch (error) {
+            // Invalid token format
+            return true;
+        }
+    }
+
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if(token){
-            setIsLoggedIn(true)
+        if (!token){
+            setIsLoggedIn(false);
+        }
+        else if(isTokenExpired(token)){
+            setIsLoggedIn(false);
+        }
+        else{
+            setIsLoggedIn(true);
         }
     },[])
 
