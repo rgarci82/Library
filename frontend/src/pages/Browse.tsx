@@ -61,35 +61,44 @@ const BrowsePage: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
+  const [userDataLoading, setUserDataLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null); // Initialize error state
 
   const fetchUserData = async () => {
+    setUserDataLoading(true);
     try {
-        const token = localStorage.getItem("token");
-        if (!token){
-          navigate('/login');
-        }
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
 
-        const decoded: JwtPayload | null = jwtDecode(token!);  // Decode the token
-        if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+      const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
+      if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
 
-        // Use decoded.id directly for fetching user data
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
+      // Fetch user data
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) throw new Error("Failed to fetch user data");
+      if (!response.ok) throw new Error("Failed to fetch user data");
 
-        const data = await response.json();
-        setUserData(data);
+      const userData = await response.json();
+      setUserData(userData);
+
+      if (!userData.userID) {
+        console.error("User data is not available.");
+        return; // Return early if userID is undefined
+      }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
+    } finally {
+      setUserDataLoading(false);
     }
   };
+
 
   const fetchBookCopies = async (ISBN : string, book : Book) => {
     try {
@@ -141,7 +150,36 @@ const BrowsePage: React.FC = () => {
     }
   };
   
+  const borrowDevice = async (device: Device) => {
+    try {
+      fetchUserData();
+      if (userDataLoading) {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData, device }), // Send device as JSON
+          });
 
+          const data = await response.json(); // Parse JSON after fetch completes
+
+          if (response.ok) {
+            console.log("Device borrowed successfully", data);
+          } else {
+            setError(data.message || "An error occurred");
+          }
+        } catch (error) {
+          setError("Failed to borrow device. Please try again.");
+          console.error("Error:", error);
+        }
+      }
+      console.log(userData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const openPopup = (item: Item) => {
     setSelectedItem(item);
@@ -150,7 +188,7 @@ const BrowsePage: React.FC = () => {
   
   const closePopup = () => {
     setIsPopupOpen(false);
-    setSelectedItem(null); // Reset selected book
+    setSelectedItem(null); // Reset selected device
   };
 
   useEffect(() => {
@@ -357,7 +395,7 @@ const BrowsePage: React.FC = () => {
                           {device.brand} {device.model}
                         </p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.borrowButton} onClick={()=> borrowDevice(device)}>Borrow</button>
                           <button style={styles.detailsButton} onClick = {() => openPopup(device)}>Details</button>
                         </div>
                       </div>

@@ -9,6 +9,7 @@ import {
   getAllDeviceRequests,
   deviceRequestAccepted,
   deviceRequestDeny,
+  borrowDevice,
 } from "../controllers/deviceController.js";
 
 const route = express.Router();
@@ -22,5 +23,6 @@ route.put("/devices/request/deny/:requestID", deviceRequestDeny);
 route.get("/devices/:serialNumber", getDeviceBySN);
 route.put("/devices/:serialNumber", updateDevice);
 route.delete("/devices/:serialNumber", deleteDevice);
+route.post("/devices/borrow", borrowDevice);
 
 export default route;
