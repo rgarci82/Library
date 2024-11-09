@@ -10,6 +10,7 @@ import {
   getAllMediaRequests,
   mediaRequestAccepted,
   mediaRequestDeny,
+  borrowMedia,
 } from "../controllers/mediaController.js";
 const route = express.Router();
 
@@ -26,5 +27,6 @@ route.put("/media/request/deny/:requestID", mediaRequestDeny);
 route.get("/media/:MediaID", getMediaByID);
 route.put("/media/:MediaID", updateMedia);
 route.put("/media/:MediaID/softDelete", deleteMedia);
+route.post("/media/borrow", borrowMedia);
 
 export default route;
