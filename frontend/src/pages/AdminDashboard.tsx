@@ -4,7 +4,6 @@ import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import { useNavigate } from "react-router-dom";
 type ItemType = "books" | "media" | "devices";
-import axios from "axios";
 
 export interface Book {
   itemType: ItemType;
@@ -69,6 +68,12 @@ interface DeviceRequest {
   Status: string;
 }
 
+interface MonthlyRegistrationRecord {
+  year: number;
+  month: number;
+  user_count: number;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -118,26 +123,9 @@ const AdminDashboard = () => {
   const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([]);
 
   //dataQueries
-  interface MonthlyRegistrationRecord {
-    year: number;
-    month: number;
-    user_count: number;
-  }
   const [monthlyRegistrations, setMonthlyRegistrations] = useState<
     MonthlyRegistrationRecord[]
   >([]);
-
-  useEffect(() => {
-    const fetchMonthlyRegistrations = async () => {
-      try {
-        const response = await axios.get("/users/monthly-registrations");
-        setMonthlyRegistrations(response.data);
-      } catch (error) {
-        console.error("Error fetching monthly registrations:", error);
-      }
-    };
-    fetchMonthlyRegistrations();
-  }, []);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -288,6 +276,7 @@ const AdminDashboard = () => {
 
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
+    console.log("Tab changed to:", tab);
   };
 
   const handleEditClick = (item: Book | Media | Device) => {
@@ -555,6 +544,20 @@ const AdminDashboard = () => {
       console.error(error);
     }
   };
+  const fetchMonthlyRegistrations = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/user-registrations`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch registrations");
+      }
+      const data = await response.json();
+      setMonthlyRegistrations(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const refreshItems = async () => {
     await fetchBooks();
@@ -569,6 +572,7 @@ const AdminDashboard = () => {
     fetchBookRequests();
     fetchMediaRequests();
     fetchDeviceRequests();
+    fetchMonthlyRegistrations();
   }, []);
 
   const handleSignOut = () => {
@@ -1125,29 +1129,26 @@ const AdminDashboard = () => {
 
         {activeTab == "dataQueries" && (
           <>
-            <div>
-              <h1>Data Queries</h1>
-              <div id="dataQueries">
-                <h2>Monthly User Registrations</h2>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Year</th>
-                      <th>Month</th>
-                      <th>User Count</th>
+            <div className="media-requests">
+              <h1>Monthly Registrations</h1>
+              <table className="requests-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>User Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyRegistrations.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.user_count}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyRegistrations.map((record, index) => (
-                      <tr key={index}>
-                        <td>{record.year}</td>
-                        <td>{record.month}</td>
-                        <td>{record.user_count}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </>
         )}

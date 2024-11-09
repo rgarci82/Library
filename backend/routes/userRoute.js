@@ -14,6 +14,6 @@ route.get('/users/:userID/mediaBorrowed', getUserBorrowedMedia)
 route.get('/users/:userID/deviceBorrowed', getUserBorrowedDevice)
 route.get('/users/:userID/booksRequested', getUserRequestedBooks)
 route.get('/users/:userID/mediaRequested', getUserRequestedMedia)
-route.get('/users/monthly-registrations', getMonthlyUserRegistrations);
+route.get('/api/user-registrations', getMonthlyUserRegistrations);
 
 export default route 
