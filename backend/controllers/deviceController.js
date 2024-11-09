@@ -2,7 +2,9 @@ import pool from "../config/db.js";
 
 export async function getDevices(req, res) {
   try {
-    const [rows] = await pool.query("SELECT * FROM device");
+    const [rows] = await pool.query(
+      "SELECT * FROM device WHERE is_deleted = 0"
+    );
 
     res.json(rows);
   } catch (error) {
@@ -36,6 +38,37 @@ export async function createDevice(req, res) {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+}
+
+export async function returnDevice(req, res) {
+  const { selectedItem } = req.body;
+
+  try {
+    const returnDateResult = await pool.query(
+      `UPDATE deviceborrowed 
+      SET returnDate = NOW()
+      WHERE serialNumber = ?`,
+      [selectedItem.serialNumber]
+    );
+
+    const returnStatusResult = await pool.query(
+      `UPDATE device
+      SET status = 'available'
+      WHERE serialNumber = ?`,
+      [selectedItem.serialNumber]
+    );
+
+    // Return a success response with a 201 status
+    if (returnDateResult && returnStatusResult){
+      res.status(201).json({
+        message: "Device returned successfully",
+      });
+    }
+  } catch (error) {
+    console.error('Error occurred:', error);
+    // Send an appropriate error response to the client
+    return { success: false, message: 'Internal Server Error', error: error.message };
   }
 }
 
@@ -213,14 +246,26 @@ export async function deleteDevice(req, res) {
   try {
     const { serialNumber } = req.params;
 
-    const [result] = await pool.query(
-      "DELETE FROM device WHERE serialNumber = ?",
+    const [device] = await pool.query(
+      "SELECT status FROM device WHERE serialNumber = ?",
       [serialNumber]
     );
 
-    if (result.affectedRows == 0) {
+    if (device.length === 0) {
       res.status(404).json({ message: "Device not found" });
     }
+
+    if (device[0].status === "borrowed") {
+      return res.status(409).json({
+        message:
+          "Device cannot be deleted because it is currently being borrowed.",
+      });
+    }
+
+    const [result] = await pool.query(
+      "UPDATE device SET is_deleted = 1, status = 'deleted' WHERE serialNumber = ?",
+      [serialNumber]
+    );
 
     res.json({ message: "Device deleted successfully" });
   } catch (error) {

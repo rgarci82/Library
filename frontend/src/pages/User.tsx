@@ -69,6 +69,8 @@ interface deviceHold {
   status: string;
 }
 
+type borrowedItem = BorrowedBook | BorrowedMedia | BorrowedDevice;
+
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
   const [userData, setUserData] = useState<any>(null);
@@ -83,6 +85,85 @@ const UserPage: React.FC = () => {
   const [userbookHold, setUserbookHold] = useState<bookHold[]>([]);
   const [usermediaHold, setUsermediaHold] = useState<mediaHold[]>([]);
   const [userdeviceHold, setUserdeviceHold] = useState<deviceHold[]>([]);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
+
+  const returnItem = async (selectedItem: borrowedItem) => {   
+    if ("ISBN" in selectedItem){
+      try {
+        const bookResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/books/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!bookResponse.ok) throw new Error("Failed to return borrowed book");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+    else if ("MediaID" in selectedItem){
+      try {
+        const mediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/media/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!mediaResponse.ok) throw new Error("Failed to return borrowed media");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+    else if ("serialNumber" in selectedItem){
+      try {
+        const deviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/return`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({selectedItem}),
+        });
+
+        if (!deviceResponse.ok) throw new Error("Failed to return borrowed device");
+        
+        window.location.reload();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  const handleReturnClick = (item: borrowedItem) => {
+    setSelectedItem(item);
+    setShowModal(true);
+  };
+
+  const handleConfirmReturn = () => {
+    // Proceed with the return action
+    if (selectedItem){
+      returnItem(selectedItem);
+    }
+    else{
+      console.log("No item selected");
+    }
+    setShowModal(false); // Close the modal
+  };
+
+  const handleCancel = () => {
+    setShowModal(false); // Close the modal without returning
+    setSelectedItem(null);
+  };
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -271,7 +352,7 @@ const UserPage: React.FC = () => {
 
         const booksRequestedData = await requestedBooksResponse.json();
         setUserRequestedBooks(booksRequestedData.userRequestedBooks || []); // Ensure you access the correct property
-  //device
+        //device
         const requestedDeviceReponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceRequested`, {
           method: 'GET',
           headers: {
@@ -348,7 +429,6 @@ const UserPage: React.FC = () => {
   const handleSignOut = () => {
     navigate('/')
     localStorage.clear();
-    
   }
 
   //Handle Clicking Tabs
@@ -412,8 +492,8 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">ItemID: {book.itemID}</li>
                       <li className="info-text-css">Due Date: {new Date(book.dueDate).toLocaleDateString()}</li>
                     </ul>
-                    <div className="button-container">
-                      <button className="button-text">
+                    <div className="button-container" onClick={()=> handleReturnClick(book)}>
+                      <button className="button-text return-button">
                         Return
                       </button>
                     </div>
@@ -438,8 +518,8 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">ItemID: {media.itemID}</li>
                       <li className="info-text-css">Due Date: {new Date(media.dueDate).toLocaleDateString()}</li>
                     </ul>
-                    <div className="button-container">
-                      <button className="button-text">
+                    <div className="button-container" onClick={()=> handleReturnClick(media)}>
+                      <button className="button-text return-button">
                         Return
                       </button>
                     </div>
@@ -463,7 +543,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">Due Date: {new Date(device.dueDate).toLocaleDateString()}</li>
                     </ul>
                     <div className="button-container">
-                      <button className="button-text">
+                      <button className="button-text return-button" onClick={()=> handleReturnClick(device)}>
                         Return
                       </button>
                     </div>
@@ -474,7 +554,17 @@ const UserPage: React.FC = () => {
               )
             )}
 
-  
+            {/* Modal */}
+            {showModal && selectedItem && (
+              <div className="modal">
+                <div className="modal-content">
+                  <p className="confirmation-text">Are you sure you want to return this item?</p>
+                  <button onClick={handleConfirmReturn} className="yes-button">Yes</button>
+                  <button onClick={handleCancel} className="cancel-button">Cancel</button>
+                </div>
+              </div>
+            )}
+            
             {/* Fines */}
             {activeTab === 'fines' && (
               <div className="info-box fines-box">

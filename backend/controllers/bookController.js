@@ -2,7 +2,7 @@ import pool from "../config/db.js";
 
 export async function getBooks(req, res) {
   try {
-    const [rows] = await pool.query("SELECT * FROM book");
+    const [rows] = await pool.query("SELECT * FROM book WHERE is_deleted = 0");
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -46,15 +46,16 @@ export async function createBook(req, res) {
   }
 }
 
-export async function getBookCopy(req, res){
+export async function getBookCopy(req, res) {
   try {
     const { ISBN } = req.params;
 
-    if (!ISBN){
-      return res.status(400).json({message: "ISBN is required"});
+    if (!ISBN) {
+      return res.status(400).json({ message: "ISBN is required" });
     }
 
-    const [bookCopies] = await pool.query(`
+    const [bookCopies] = await pool.query(
+      `
       SELECT bookcopy.itemID, bookcopy.status
       FROM bookcopy
       WHERE bookcopy.ISBN = ? AND bookcopy.status = 'available'
@@ -104,7 +105,7 @@ export async function borrowBook(req, res) {
     }
 
     const userID = userData.userID;
-    const dueDate = '2024-10-30 18:00:00';
+    const dueDate = "2024-10-30 18:00:00";
     const itemID = availableCopy[0].itemID;
 
     //Insert the borrow record into the 'bookborrowed' table
@@ -122,17 +123,49 @@ export async function borrowBook(req, res) {
     // Return a success response with a 201 status
     res.status(201).json({
       message: "Book borrowed successfully",
-      itemID: itemID
+      itemID: itemID,
     });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    // Send an appropriate error response to the client
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
+  }
+}
+
+export async function returnBook(req, res) {
+  const { selectedItem } = req.body;
+
+  try {
+    const returnDateResult = await pool.query(
+      `UPDATE bookborrowed 
+      SET returnDate = NOW()
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
+
+    const returnStatusResult = await pool.query(
+      `UPDATE bookcopy
+      SET status = 'available'
+      WHERE itemID = ?`,
+      [selectedItem.itemID]
+    );
+
+    // Return a success response with a 201 status
+    if (returnDateResult && returnStatusResult){
+      res.status(201).json({
+        message: "Book returned successfully",
+      });
+    }
   } catch (error) {
     console.error('Error occurred:', error);
     // Send an appropriate error response to the client
     return { success: false, message: 'Internal Server Error', error: error.message };
   }
 }
-
-
-
 
 export async function holdBook(req, res){
 
@@ -335,15 +368,26 @@ export async function deleteBook(req, res) {
   try {
     const { ISBN } = req.params;
 
-    const [result] = await pool.query("DELETE FROM book WHERE ISBN = ?", [
+    const [borrowedCopies] = await pool.query(
+      "SELECT COUNT(*) as borrowedCount FROM bookcopy WHERE ISBN = ? AND status = 'borrowed'",
+      [ISBN]
+    );
+
+    if (borrowedCopies[0].borrowedCount > 0) {
+      return res
+        .status(409)
+        .json({ message: "Some copies are currently being borrowed." });
+    }
+
+    // Step 2: Update book and bookcopies if no copies are borrowed
+    await pool.query("UPDATE book SET is_deleted = 1 WHERE ISBN = ?", [ISBN]);
+    await pool.query("UPDATE bookcopy SET status = 'deleted' WHERE isbn = ?", [
       ISBN,
     ]);
 
-    if (result.affectedRows == 0) {
-      res.status(404).json({ message: "Book not found" });
-    }
-
-    res.json({ message: "Book deleted successfully" });
+    res.json({
+      message: "Book and all associated copies deleted successfully.",
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

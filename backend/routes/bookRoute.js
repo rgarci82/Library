@@ -4,6 +4,7 @@ import {
   createBook,
   getBookCopy,
   borrowBook,
+  returnBook,
   holdBook,
   requestBook,
   getBookByISBN,
@@ -20,6 +21,7 @@ route.get("/books", getBooks);
 route.post("/books", createBook);
 route.get("/books/:ISBN/bookcopy", getBookCopy);
 route.post("/books/borrow", borrowBook);
+route.post("/books/return", returnBook);
 route.post("/books/hold", holdBook);
 route.post("/books/request", requestBook);
 route.get("/books/request", getAllBookRequests);
@@ -27,6 +29,6 @@ route.put("/books/request/accept/:requestID", bookRequestAccepted);
 route.put("/books/request/deny/:requestID", bookRequestDeny);
 route.get("/books/:ISBN", getBookByISBN);
 route.put("/books/:ISBN", updateBook);
-route.delete("/books/:ISBN", deleteBook);
+route.put("/books/:ISBN/softDelete", deleteBook);
 
 export default route;
