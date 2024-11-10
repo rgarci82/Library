@@ -275,7 +275,7 @@ export async function deleteDevice(req, res) {
 //borrow device funtion 1, copy paste, change
 export async function borrowDevice(req, res) {
   const { userData, device } = req.body;
-  console.log(userData);
+  console.log("TESTING:::", userData);
   try {
     // Check if the user has already borrowed a copy of this device
     const [existingBorrow] = await pool.query(
@@ -287,9 +287,11 @@ export async function borrowDevice(req, res) {
 
     // If a matching record is found, return a 400 status with a message
     if (existingBorrow.length > 0) {
-      return res.status(400).json({
-        message: "You have already borrowed this device.",
-      });
+      if (existingBorrow.some(item => item.returnDate === null)){
+        return res.status(400).json({
+          message: "You have already borrowed this device.",
+        });
+      }
     }
 
     // Find the first available serialNumber

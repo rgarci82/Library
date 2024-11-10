@@ -82,11 +82,13 @@ export async function borrowBook(req, res) {
     );
 
     // If a matching record is found, return a 400 status with a message
+    //&& existingBorrow.every(item => item.returnDate !== null)
     if (existingBorrow.length > 0) {
-      console.log(existingBorrow)
-      return res.status(400).json({
-        message: "You have already borrowed this book.",
-      });
+      if (existingBorrow.some(item => item.returnDate === null)){
+        return res.status(400).json({
+          message: "You have already borrowed this book.",
+        });
+      }
     }
 
     // Find the first available itemID for the book ISBN

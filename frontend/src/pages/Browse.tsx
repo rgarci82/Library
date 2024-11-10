@@ -94,16 +94,14 @@ const BrowsePage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-    } finally {
-      setUserDataLoading(false);
+    } finally{
+      setUserDataLoading(true);
     }
   };
 
 
   const fetchBookCopies = async (ISBN : string, book : Book) => {
     try {
-      fetchUserData();
-      
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
           method: 'GET',
           headers: {
@@ -151,9 +149,8 @@ const BrowsePage: React.FC = () => {
   };
   
   const borrowDevice = async (device: Device) => {
-    try {
-      fetchUserData();
-      if (userDataLoading) {
+    try {      
+      if (userData) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
             method: 'POST',
@@ -175,7 +172,6 @@ const BrowsePage: React.FC = () => {
           console.error("Error:", error);
         }
       }
-      console.log(userData);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -190,7 +186,6 @@ const BrowsePage: React.FC = () => {
         },
         body: JSON.stringify({ userData, media }), // Send book as JSON
       });
-  console.log(media)
       const data = await response.json(); // Parse JSON after fetch completes
   
       if (response.ok) {
@@ -206,8 +201,7 @@ const BrowsePage: React.FC = () => {
 
   const fetchMediaCopies = async (MediaID : number, media : Media) => {
     try {
-      await fetchUserData();
-      
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
           method: 'GET',
           headers: {
@@ -240,6 +234,8 @@ const BrowsePage: React.FC = () => {
     setIsPopupOpen(false);
     setSelectedItem(null); // Reset selected device
   };
+
+  useEffect(() => {fetchUserData();});
 
   useEffect(() => {
     // Get the search term from the URL query parameter
