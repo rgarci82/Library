@@ -108,7 +108,6 @@ export async function borrowBook(req, res) {
     }
 
     const userID = userData.userID;
-    const dueDate = "2024-10-30 18:00:00";
     const itemID = availableCopy[0].itemID;
 
     //Insert the borrow record into the 'bookborrowed' table

@@ -17,10 +17,6 @@ interface Book {
   edition: number | null;
 }
 
-interface BookCopy {
-  ItemID: number;
-  status: ItemStatus;
-}
 interface Media {
   MediaID: number;
   mTitle: string;
@@ -52,7 +48,6 @@ const BrowsePage: React.FC = () => {
   
   const [userData, setUserData] = useState<any>(null);
   const [allBooks, setAllBooks] = useState<Book[]>([]);
-  const [bookCopy, setBookCopy] = useState<BookCopy[]>([]);
   const [allMedia, setAllMedia] = useState<Media[]>([]);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [filteredItems, setFilteredItems] = useState<(Book | Media | Device)[]>([]);
@@ -60,8 +55,6 @@ const BrowsePage: React.FC = () => {
   const [showHoldPopup, setShowHoldPopup] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-
-  const [error, setError] = useState<string | null>(null); // Initialize error state
 
   const fetchUserData = async () => {
     try {
@@ -120,80 +113,6 @@ const BrowsePage: React.FC = () => {
     }
   }
 
-  const borrowBook = async (book: Book) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userData, book }), // Send book as JSON
-      });
-  
-      const data = await response.json(); // Parse JSON after fetch completes
-  
-      if (response.ok) {
-        console.log("Book borrowed successfully", data);
-      } else {
-        setError(data.message || "An error occurred");
-      }
-    } catch (error) {
-      setError("Failed to borrow book. Please try again.");
-      console.error("Error:", error);
-    }
-  };
-  
-  const borrowDevice = async (device: Device) => {
-    try {      
-      if (userData) {
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userData, device }), // Send device as JSON
-          });
-
-          const data = await response.json(); // Parse JSON after fetch completes
-
-          if (response.ok) {
-            console.log("Device borrowed successfully", data);
-          } else {
-            setError(data.message || "An error occurred");
-          }
-        } catch (error) {
-          setError("Failed to borrow device. Please try again.");
-          console.error("Error:", error);
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const borrowMedia = async (media: Media) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userData, media }), // Send book as JSON
-      });
-      const data = await response.json(); // Parse JSON after fetch completes
-  
-      if (response.ok) {
-        console.log("Media borrowed successfully", data);
-      } else {
-        setError(data.message || "An error occurred");
-      }
-    } catch (error) {
-      setError("Failed to borrow media. Please try again.");
-      console.error("Error:", error);
-    }
-  };
-
   const fetchMediaCopies = async (MediaID : number, media : Media) => {
     try {
 
@@ -220,6 +139,76 @@ const BrowsePage: React.FC = () => {
     }
   }
 
+  const borrowBook = async (book: Book) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData, book }), // Send book as JSON
+      });
+  
+      await response.json(); // Parse JSON after fetch completes
+  
+      if (response.ok) {
+        console.log("Book borrowed successfully");
+        navigate('/user');
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  const borrowMedia = async (media: Media) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData, media }), // Send book as JSON
+      });
+      
+      await response.json(); // Parse JSON after fetch completes
+  
+      if (response.ok) {
+        console.log("Media borrowed successfully");
+        navigate('/user');
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const borrowDevice = async (device: Device) => {
+    try {      
+      if (userData) {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData, device }), // Send device as JSON
+          });
+
+          await response.json(); // Parse JSON after fetch completes
+
+          if (response.ok) {
+            console.log("Device borrowed successfully");
+            navigate('/user');
+          } 
+        } catch (error) {
+          
+          console.error("Error:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const openPopup = (item: Item) => {
     setSelectedItem(item);
     setIsPopupOpen(true);
@@ -227,18 +216,20 @@ const BrowsePage: React.FC = () => {
   
   const closePopup = () => {
     setIsPopupOpen(false);
-    setSelectedItem(null); // Reset selected device
+    setSelectedItem(null);
   };
 
+  //Fetch user data
   useEffect(() => {fetchUserData();});
 
+  // Get the search term from the URL query parameter
   useEffect(() => {
-    // Get the search term from the URL query parameter
     const params = new URLSearchParams(location.search);
     const search = params.get('search');
     if (search) setSearchTerm(search);
-}, [location]);
+  }, [location]);
 
+  //Fetch all books
   useEffect(() => {
     const fetchAllBooks = async () => {
       try {
@@ -260,7 +251,8 @@ const BrowsePage: React.FC = () => {
     }
     fetchAllBooks();
   }, []);
-
+  
+  //Fetch all media
   useEffect(() => {
     const fetchAllMedia = async () => {
       try {
@@ -282,6 +274,7 @@ const BrowsePage: React.FC = () => {
     fetchAllMedia();
   }, []);
 
+  //Fetch all device
   useEffect(() => {
     const fetchAllDevices = async () => {
       try {
@@ -337,8 +330,6 @@ const BrowsePage: React.FC = () => {
     // Update the state with the filtered items
     setFilteredItems(filtered);
   }, [searchTerm, searchBy, allBooks, allMedia, allDevices]);
-
-  
 
   return (
     <div>
