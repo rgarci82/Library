@@ -287,3 +287,92 @@ export async function deleteMedia(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
+export async function borrowMedia(req, res) {
+  const { userData, media } = req.body;
+
+  try {
+    // Check if the user has already borrowed a copy of this media
+    const [existingBorrow] = await pool.query(
+      `SELECT * FROM mediaborrowed 
+       JOIN mediacopy ON mediaborrowed.itemID = mediacopy.itemID
+       WHERE mediaborrowed.userID = ? AND mediacopy.MediaID = ?`,
+      [userData.userID, media.MediaID]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingBorrow.length > 0) {
+      return res.status(400).json({
+        message: "You have already borrowed this media.",
+      });
+    }
+
+    // Find the first available itemID for the mediaID
+    const [availableCopy] = await pool.query(
+      `SELECT itemID FROM mediacopy 
+       WHERE MediaID = ? AND status = 'available' 
+       ORDER BY itemID ASC 
+       LIMIT 1`,
+      [media.MediaID]
+    );
+
+    // If no available copy is found, return a 404 status with a message
+    if (availableCopy.length === 0) {
+      return res.status(404).json({
+        message: "No available copies of this media.",
+      });
+    }
+
+    const userID = userData.userID;
+    const itemID = availableCopy[0].itemID;
+
+    //Insert the borrow record into the 'mediaborrowed' table
+    const [borrowResult] = await pool.query(
+      `INSERT INTO mediaborrowed (userID, itemID) VALUES (?, ?)`,
+      [userID, itemID]
+    );
+
+    // Update the status of the borrowed media copy in the 'mediacopy' table
+    const [updateResult] = await pool.query(
+      `UPDATE mediacopy SET status = 'borrowed' WHERE itemID = ?`,
+      [itemID]
+    );
+
+    // Return a success response with a 201 status
+    res.status(201).json({
+      message: "Media borrowed successfully",
+      itemID: itemID,
+    });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    // Send an appropriate error response to the client
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
+  }
+}
+
+export async function getMediaCopy(req, res) {
+  try {
+    const { MediaID } = req.params;
+
+    if (!MediaID) {
+      return res.status(400).json({ message: "MediaID is required" });
+    }
+
+    const [mediaCopies] = await pool.query(
+      `
+      SELECT mediacopy.itemID, mediacopy.status
+      FROM mediacopy
+      WHERE mediacopy.MediaID = ? AND mediacopy.status = 'available'
+      `,
+      [MediaID]
+    );
+
+    res.json(mediaCopies);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}

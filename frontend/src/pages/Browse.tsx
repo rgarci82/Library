@@ -181,6 +181,56 @@ const BrowsePage: React.FC = () => {
     }
   };
 
+  const borrowMedia = async (media: Media) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData, media }), // Send book as JSON
+      });
+  console.log(media)
+      const data = await response.json(); // Parse JSON after fetch completes
+  
+      if (response.ok) {
+        console.log("Media borrowed successfully", data);
+      } else {
+        setError(data.message || "An error occurred");
+      }
+    } catch (error) {
+      setError("Failed to borrow media. Please try again.");
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchMediaCopies = async (MediaID : number, media : Media) => {
+    try {
+      await fetchUserData();
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all media");
+
+      const data = await response.json();
+
+      if (data.length > 0){
+        borrowMedia(media);
+        return;
+      }
+      else if (data.length === 0){
+        setShowHoldPopup(true);
+      }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  }
+
   const openPopup = (item: Item) => {
     setSelectedItem(item);
     setIsPopupOpen(true);
@@ -381,7 +431,7 @@ const BrowsePage: React.FC = () => {
                           Genre: {media.genre}
                         </p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton}>Borrow</button>
+                          <button style={styles.borrowButton} onClick={()=> fetchMediaCopies(media.MediaID, media)}>Borrow</button>
                           <button style={styles.detailsButton} onClick = {() => openPopup(media)}>Details</button>
                         </div>
                       </div>

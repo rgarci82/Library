@@ -83,6 +83,7 @@ export async function borrowBook(req, res) {
 
     // If a matching record is found, return a 400 status with a message
     if (existingBorrow.length > 0) {
+      console.log(existingBorrow)
       return res.status(400).json({
         message: "You have already borrowed this book.",
       });
