@@ -61,12 +61,9 @@ const BrowsePage: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-  const [userDataLoading, setUserDataLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null); // Initialize error state
 
   const fetchUserData = async () => {
-    setUserDataLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
@@ -94,9 +91,7 @@ const BrowsePage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-    } finally{
-      setUserDataLoading(true);
-    }
+    } 
   };
 
 
