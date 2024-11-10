@@ -18,7 +18,7 @@ const Request: React.FC = () => {
     const [bookEdition, setBookEdition] = useState<string>("");
 
     const [mediaTitle, setMediaTitle] = useState<string>("");
-    const [mediaISBN, setMediaISBN] = useState<string>("");
+    const [mediaID, setMediaID] = useState<string>("");
     const [mediaAuthor, setMediaAuthor] = useState<string>("");
     const [mediaPublisher, setMediaPublisher] = useState<string>("");
     const [mediaGenre, setMediaGenre] = useState<string>("");
@@ -46,7 +46,7 @@ const Request: React.FC = () => {
           setError("Please fill in all fields");
           return;
         }
-        else if (itemType === 'Media' && (!mediaTitle || !mediaISBN || !mediaAuthor || !mediaPublisher || !mediaGenre)){
+        else if (itemType === 'Media' && (!mediaTitle || !mediaID || !mediaAuthor || !mediaPublisher || !mediaGenre)){
           setError("Please fill in all fields");
         }
         else if (itemType === 'Device' && (!deviceTitle || !serialNumber || !brand || !model)){
@@ -97,7 +97,7 @@ const Request: React.FC = () => {
               body: JSON.stringify({
                 userID,
                 mediaTitle,
-                mediaISBN,
+                mediaID,
                 mediaAuthor,
                 mediaPublisher,
                 mediaGenre,
@@ -324,13 +324,13 @@ const Request: React.FC = () => {
                   />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>ISBN</label>
+                  <label style={styles.label}>MediaID</label>
                   <input
                     type="text"
-                    value={mediaISBN}
+                    value={mediaID}
                     onChange={(e) => {
                       const sanitizedValue = e.target.value;
-                      setMediaISBN(sanitizedValue);
+                      setMediaID(sanitizedValue);
                     }}
                     placeholder="Enter the ISBN"
                     required

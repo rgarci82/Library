@@ -56,6 +56,8 @@ const BrowsePage: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
+  const [selectedHoldItem, setSelectedHoldItem] = useState<Item>();
+
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -106,6 +108,7 @@ const BrowsePage: React.FC = () => {
         return;
       }
       else if (data.length === 0){
+        setSelectedHoldItem(book);
         setShowHoldPopup(true);
       }
     } catch (error) {
@@ -132,6 +135,7 @@ const BrowsePage: React.FC = () => {
         return;
       }
       else if (data.length === 0){
+        setSelectedHoldItem(media);
         setShowHoldPopup(true);
       }
     } catch (error) {
@@ -198,6 +202,10 @@ const BrowsePage: React.FC = () => {
           if (response.ok) {
             console.log("Device borrowed successfully");
             navigate('/user');
+          }
+          else{
+            setSelectedHoldItem(device);
+            setShowHoldPopup(true);
           } 
         } catch (error) {
           
@@ -206,6 +214,68 @@ const BrowsePage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const holdingItem = async () => {
+    if (selectedHoldItem){
+      if ("ISBN" in selectedHoldItem){
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/hold`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
+          });
+      
+          await response.json(); // Parse JSON after fetch completes
+      
+          if (response.ok) {
+            navigate('/user');
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+      else if ("MediaID" in selectedHoldItem){
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/hold`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
+          });
+      
+          await response.json(); // Parse JSON after fetch completes
+      
+          if (response.ok) {
+            navigate('/user');
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+      else if ("serialNumber" in selectedHoldItem){
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/hold`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
+          });
+      
+          await response.json(); // Parse JSON after fetch completes
+      
+          if (response.ok) {
+            navigate('/user');
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
     }
   };
 
@@ -444,10 +514,10 @@ const BrowsePage: React.FC = () => {
             <div style={styles.detailsPopupOverlay}>
               <div style={styles.detailsPopup}>
                 <h3>No copies available</h3>
-                <p style={styles.genreText}>This book is currently not available. Would you like to place it on hold?</p>
+                <p style={styles.genreText}>This item is currently not available. Would you like to place it on hold?</p>
                 <div style={styles.holdCloseContainer}>
                   <button onClick={() => {
-                    // Handle hold logic here
+                    holdingItem();
                     setShowHoldPopup(false); // Close the popup
                   }} style={styles.closeButton}>
                     Hold

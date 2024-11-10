@@ -681,7 +681,7 @@ const UserPage: React.FC = () => {
                       <p className="not-found-css">No media holds found.</p>
                     )}
 
-                    {/* Display book hold */}
+                    {/* Display device hold */}
                     <div className="title-container">
                       <h2 className="hold-title">Device Holds</h2>
                     </div>

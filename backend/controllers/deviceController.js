@@ -72,17 +72,54 @@ export async function returnDevice(req, res) {
   }
 }
 
+export async function holdDevice(req, res){
+  const { userData, selectedHoldItem} = req.body;
+
+  try{
+    // Check if the user has already borrowed this device
+    const [existingHold] = await pool.query(
+      `SELECT * FROM devicehold 
+       JOIN device ON devicehold.serialNumber = device.serialNumber
+       WHERE devicehold.userID = ? AND device.serialNumber = ?`,
+      [userData.userID, selectedHoldItem.serialNumber]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingHold.length > 0) {
+      if (existingHold.some(item => item.status === 'OnHold')){
+        return res.status(400).json({
+          message: "You already have this device on hold.",
+        });
+      }
+    }
+
+    const [holdResult] = await pool.query(
+      `INSERT INTO devicehold(userID, serialNumber, status)
+      VALUES (?, ?, 'OnHold')`,
+      [userData.userID, selectedHoldItem.serialNumber]
+    );
+
+    res.status(201).json({
+      message: "Device on hold successfully",
+    });
+  }
+  catch (error){
+    console.error('Error occured:', error);
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
+
 export async function requestDevice(req, res) {
   const { userID, serialNumber, deviceTitle, brand, model, status } = req.body;
 
   try {
-    // Check if the book already exists in the 'book' table
+    // Check if the device already exists in the 'device' table
     const [existingDevice] = await pool.query(
       "SELECT * FROM device WHERE serialNumber = ?",
       [serialNumber]
     );
 
-    // If a book with this ISBN exists, return a 400 status with a message
+    // If a device with this serialNumber exists, return a 400 status with a message
     if (existingDevice.length > 0) {
       return res.status(400).json({
         message:
@@ -102,7 +139,7 @@ export async function requestDevice(req, res) {
       });
     }
 
-    // Insert the book request into the 'bookrequest' table
+    // Insert the device request into the 'devicerequest' table
     const [result] = await pool.query(
       "INSERT INTO devicerequest (userID, serialNumber, dName, brand, model, Status) VALUES (?, ?, ?, ?, ?, ?)",
       [userID, serialNumber, deviceTitle, brand, model, status]
@@ -120,10 +157,10 @@ export async function requestDevice(req, res) {
 
 export async function getAllDeviceRequests(req, res) {
   try {
-    // Query to fetch all book requests
+    // Query to fetch all device requests
     const [deviceRequests] = await pool.query("SELECT * FROM devicerequest");
 
-    // Return the list of book requests
+    // Return the list of device requests
     res.status(200).json(deviceRequests);
   } catch (error) {
     console.error("Error occurred while fetching device requests:", error);
@@ -275,7 +312,6 @@ export async function deleteDevice(req, res) {
 //borrow device funtion 1, copy paste, change
 export async function borrowDevice(req, res) {
   const { userData, device } = req.body;
-  console.log("TESTING:::", userData);
   try {
     // Check if the user has already borrowed a copy of this device
     const [existingBorrow] = await pool.query(

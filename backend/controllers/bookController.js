@@ -72,6 +72,8 @@ export async function getBookCopy(req, res) {
 export async function borrowBook(req, res) {
   const { userData, book } = req.body;
 
+  console.log("BORROWING: ", book);
+
   try {
     // Check if the user has already borrowed a copy of this book
     const [existingBorrow] = await pool.query(
@@ -82,7 +84,6 @@ export async function borrowBook(req, res) {
     );
 
     // If a matching record is found, return a 400 status with a message
-    //&& existingBorrow.every(item => item.returnDate !== null)
     if (existingBorrow.length > 0) {
       if (existingBorrow.some(item => item.returnDate === null)){
         return res.status(400).json({
@@ -170,7 +171,40 @@ export async function returnBook(req, res) {
 }
 
 export async function holdBook(req, res){
+  const { userData, selectedHoldItem} = req.body;
 
+  try{
+    // Check if the user has already borrowed a copy of this book
+    const [existingHold] = await pool.query(
+      `SELECT * FROM bookhold 
+       JOIN book ON bookhold.ISBN = book.ISBN
+       WHERE bookhold.userID = ? AND book.ISBN = ?`,
+      [userData.userID, selectedHoldItem.ISBN]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingHold.length > 0) {
+      if (existingHold.some(item => item.status === 'OnHold')){
+        return res.status(400).json({
+          message: "You already have this book on hold.",
+        });
+      }
+    }
+
+    const [holdResult] = await pool.query(
+      `INSERT INTO bookhold(userID, ISBN, status)
+      VALUES (?, ?, 'OnHold')`,
+      [userData.userID, selectedHoldItem.ISBN]
+    );
+
+    res.status(201).json({
+      message: "Book on hold successfully",
+    });
+  }
+  catch (error){
+    console.error('Error occured:', error);
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
 }
 
 export async function requestBook(req, res) {

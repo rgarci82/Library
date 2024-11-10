@@ -4,6 +4,7 @@ import {
   createMedia,
   getMediaByID,
   returnMedia,
+  holdMedia,
   updateMedia,
   deleteMedia,
   requestMedia,
@@ -19,6 +20,7 @@ route.get("/media", getMedia);
 route.post("/media", createMedia);
 route.get("/media/:MediaID", getMediaByID);
 route.post("/media/return", returnMedia);
+route.post("/media/hold", holdMedia);
 route.put("/media/:MediaID", updateMedia);
 route.delete("/media/:MediaID", deleteMedia);
 route.post("/media/request", requestMedia);

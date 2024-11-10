@@ -70,10 +70,47 @@ export async function returnMedia(req, res) {
   }
 }
 
+export async function holdMedia(req, res){
+  const { userData, selectedHoldItem} = req.body;
+
+  try{
+    // Check if the user has already borrowed a copy of this media
+    const [existingHold] = await pool.query(
+      `SELECT * FROM mediahold 
+       JOIN media ON mediahold.MediaID = media.MediaID
+       WHERE mediahold.userID = ? AND media.MediaID = ?`,
+      [userData.userID, selectedHoldItem.MediaID]
+    );
+
+    // If a matching record is found, return a 400 status with a message
+    if (existingHold.length > 0) {
+      if (existingHold.some(item => item.status === 'OnHold')){
+        return res.status(400).json({
+          message: "You already have this media on hold.",
+        });
+      }
+    }
+
+    const [holdResult] = await pool.query(
+      `INSERT INTO mediahold(userID, MediaID, status)
+      VALUES (?, ?, 'OnHold')`,
+      [userData.userID, selectedHoldItem.MediaID]
+    );
+
+    res.status(201).json({
+      message: "Media on hold successfully",
+    });
+  }
+  catch (error){
+    console.error('Error occured:', error);
+    return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
+
 export async function requestMedia(req, res) {
   const {
     userID,
-    mediaISBN,
+    mediaID,
     mediaTitle,
     mediaAuthor,
     mediaPublisher,
@@ -85,33 +122,33 @@ export async function requestMedia(req, res) {
   try {
     const [existingMedia] = await pool.query(
       "SELECT * FROM media WHERE MediaID = ?",
-      [mediaISBN]
+      [mediaID]
     );
 
     if (existingMedia.length > 0) {
       return res.status(400).json({
         message:
-          "A media with this ISBN already exists, try borrowing it instead.",
+          "A media with this MediaID already exists, try borrowing it instead.",
       });
     }
 
     // Corrected syntax for checking existing requests
     const [existingRequest] = await pool.query(
-      "SELECT * FROM mediarequest WHERE ISBN = ? AND userID = ?",
-      [mediaISBN, userID] // Combine the parameters into a single array
+      "SELECT * FROM mediarequest WHERE MediaID = ? AND userID = ?",
+      [mediaID, userID] // Combine the parameters into a single array
     );
 
     if (existingRequest.length > 0) {
       return res.status(400).json({
-        message: "A media with this ISBN request already exists.",
+        message: "A media with this MediaID request already exists.",
       });
     }
 
     const [result] = await pool.query(
-      "INSERT INTO mediarequest (userID, ISBN, mTitle, mAuthor, publisher, genre, edition, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO mediarequest (userID, MediaID, mTitle, mAuthor, publisher, genre, edition, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         userID,
-        mediaISBN,
+        mediaID,
         mediaTitle,
         mediaAuthor,
         mediaPublisher,
@@ -218,7 +255,7 @@ export async function getMediaByID(req, res) {
   try {
     const { MediaID } = req.params;
     const [result] = await pool.query(
-      "SELECT * FROM device WHERE MediaID = ?",
+      "SELECT * FROM media WHERE MediaID = ?",
       [MediaID]
     );
     if (result.length == 0) {
@@ -271,7 +308,6 @@ export async function deleteMedia(req, res) {
         .json({ message: "Some copies are currently being borrowed." });
     }
 
-    // Step 2: Update book and bookcopies if no copies are borrowed
     await pool.query("UPDATE media SET is_deleted = 1 WHERE MediaID = ?", [
       MediaID,
     ]);
@@ -281,7 +317,7 @@ export async function deleteMedia(req, res) {
     );
 
     res.json({
-      message: "Book and all associated copies deleted successfully.",
+      message: "Media and all associated copies deleted successfully.",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
