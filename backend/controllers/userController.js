@@ -267,8 +267,10 @@ export async function getUserbookHold(req, res) {
 
         // SQL query to get all books borrowed by the user
         const bookHoldResult = await pool.query(
-            `SELECT * FROM bookhold
-             WHERE bookhold.userID = ?`,
+            `SELECT b.bTitle, b.bAuthor, bh.holdDate
+            FROM bookhold bh
+            JOIN  book b  ON b.ISBN = bh. ISBN
+            WHERE bh.userID = ?; `,
             [userID]
         );
 
@@ -291,8 +293,10 @@ export async function getUsermediaHold(req, res) {
 
         // SQL query to get all books borrowed by the user
         const mediaHoldResult = await pool.query(
-            `SELECT * FROM mediahold
-             WHERE mediahold.userID = ?`,
+            `SELECT m.mTitle, m.mAuthor, mh.holdDate
+            FROM mediahold mh
+            JOIN  media m ON m. MediaID = mh. MediaID
+            WHERE mh.userID = ?`,
             [userID]
         );
 
@@ -314,8 +318,10 @@ export async function getUserdeviceHold(req, res) {
 
         // SQL query to get all device hold by the user
         const deviceHoldResult = await pool.query(
-            `SELECT * FROM devicehold
-             WHERE devicehold.userID = ?`,
+            `SELECT d.dName, d.brand, dh.holddate
+            FROM devicehold dh
+            JOIN  device d ON d.serialNumber = dh. serialNumber
+            WHERE dh.userID = ?`,
             [userID]
         );
 

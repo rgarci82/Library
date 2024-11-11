@@ -53,16 +53,22 @@ interface RequestedDevice {
 interface bookHold {
   holddate: string | number | Date;
   status: string;
+  bTitle:string
+  bAuthor:string;
 }
 
 interface mediaHold {
   holddate: string | number | Date;
   status: string;
+  mTitle:string;
+  mAuthor:string
 }
 
 interface deviceHold {
   holddate: string | number | Date;
   status: string;
+  dName : string
+  dbrand: string;
 }
 
 
@@ -577,6 +583,8 @@ useEffect(() => {
                       userbookHold.map((bookhold, index) => (
                         <div key={index} className="info-box item-requested-box">
                           <ul>
+                            <li>Book Title: {bookhold.bTitle}</li>
+                            <li>Book Author: {bookhold.bAuthor}</li>
                             <li>Request Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
                             <li>Status: {bookhold.status}</li>
                           </ul>
@@ -585,14 +593,18 @@ useEffect(() => {
                     ) : (
                       <p>No books holds found.</p>
                     )}
-                     {/* Display book hold */}
+                     {/* Display device hold */}
                      <h2>Device Holds</h2>
                     {userdeviceHold.length > 0 ? (
                       userdeviceHold.map((devicehold, index) => (
                         <div key={index} className="info-box item-requested-box">
                           <ul>
+                          <li>Device Name: {devicehold.dName}</li> 
+                          <li>Device brand: {devicehold.dbrand}</li> 
                             <li>Hold Date: {new Date(devicehold.holddate).toLocaleDateString()}</li>
+                          
                             <li>Status: {devicehold.status}</li>
+
                           </ul>
                         </div>
                       ))
@@ -606,6 +618,8 @@ useEffect(() => {
                       usermediaHold.map((mediahold, index) => (
                         <div key={index} className="info-box item-requested-box">
                           <ul>
+                            <li>Media Title: {mediahold.mTitle}</li>
+                            <li>Media Author: {mediahold.mAuthor}</li>
                             <li>Request Date: {new Date(mediahold.holddate).toLocaleDateString()}</li>
                             <li>Status: {mediahold.status}</li>
                           </ul>
