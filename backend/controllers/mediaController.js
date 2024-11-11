@@ -332,7 +332,7 @@ export async function deleteMedia(req, res) {
 
 export async function borrowMedia(req, res) {
   const { userData, media } = req.body;
-
+  
   try {
     // Check if the user has already borrowed a copy of this media
     const [existingBorrow] = await pool.query(

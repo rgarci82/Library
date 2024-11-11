@@ -72,8 +72,6 @@ export async function getBookCopy(req, res) {
 export async function borrowBook(req, res) {
   const { userData, book } = req.body;
 
-  console.log("BORROWING: ", book);
-
   try {
     // Check if the user has already borrowed a copy of this book
     const [existingBorrow] = await pool.query(
@@ -141,7 +139,7 @@ export async function borrowBook(req, res) {
 
 export async function returnBook(req, res) {
   const { selectedItem } = req.body;
-
+  
   try {
     const returnDateResult = await pool.query(
       `UPDATE bookborrowed 

@@ -168,11 +168,9 @@ const UserPage: React.FC = () => {
   };
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
 
   const navigate = useNavigate();
-
-  const [notificationsData, setNotificationsData] = useState<{ reminder: string }[]>([]);
 
   // First useEffect to fetch user data
   useEffect(() => {
@@ -441,7 +439,6 @@ const UserPage: React.FC = () => {
 
   // Render loading state or error state if needed
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="background-container">
@@ -473,7 +470,7 @@ const UserPage: React.FC = () => {
           <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
           <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Devices</div>
           <div className={`tab ${activeTab === 'fines' ? 'active' : ''}`} onClick={() => handleTabClick('fines')}>Fines</div>
-          <div className={`tab ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => handleTabClick('notifications')}>Notifications</div>
+          {/*<div className={`tab ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => handleTabClick('notifications')}>Notifications</div>*/}
           <div className={`tab ${activeTab === 'itemRequested' ? 'active' : ''}`} onClick={() => handleTabClick('itemRequested')}>Item Requested</div>
           <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
         </div>
@@ -709,7 +706,7 @@ const UserPage: React.FC = () => {
             )}
              
             {/* Notifications */}
-            {activeTab === 'notifications' && (
+            {/*activeTab === 'notifications' && (
               notificationsData.length > 0 ? (
                 notificationsData.map((notification, index) => (
                   <div key={index} className="info-box notifications-box">
@@ -722,7 +719,7 @@ const UserPage: React.FC = () => {
               ) : (
                 <p className="not-found-css">No notifications found.</p>
               )
-            )}
+            )*/}
           </>
         ) : (
           <p>Loading user data...</p>
