@@ -839,7 +839,7 @@ const AdminDashboard = () => {
               <div className="form-group">
                 <label htmlFor="edition">Edition (optional):</label>
                 <input
-                  type="text"
+                  type="number"
                   id="edition"
                   name="edition"
                   value={edition}
@@ -921,7 +921,7 @@ const AdminDashboard = () => {
               <div className="form-group">
                 <label htmlFor="mEdition">Edition (optional):</label>
                 <input
-                  type="text"
+                  type="number"
                   id="mEdition"
                   name="mEdition"
                   value={mEdition}

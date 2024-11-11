@@ -17,8 +17,6 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       setError("Both email and password are required.");
     } else {
       setError("");
-      console.log("Email:", email);
-      console.log("Password:", password);
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
@@ -35,7 +33,6 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Admin logged in successfully", data);
         localStorage.setItem("token", data.token);
         onLogin()
         navigate('/adminDashboard');

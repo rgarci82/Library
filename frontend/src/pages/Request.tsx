@@ -474,15 +474,17 @@ const Request: React.FC = () => {
 
 
 const styles : { [key: string]: React.CSSProperties }= {
-    container: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "100vh",
-      backgroundColor: "#007BFF",
-      padding: "20px",
-      backgroundImage: `url('/Background.png')`
-    },
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    backgroundColor: "#007BFF",
+    backgroundImage: `url('/Background.png')`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  },
     registrationBox: {
       width: "52.5vw",
       minHeight: "40vh",
