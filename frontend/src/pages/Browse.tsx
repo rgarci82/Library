@@ -64,7 +64,9 @@ const BrowsePage: React.FC = () => {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+      if (!token){
+        return;
+      }
 
       const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
       if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
@@ -122,7 +124,6 @@ const BrowsePage: React.FC = () => {
 
   const fetchMediaCopies = async (MediaID: number, media: Media) => {
     try {
-
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
         method: 'GET',
         headers: {
@@ -149,6 +150,9 @@ const BrowsePage: React.FC = () => {
 
   const borrowBook = async (book: Book) => {
     try {
+      if(!userData){
+        navigate('/login')
+      }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
         method: 'POST',
         headers: {
@@ -170,6 +174,9 @@ const BrowsePage: React.FC = () => {
 
   const borrowMedia = async (media: Media) => {
     try {
+      if(!userData){
+        navigate('/login')
+      }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
         method: 'POST',
         headers: {
@@ -191,6 +198,9 @@ const BrowsePage: React.FC = () => {
 
   const borrowDevice = async (device: Device) => {
     try {
+      if(!userData){
+        navigate('/login')
+      }
       if (userData) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
