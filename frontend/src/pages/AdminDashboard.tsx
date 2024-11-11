@@ -50,7 +50,7 @@ interface BookRequest {
 interface MediaRequest {
   requestID: number;
   userID: number;
-  ISBN: string;
+  MediaID: string;
   mTitle: string;
   mAuthor: string;
   publisher: string;
@@ -67,6 +67,16 @@ interface DeviceRequest {
   brand: string;
   model: string;
   Status: string;
+}
+
+interface MonthlyRegistrationRecord {
+  year: number;
+  month: number;
+  user_count: number;
+}
+
+interface TotalFines {
+  totalFines: number;
 }
 
 const AdminDashboard = () => {
@@ -116,6 +126,12 @@ const AdminDashboard = () => {
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([]);
+
+  //reports
+  const [monthlyRegistrations, setMonthlyRegistrations] = useState<
+  MonthlyRegistrationRecord[]
+>([]);
+  const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -511,10 +527,15 @@ const AdminDashboard = () => {
   const fetchMediaRequests = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/media/request`
+        `${import.meta.env.VITE_API_URL}/api/media/request/all`,
+        {
+          method: 'GET'
+        }
       );
+
+      console.log(response)
       if (!response.ok) {
-        throw new Error("Failed to fetch books");
+        throw new Error("Failed to fetch media requests");
       }
       const data = await response.json();
       setMediaRequests(data);
@@ -529,12 +550,43 @@ const AdminDashboard = () => {
         `${import.meta.env.VITE_API_URL}/api/devices/request`
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch books");
+        throw new Error("Failed to fetch device requests");
       }
       const data = await response.json();
       setDeviceRequests(data);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const fetchMonthlyRegistrations = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/user-registrations`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch registrations");
+      }
+      const data = await response.json();
+      setMonthlyRegistrations(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchTotalFineAmount = async () => {
+    try{
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/totalFineAmount`, 
+        {
+          method: 'GET'
+        }
+      );
+
+      const data = await response.json();
+
+      setTotalFines(data[0]);
+    }catch (error) {
+      console.error(error)
     }
   };
 
@@ -551,6 +603,8 @@ const AdminDashboard = () => {
     fetchBookRequests();
     fetchMediaRequests();
     fetchDeviceRequests();
+    fetchTotalFineAmount();
+    fetchMonthlyRegistrations();
   }, []);
 
   const handleSignOut = () => {
@@ -1007,7 +1061,7 @@ const AdminDashboard = () => {
               <table className="requests-table">
                 <thead>
                   <tr>
-                    <th>ISBN</th>
+                    <th>Media ID</th>
                     <th>Title</th>
                     <th>Author</th>
                     <th>Edition</th>
@@ -1021,7 +1075,7 @@ const AdminDashboard = () => {
                 <tbody>
                   {mediaRequests.map((request) => (
                     <tr key={request.requestID}>
-                      <td>{request.ISBN}</td>
+                      <td>{request.MediaID}</td>
                       <td>{request.mTitle}</td>
                       <td>{request.mAuthor}</td>
                       <td>{request.edition}</td>
@@ -1086,6 +1140,49 @@ const AdminDashboard = () => {
                           Deny
                         </button>
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {activeTab == "dataQueries" && (
+          <>
+            <div className="report-container">
+              <h2>Total Fines Report</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Total Fines</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="total-amount">${totalFines?.totalFines}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Monthly Registrations Report */}
+            <div className="report-container">
+              <h2>Monthly Registrations Report</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>User Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyRegistrations.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.user_count}</td>
                     </tr>
                   ))}
                 </tbody>
