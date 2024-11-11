@@ -78,5 +78,12 @@ input:focus {
 .header__img--wrapper {
   padding: 20px;
   z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-styler {
+  width: 90%;
 }
 

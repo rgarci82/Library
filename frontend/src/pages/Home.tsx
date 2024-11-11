@@ -82,7 +82,7 @@ const Home: React.FC = () => {
                             }} />
                     </div>
                     <figure className="header__img--wrapper">
-                        <img src={Logo}></img>
+                        <img src={Logo} className="image-styler"></img>
                     </figure>
                 </div>
             </header>

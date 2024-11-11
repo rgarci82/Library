@@ -1,7 +1,7 @@
 import React, { useState , useEffect} from 'react';
 import './User.css';
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 interface JwtPayload {
   id: number; 
@@ -444,20 +444,13 @@ const UserPage: React.FC = () => {
     <div className="background-container">
       <div className="navbar">
         <div className="navbar-section library-name">
-          My Library
+          <Link to={"/"} className="admin__link">My Library</Link>
+
         </div>
   
         <div className="navbar-section search-section">
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Browse for items..."
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                window.location.href = '/browse';
-              }
-            }}
-          />
+          <Link to="/browse" className="browseButton">Browse</Link>
+
           <div className="nav-icons">
             <button className = "logOutButton" onClick={() => handleSignOut()}>Sign out</button>
           </div>
