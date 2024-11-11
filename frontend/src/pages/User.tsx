@@ -459,9 +459,7 @@ const UserPage: React.FC = () => {
             }}
           />
           <div className="nav-icons">
-            <span>🔧</span>
-            <span>👤</span>
-            <button onClick={() => handleSignOut()}>Sign out</button>
+            <button className = "logOutButton" onClick={() => handleSignOut()}>Sign out</button>
           </div>
         </div>
   
