@@ -370,3 +370,31 @@ export async function borrowDevice(req, res) {
     return { success: false, message: 'Internal Server Error', error: error.message };
   }
 }
+
+export async function getMonthlyDeviceBorrow(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(borrowDate) AS year, MONTHNAME(borrowDate) AS month, COUNT(*) AS devices_borrowed_count
+      FROM deviceborrowed
+      GROUP BY YEAR(borrowDate), MONTHNAME(borrowDate);`)
+
+      res.json(results)
+  } catch (error){
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getMonthlyDeviceRequests(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(requestDate) AS year, MONTHNAME(requestDate) AS month, COUNT(*) AS devices_requested_count
+      FROM devicerequest
+      GROUP BY YEAR(requestDate), MONTHNAME(requestDate);`)
+      
+      res.json(results)
+  } catch (error){
+    res.status(500).json({ message: error.message });
+  }
+}

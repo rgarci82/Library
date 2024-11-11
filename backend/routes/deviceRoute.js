@@ -12,6 +12,8 @@ import {
   deviceRequestAccepted,
   deviceRequestDeny,
   borrowDevice,
+  getMonthlyDeviceBorrow,
+  getMonthlyDeviceRequests,
 } from "../controllers/deviceController.js";
 
 const route = express.Router();
@@ -28,5 +30,7 @@ route.get("/devices/:serialNumber", getDeviceBySN);
 route.put("/devices/:serialNumber", updateDevice);
 route.post("/devices/borrow", borrowDevice);
 route.put("/devices/:serialNumber/softDelete", deleteDevice);
+route.get("/devices/borrow/monthly", getMonthlyDeviceBorrow)
+route.get("/devices/request/monthly", getMonthlyDeviceRequests)
 
 export default route;

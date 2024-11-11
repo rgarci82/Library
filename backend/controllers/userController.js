@@ -340,7 +340,7 @@ export async function getMonthlyUserRegistrations(req, res) {
     const [results] = await pool.query(`
               SELECT 
                   YEAR(created_at) AS year,
-                  MONTH(created_at) AS month,
+                  MONTHNAME(created_at) AS month,
                   COUNT(*) AS user_count
               FROM users
               GROUP BY year, month

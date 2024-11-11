@@ -13,6 +13,8 @@ import {
   mediaRequestDeny,
   borrowMedia,
   getMediaCopy,
+  getMonthlyMediaBorrowed,
+  getMonthlyMediaRequests,
 } from "../controllers/mediaController.js";
 const route = express.Router();
 
@@ -31,5 +33,7 @@ route.put("/media/:MediaID", updateMedia);
 route.put("/media/:MediaID/softDelete", deleteMedia);
 route.post("/media/borrow", borrowMedia);
 route.get("/media/:MediaID/mediacopy", getMediaCopy);
+route.get("/media/borrow/monthly", getMonthlyMediaBorrowed)
+route.get("/media/request/monthly", getMonthlyMediaRequests)
 
 export default route;

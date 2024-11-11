@@ -75,6 +75,42 @@ interface MonthlyRegistrationRecord {
   user_count: number;
 }
 
+interface MonthlyBookBorrow {
+  year: number;
+  month: string;
+  books_borrowed_count: number
+}
+
+interface MonthlyBookRequest {
+  year: number;
+  month: string;
+  books_requested_count: number
+}
+
+interface MonthlyMediaBorrow {
+  year: number;
+  month: string;
+  media_borrowed_count: number
+}
+
+interface MonthlyMediaRequest {
+  year: number;
+  month: string;
+  media_requested_count: number
+}
+
+interface MonthlyDeviceBorrow {
+  year: number;
+  month: string;
+  devices_borrowed_count: number
+}
+
+interface MonthlyDeviceRequest {
+  year: number;
+  month: string;
+  devices_requested_count: number
+}
+
 interface TotalFines {
   totalFines: number;
 }
@@ -129,8 +165,14 @@ const AdminDashboard = () => {
 
   //reports
   const [monthlyRegistrations, setMonthlyRegistrations] = useState<
-  MonthlyRegistrationRecord[]
->([]);
+    MonthlyRegistrationRecord[]
+  >([]);
+  const [monthlyBookBorrows, setMonthlyBookBorrows] = useState<MonthlyBookBorrow[]>([]);
+  const [monthlyBookRequests, setMonthlyBookRequests] = useState<MonthlyBookRequest[]>([]);
+  const [monthlyMediaBorrows, setMonthlyMediaBorrows] = useState<MonthlyMediaBorrow[]>([]);
+  const [monthlyMediaRequests, setMonthlyMediaRequests] = useState<MonthlyMediaRequest[]>([]);
+  const [monthlyDeviceBorrows, setMonthlyDeviceBorrows] = useState<MonthlyDeviceBorrow[]>([]);
+  const [monthlyDeviceRequests, setMonthlyDeviceRequests] = useState<MonthlyDeviceRequest[]>([]);
   const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -290,8 +332,8 @@ const AdminDashboard = () => {
       itemType: item.hasOwnProperty("bTitle")
         ? ("books" as ItemType)
         : item.hasOwnProperty("mTitle")
-        ? ("media" as ItemType)
-        : ("devices" as ItemType),
+          ? ("media" as ItemType)
+          : ("devices" as ItemType),
     };
 
     setSelectedItem(itemWithType);
@@ -300,13 +342,13 @@ const AdminDashboard = () => {
 
   const confirmDelete = async () => {
     if (!selectedItemDelete) return;
-  
+
     let id: string | number | undefined;
     if ("ISBN" in selectedItemDelete) id = selectedItemDelete.ISBN;
     else if ("MediaID" in selectedItemDelete) id = selectedItemDelete.MediaID;
     else if ("serialNumber" in selectedItemDelete)
       id = selectedItemDelete.serialNumber;
-  
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/${selectedItemDelete.itemType}/${id}/softDelete`,
@@ -314,15 +356,15 @@ const AdminDashboard = () => {
           method: "PUT",
         }
       );
-  
+
       if (response.status === 409) {
         const result = await response.json();
         alert(result.message);
         return;
       }
-  
+
       if (!response.ok) throw new Error("Failed to delete item");
-  
+
       setIsDeleting(false);
       setSelectedItemDelete(null);
       await fetchBooks();
@@ -344,8 +386,8 @@ const AdminDashboard = () => {
       itemType: item.hasOwnProperty("bTitle")
         ? ("books" as ItemType)
         : item.hasOwnProperty("mTitle")
-        ? ("media" as ItemType)
-        : ("devices" as ItemType),
+          ? ("media" as ItemType)
+          : ("devices" as ItemType),
     };
 
     setSelectedItemDelete(itemWithType);
@@ -393,8 +435,7 @@ const AdminDashboard = () => {
   const handleDeviceAccept = async (requestID: number) => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
+        `${import.meta.env.VITE_API_URL
         }/api/devices/request/accept/${requestID}`,
         {
           method: "PUT",
@@ -533,7 +574,6 @@ const AdminDashboard = () => {
         }
       );
 
-      console.log(response)
       if (!response.ok) {
         throw new Error("Failed to fetch media requests");
       }
@@ -574,9 +614,77 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchMonthlyBookBorrow = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow/monthly`)
+
+      const data = await response.json()
+      setMonthlyBookBorrows(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+  const fetchMonthlyBookRequest = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/request/monthly`)
+
+      const data = await response.json()
+      setMonthlyBookRequests(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const fetchMonthlyMediaBorrow = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow/monthly`)
+
+      const data = await response.json()
+      setMonthlyMediaBorrows(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+  const fetchMonthlyMediaRequest = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/request/monthly`)
+
+      const data = await response.json()
+      setMonthlyMediaRequests(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const fetchMonthlyDeviceBorrow = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow/monthly`)
+
+      const data = await response.json()
+      setMonthlyDeviceBorrows(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const fetchMonthlyDeviceRequest = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/request/monthly`)
+
+      const data = await response.json()
+      setMonthlyDeviceRequests(data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const fetchTotalFineAmount = async () => {
-    try{
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/totalFineAmount`, 
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/totalFineAmount`,
         {
           method: 'GET'
         }
@@ -585,7 +693,7 @@ const AdminDashboard = () => {
       const data = await response.json();
 
       setTotalFines(data[0]);
-    }catch (error) {
+    } catch (error) {
       console.error(error)
     }
   };
@@ -605,6 +713,12 @@ const AdminDashboard = () => {
     fetchDeviceRequests();
     fetchTotalFineAmount();
     fetchMonthlyRegistrations();
+    fetchMonthlyBookBorrow();
+    fetchMonthlyBookRequest();
+    fetchMonthlyMediaRequest();
+    fetchMonthlyMediaBorrow();
+    fetchMonthlyDeviceRequest();
+    fetchMonthlyDeviceBorrow();
   }, []);
 
   const handleSignOut = () => {
@@ -1183,6 +1297,133 @@ const AdminDashboard = () => {
                       <td>{record.year}</td>
                       <td>{record.month}</td>
                       <td>{record.user_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="report-container">
+              <h2>Monthly Books Borrowed</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Books Borrowed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyBookBorrows.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.books_borrowed_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="report-container">
+              <h2>Monthly Books Requested</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Books Requested</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyBookRequests.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.books_requested_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="report-container">
+              <h2>Monthly Media Borrowed</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Media Borrowed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyMediaBorrows.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.media_borrowed_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="report-container">
+              <h2>Monthly Media Requested</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Media Requested</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyMediaRequests.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.media_requested_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="report-container">
+              <h2>Monthly Devices Borrowed</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Devices Borrowed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyDeviceBorrows.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.devices_borrowed_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="report-container">
+              <h2>Monthly Devices Requested</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th>Devices Requested</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyDeviceRequests.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.year}</td>
+                      <td>{record.month}</td>
+                      <td>{record.devices_requested_count}</td>
                     </tr>
                   ))}
                 </tbody>

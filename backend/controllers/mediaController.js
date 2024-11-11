@@ -420,3 +420,31 @@ export async function getMediaCopy(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
+export async function getMonthlyMediaBorrowed(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(borrowDate) AS year, MONTHNAME(borrowDate) AS month, COUNT(*) AS media_borrowed_count
+      FROM mediaborrowed
+      GROUP BY YEAR(borrowDate), MONTHNAME(borrowDate);`)
+
+      res.json(results)
+  } catch (error){
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getMonthlyMediaRequests(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(requestDate) AS year, MONTHNAME(requestDate) AS month, COUNT(*) AS media_requested_count
+      FROM mediarequest
+      GROUP BY YEAR(requestDate), MONTHNAME(requestDate);`)
+
+      res.json(results)
+  } catch (error){
+    res.status(500).json({ message: error.message });
+  }
+}
