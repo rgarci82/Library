@@ -179,10 +179,12 @@ const styles : { [key: string]: React.CSSProperties }= {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      minHeight: "100vh",
+      height: "100vh",
       backgroundColor: "#007BFF",
-      padding: "20px",
-      backgroundImage: `url('/Background.png')`
+      backgroundImage: `url('/Background.png')`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
     },
     registrationBox: {
       width: "52.5vw",

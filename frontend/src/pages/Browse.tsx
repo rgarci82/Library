@@ -615,7 +615,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   browseContainer: {
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
-    backgroundImage: `url('/Background.png')`,
+    backgroundColor: 'gray',
     height: '100%',
   },
   textContainer: {
@@ -630,6 +630,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   headerTitle: {
     fontSize: '2.5rem',
+    letterSpacing: '1px',
+    wordSpacing: '10px',
     color: 'black',
   },
   headerSubtitle: {
@@ -639,10 +641,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   dropdown: {
     padding: '10px',
     width: '15vh',
-    height: '7vh',
+    height: '6.5vh',
     margin: '10px 0',
     fontSize: '16px',
-    borderRadius: '25px',
+    borderRadius: '20px',
     border: '1px solid #ccc',
     backgroundColor: '#f9f9f9',
     outline: 'none',

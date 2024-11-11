@@ -95,7 +95,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: "center",
     height: "100vh",
     backgroundColor: "#007BFF",
-    backgroundImage: `url('/Background.png')`
+    backgroundImage: `url('/Background.png')`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
   },
   loginBox: {
     backgroundColor: "#ffffff",
