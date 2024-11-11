@@ -16,7 +16,7 @@ const Home: React.FC = () => {
         try {
             const decoded = jwtDecode(token);
             if (!decoded.exp) return true; // No expiration field, consider it expired
-    
+
             // Check if the current time is past the token expiration time
             const currentTime = Date.now() / 1000;
             return decoded.exp < currentTime;
@@ -28,16 +28,16 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (!token){
+        if (!token) {
             setIsLoggedIn(false);
         }
-        else if(isTokenExpired(token)){
+        else if (isTokenExpired(token)) {
             setIsLoggedIn(false);
         }
-        else{
+        else {
             setIsLoggedIn(true);
         }
-    },[])
+    }, [])
 
 
     return (
@@ -47,19 +47,19 @@ const Home: React.FC = () => {
                     <Link to='/' className="logo"><b>Library</b></Link>
                     <ul className="nav__links">
                         <li className="nav__list">
-                        <Link to='/browse' className="nav__link underline">Browse</Link>
+                            <Link to='/browse' className="nav__link underline">Browse</Link>
                         </li>
                         {isLoggedIn ? (
                             <li className='nav__list'>
-                                <Link to='/user' className='nav__link nav__link--primary'>Profile</Link>
+                                <Link to={localStorage.getItem('isAdmin') === 'True' ? '/adminDashboard' : '/user'} className='nav__link nav__link--primary'>Profile</Link>
                             </li>
                         ) : (
                             <>
                                 <li className="nav__list">
-                                <Link to='/register' className="nav__link underline">Sign Up</Link>
+                                    <Link to='/register' className="nav__link underline">Sign Up</Link>
                                 </li>
                                 <li className="nav__list">
-                                <Link to='/login' className="nav__link nav__link--primary">Login</Link>
+                                    <Link to='/login' className="nav__link nav__link--primary">Login</Link>
                                 </li>
                             </>
                         )}
@@ -69,20 +69,20 @@ const Home: React.FC = () => {
             <header>
                 <div className="header__container">
                     <div className="input-wrapper">
-                    <FaSearch id="search-icon" />
-                    <input 
-                    placeholder="Type to search..." 
-                    type="text" 
-                    onChange={(e) => setInputText(e.target.value)} 
-                    value={inputText} 
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            navigate(`/browse?search=${encodeURIComponent(inputText)}`);
-                        }
-                    }}/>
+                        <FaSearch id="search-icon" />
+                        <input
+                            placeholder="Type to search..."
+                            type="text"
+                            onChange={(e) => setInputText(e.target.value)}
+                            value={inputText}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    navigate(`/browse?search=${encodeURIComponent(inputText)}`);
+                                }
+                            }} />
                     </div>
                     <figure className="header__img--wrapper">
-                    <img src={Logo}></img>
+                        <img src={Logo}></img>
                     </figure>
                 </div>
             </header>

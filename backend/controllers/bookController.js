@@ -85,7 +85,7 @@ export async function borrowBook(req, res) {
 
     // If a matching record is found, return a 400 status with a message
     if (existingBorrow.length > 0) {
-      if (existingBorrow.some(item => item.returnDate === null)){
+      if (existingBorrow.some((item) => item.returnDate === null)) {
         return res.status(400).json({
           message: "You have already borrowed this book.",
         });
@@ -158,22 +158,26 @@ export async function returnBook(req, res) {
     );
 
     // Return a success response with a 201 status
-    if (returnDateResult && returnStatusResult){
+    if (returnDateResult && returnStatusResult) {
       res.status(201).json({
         message: "Book returned successfully",
       });
     }
   } catch (error) {
-    console.error('Error occurred:', error);
+    console.error("Error occurred:", error);
     // Send an appropriate error response to the client
-    return { success: false, message: 'Internal Server Error', error: error.message };
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
   }
 }
 
-export async function holdBook(req, res){
-  const { userData, selectedHoldItem} = req.body;
+export async function holdBook(req, res) {
+  const { userData, selectedHoldItem } = req.body;
 
-  try{
+  try {
     // Check if the user has already borrowed a copy of this book
     const [existingHold] = await pool.query(
       `SELECT * FROM bookhold 
@@ -184,7 +188,7 @@ export async function holdBook(req, res){
 
     // If a matching record is found, return a 400 status with a message
     if (existingHold.length > 0) {
-      if (existingHold.some(item => item.status === 'OnHold')){
+      if (existingHold.some((item) => item.status === "OnHold")) {
         return res.status(400).json({
           message: "You already have this book on hold.",
         });
@@ -200,10 +204,13 @@ export async function holdBook(req, res){
     res.status(201).json({
       message: "Book on hold successfully",
     });
-  }
-  catch (error){
-    console.error('Error occured:', error);
-    return { success: false, message: 'Internal Server Error', error: error.message };
+  } catch (error) {
+    console.error("Error occured:", error);
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
   }
 }
 
@@ -426,5 +433,31 @@ export async function deleteBook(req, res) {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getMonthlyBookBorrowed(req, res){
+  try {
+    const [results] = await pool.query(`SELECT 
+      YEAR(borrowDate) AS year, MONTHNAME(borrowDate) AS month, COUNT(*) AS books_borrowed_count 
+      FROM bookborrowed 
+      GROUP BY YEAR(borrowDate), MONTHNAME(borrowDate)`);
+
+    res.json(results)
+  } catch (error){
+    res.status(500).json({message: error.message})
+  }
+}
+
+export async function getMonthlyBookRequests(req, res){
+  try{
+    const [results] = await pool.query(`SELECT 
+  YEAR(requestDate) AS year, MONTHNAME(requestDate) AS month, COUNT(*) AS books_requested_count
+  FROM bookrequest
+  GROUP BY YEAR(requestDate), MONTHNAME(requestDate)`)
+
+  res.json(results)
+  } catch (error){
+    res.status(500).json({message: error.message})
   }
 }

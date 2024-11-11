@@ -58,22 +58,26 @@ export async function returnMedia(req, res) {
     );
 
     // Return a success response with a 201 status
-    if (returnDateResult && returnStatusResult){
+    if (returnDateResult && returnStatusResult) {
       res.status(201).json({
         message: "Media returned successfully",
       });
     }
   } catch (error) {
-    console.error('Error occurred:', error);
+    console.error("Error occurred:", error);
     // Send an appropriate error response to the client
-    return { success: false, message: 'Internal Server Error', error: error.message };
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
   }
 }
 
-export async function holdMedia(req, res){
-  const { userData, selectedHoldItem} = req.body;
+export async function holdMedia(req, res) {
+  const { userData, selectedHoldItem } = req.body;
 
-  try{
+  try {
     // Check if the user has already borrowed a copy of this media
     const [existingHold] = await pool.query(
       `SELECT * FROM mediahold 
@@ -84,7 +88,7 @@ export async function holdMedia(req, res){
 
     // If a matching record is found, return a 400 status with a message
     if (existingHold.length > 0) {
-      if (existingHold.some(item => item.status === 'OnHold')){
+      if (existingHold.some((item) => item.status === "OnHold")) {
         return res.status(400).json({
           message: "You already have this media on hold.",
         });
@@ -100,10 +104,13 @@ export async function holdMedia(req, res){
     res.status(201).json({
       message: "Media on hold successfully",
     });
-  }
-  catch (error){
-    console.error('Error occured:', error);
-    return { success: false, message: 'Internal Server Error', error: error.message };
+  } catch (error) {
+    console.error("Error occured:", error);
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
   }
 }
 
@@ -254,10 +261,9 @@ export async function mediaRequestDeny(req, res) {
 export async function getMediaByID(req, res) {
   try {
     const { MediaID } = req.params;
-    const [result] = await pool.query(
-      "SELECT * FROM media WHERE MediaID = ?",
-      [MediaID]
-    );
+    const [result] = await pool.query("SELECT * FROM media WHERE MediaID = ?", [
+      MediaID,
+    ]);
     if (result.length == 0) {
       return res.status(404).json({ message: "Media not found" });
     }
@@ -338,7 +344,7 @@ export async function borrowMedia(req, res) {
 
     // If a matching record is found, return a 400 status with a message
     if (existingBorrow.length > 0) {
-      if (existingBorrow.some(item => item.returnDate === null)){
+      if (existingBorrow.some((item) => item.returnDate === null)) {
         return res.status(400).json({
           message: "You have already borrowed this media.",
         });
@@ -411,6 +417,34 @@ export async function getMediaCopy(req, res) {
 
     res.json(mediaCopies);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getMonthlyMediaBorrowed(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(borrowDate) AS year, MONTHNAME(borrowDate) AS month, COUNT(*) AS media_borrowed_count
+      FROM mediaborrowed
+      GROUP BY YEAR(borrowDate), MONTHNAME(borrowDate);`)
+
+      res.json(results)
+  } catch (error){
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getMonthlyMediaRequests(req, res){
+  try{
+    const [results] = await pool.query(
+      `
+      SELECT YEAR(requestDate) AS year, MONTHNAME(requestDate) AS month, COUNT(*) AS media_requested_count
+      FROM mediarequest
+      GROUP BY YEAR(requestDate), MONTHNAME(requestDate);`)
+
+      res.json(results)
+  } catch (error){
     res.status(500).json({ message: error.message });
   }
 }

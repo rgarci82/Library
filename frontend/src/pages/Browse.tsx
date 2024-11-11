@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate ,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 enum ItemStatus {
   Available = 'available',
@@ -35,7 +36,7 @@ interface Device {
 }
 
 interface JwtPayload {
-  id: number; 
+  id: number;
 }
 
 type Item = Book | Media | Device;
@@ -45,7 +46,7 @@ const BrowsePage: React.FC = () => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
-  
+
   const [userData, setUserData] = useState<any>(null);
   const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [allMedia, setAllMedia] = useState<Media[]>([]);
@@ -57,6 +58,8 @@ const BrowsePage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const [selectedHoldItem, setSelectedHoldItem] = useState<Item>();
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
 
   const fetchUserData = async () => {
     try {
@@ -79,6 +82,7 @@ const BrowsePage: React.FC = () => {
 
       const userData = await response.json();
       setUserData(userData);
+      setIsLoggedIn(true)
 
       if (!userData.userID) {
         console.error("User data is not available.");
@@ -86,60 +90,60 @@ const BrowsePage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-    } 
+    }
   };
 
 
-  const fetchBookCopies = async (ISBN : string, book : Book) => {
+  const fetchBookCopies = async (ISBN: string, book: Book) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) throw new Error("Failed to fetch all books");
 
       const data = await response.json();
 
-      if (data.length > 0){
+      if (data.length > 0) {
         borrowBook(book);
         return;
       }
-      else if (data.length === 0){
+      else if (data.length === 0) {
         setSelectedHoldItem(book);
         setShowHoldPopup(true);
       }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     }
   }
 
-  const fetchMediaCopies = async (MediaID : number, media : Media) => {
+  const fetchMediaCopies = async (MediaID: number, media: Media) => {
     try {
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) throw new Error("Failed to fetch all media");
 
       const data = await response.json();
 
-      if (data.length > 0){
+      if (data.length > 0) {
         borrowMedia(media);
         return;
       }
-      else if (data.length === 0){
+      else if (data.length === 0) {
         setSelectedHoldItem(media);
         setShowHoldPopup(true);
       }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     }
   }
 
@@ -152,9 +156,9 @@ const BrowsePage: React.FC = () => {
         },
         body: JSON.stringify({ userData, book }), // Send book as JSON
       });
-  
+
       await response.json(); // Parse JSON after fetch completes
-  
+
       if (response.ok) {
         console.log("Book borrowed successfully");
         navigate('/user');
@@ -163,7 +167,7 @@ const BrowsePage: React.FC = () => {
       console.error("Error:", error);
     }
   };
-  
+
   const borrowMedia = async (media: Media) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
@@ -173,9 +177,9 @@ const BrowsePage: React.FC = () => {
         },
         body: JSON.stringify({ userData, media }), // Send book as JSON
       });
-      
+
       await response.json(); // Parse JSON after fetch completes
-  
+
       if (response.ok) {
         console.log("Media borrowed successfully");
         navigate('/user');
@@ -186,7 +190,7 @@ const BrowsePage: React.FC = () => {
   };
 
   const borrowDevice = async (device: Device) => {
-    try {      
+    try {
       if (userData) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
@@ -203,12 +207,12 @@ const BrowsePage: React.FC = () => {
             console.log("Device borrowed successfully");
             navigate('/user');
           }
-          else{
+          else {
             setSelectedHoldItem(device);
             setShowHoldPopup(true);
-          } 
+          }
         } catch (error) {
-          
+
           console.error("Error:", error);
         }
       }
@@ -218,8 +222,8 @@ const BrowsePage: React.FC = () => {
   };
 
   const holdingItem = async () => {
-    if (selectedHoldItem){
-      if ("ISBN" in selectedHoldItem){
+    if (selectedHoldItem) {
+      if ("ISBN" in selectedHoldItem) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/hold`, {
             method: 'POST',
@@ -228,9 +232,9 @@ const BrowsePage: React.FC = () => {
             },
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
-      
+
           await response.json(); // Parse JSON after fetch completes
-      
+
           if (response.ok) {
             navigate('/user');
           }
@@ -238,7 +242,7 @@ const BrowsePage: React.FC = () => {
           console.error("Error:", error);
         }
       }
-      else if ("MediaID" in selectedHoldItem){
+      else if ("MediaID" in selectedHoldItem) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/hold`, {
             method: 'POST',
@@ -247,9 +251,9 @@ const BrowsePage: React.FC = () => {
             },
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
-      
+
           await response.json(); // Parse JSON after fetch completes
-      
+
           if (response.ok) {
             navigate('/user');
           }
@@ -257,7 +261,7 @@ const BrowsePage: React.FC = () => {
           console.error("Error:", error);
         }
       }
-      else if ("serialNumber" in selectedHoldItem){
+      else if ("serialNumber" in selectedHoldItem) {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/hold`, {
             method: 'POST',
@@ -266,9 +270,9 @@ const BrowsePage: React.FC = () => {
             },
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
-      
+
           await response.json(); // Parse JSON after fetch completes
-      
+
           if (response.ok) {
             navigate('/user');
           }
@@ -283,14 +287,14 @@ const BrowsePage: React.FC = () => {
     setSelectedItem(item);
     setIsPopupOpen(true);
   };
-  
+
   const closePopup = () => {
     setIsPopupOpen(false);
     setSelectedItem(null);
   };
 
   //Fetch user data
-  useEffect(() => {fetchUserData();});
+  useEffect(() => { fetchUserData(); });
 
   // Get the search term from the URL query parameter
   useEffect(() => {
@@ -304,41 +308,41 @@ const BrowsePage: React.FC = () => {
     const fetchAllBooks = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-  
+
         if (!response.ok) throw new Error("Failed to fetch all books");
-  
+
         const data = await response.json();
-        
+
         setAllBooks(data);
       } catch (error) {
-          console.error("Error:", error);
+        console.error("Error:", error);
       }
     }
     fetchAllBooks();
   }, []);
-  
+
   //Fetch all media
   useEffect(() => {
     const fetchAllMedia = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-  
+
         if (!response.ok) throw new Error("Failed to fetch all media");
-  
+
         const data = await response.json();
         setAllMedia(data);
       } catch (error) {
-          console.error("Error:", error);
+        console.error("Error:", error);
       }
     }
     fetchAllMedia();
@@ -349,18 +353,18 @@ const BrowsePage: React.FC = () => {
     const fetchAllDevices = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-  
+
         if (!response.ok) throw new Error("Failed to fetch all devices");
-  
+
         const data = await response.json();
         setAllDevices(data);
       } catch (error) {
-          console.error("Error:", error);
+        console.error("Error:", error);
       }
     }
     fetchAllDevices();
@@ -370,7 +374,7 @@ const BrowsePage: React.FC = () => {
   useEffect(() => {
     // Determine which array to filter based on the selected search type
     let itemsToFilter: Book[] | Media[] | Device[] = [];
-  
+
     switch (searchBy) {
       case 'book':
         itemsToFilter = allBooks;
@@ -384,7 +388,7 @@ const BrowsePage: React.FC = () => {
       default:
         itemsToFilter = [];
     }
-  
+
     // Filter items based on the search term
     const filtered = itemsToFilter.filter((item) => {
       if (searchBy === 'book' && 'bTitle' in item) {
@@ -396,7 +400,7 @@ const BrowsePage: React.FC = () => {
       }
       return false; // Fallback in case none of the conditions match
     });
-  
+
     // Update the state with the filtered items
     setFilteredItems(filtered);
   }, [searchTerm, searchBy, allBooks, allMedia, allDevices]);
@@ -405,10 +409,24 @@ const BrowsePage: React.FC = () => {
     <div>
       <div>
         <div style={styles.navbar}>
-          <div style={styles.libraryName}>My Library</div>
+          <div style={styles.libraryName}>
+            <Link to={'/'} style={styles.libraryNameLink}>My Library</Link>
+          </div>
           <div style={styles.navIcons}>
-            <span>🔧</span>
-            <span>👤</span>
+            {isLoggedIn ? (
+              <li className='nav__list'>
+                <Link to={localStorage.getItem('isAdmin') === 'True' ? '/adminDashboard' : '/user'} style={styles.browseButton}>Profile</Link>
+              </li>
+            ) : (
+              <>
+                <li className="nav__list">
+                  <Link to='/register' style={styles.browseButton}>Sign Up</Link>
+                </li>
+                <li className="nav__list">
+                  <Link to='/login' style={styles.browseButton}>Login</Link>
+                </li>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -465,7 +483,7 @@ const BrowsePage: React.FC = () => {
                         </p>
                         <div style={styles.buttonContainer}>
                           <button style={styles.borrowButton} onClick={() => fetchBookCopies(book.ISBN, book)}>Borrow</button>
-                          <button style={styles.detailsButton} onClick = {() => openPopup(book)}>Details</button>
+                          <button style={styles.detailsButton} onClick={() => openPopup(book)}>Details</button>
                         </div>
                       </div>
                     );
@@ -483,8 +501,8 @@ const BrowsePage: React.FC = () => {
                           Genre: {media.genre}
                         </p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton} onClick={()=> fetchMediaCopies(media.MediaID, media)}>Borrow</button>
-                          <button style={styles.detailsButton} onClick = {() => openPopup(media)}>Details</button>
+                          <button style={styles.borrowButton} onClick={() => fetchMediaCopies(media.MediaID, media)}>Borrow</button>
+                          <button style={styles.detailsButton} onClick={() => openPopup(media)}>Details</button>
                         </div>
                       </div>
                     );
@@ -497,8 +515,8 @@ const BrowsePage: React.FC = () => {
                           {device.brand} {device.model}
                         </p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton} onClick={()=> borrowDevice(device)}>Borrow</button>
-                          <button style={styles.detailsButton} onClick = {() => openPopup(device)}>Details</button>
+                          <button style={styles.borrowButton} onClick={() => borrowDevice(device)}>Borrow</button>
+                          <button style={styles.detailsButton} onClick={() => openPopup(device)}>Details</button>
                         </div>
                       </div>
                     );
@@ -750,7 +768,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#fff',
     cursor: 'pointer',
   },
-  holdCloseContainer:{
+  holdCloseContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -758,7 +776,23 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   noItemsText: {
     textAlign: 'center',
+  },
+  libraryNameLink: {
+    color: 'white',
+    cursor: 'pointer',
+    textDecoration: 'none',
+  },
+  browseButton: {
+    backgroundColor: '#C8102E',
+    textDecoration: 'none',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    padding: '8px',
+    color: 'white',
+    border: '#C8102E',
+    borderRadius: '4px',
+    cursor: 'pointer',
   }
 }
-  
+
 export default BrowsePage;

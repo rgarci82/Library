@@ -13,6 +13,8 @@ import {
   getAllBookRequests,
   bookRequestAccepted,
   bookRequestDeny,
+  getMonthlyBookBorrowed,
+  getMonthlyBookRequests,
 } from "../controllers/bookController.js";
 
 const route = express.Router();
@@ -30,5 +32,7 @@ route.put("/books/request/deny/:requestID", bookRequestDeny);
 route.get("/books/:ISBN", getBookByISBN);
 route.put("/books/:ISBN", updateBook);
 route.put("/books/:ISBN/softDelete", deleteBook);
+route.get("/books/borrow/monthly", getMonthlyBookBorrowed)
+route.get("/books/request/monthly", getMonthlyBookRequests)
 
 export default route;
