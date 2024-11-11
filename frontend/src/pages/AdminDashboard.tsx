@@ -3,6 +3,7 @@ import "./AdminDashboard.css";
 import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type ItemType = "books" | "media" | "devices";
 
@@ -729,10 +730,12 @@ const AdminDashboard = () => {
   return (
     <div>
       <div className="navbar">
-        <div className="navbar-section library-name">My Library</div>
+        <div className="navbar-section library-name">
+          <Link to={'/'} className="admin__link">My Library</Link>
+        </div>
 
         <div className="navbar-section search-section">
-          <button onClick={() => handleSignOut()}>Sign Out</button>
+          <button className="admin__signout" onClick={() => handleSignOut()}>Sign Out</button>
         </div>
       </div>
       <div className="navbar-section tabs">
