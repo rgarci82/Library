@@ -337,20 +337,36 @@ export async function getUserdeviceHold(req, res) {
 }
 
 export async function getMonthlyUserRegistrations(req, res) {
-    try {
-      const [results] = await pool.query(`
-                SELECT 
-                    YEAR(created_at) AS year,
-                    MONTHNAME(created_at) AS month,
-                    COUNT(*) AS user_count
-                FROM users
-                GROUP BY year, month
-                ORDER BY year DESC, month DESC;
-            `);
-  
-      res.json(results);
-    } catch (error) {
-      console.error("Error fetching monthly user registrations:", error);
-      res.status(500).json({ message: "Internal Server Error" });
-    }
+  try {
+    const [results] = await pool.query(`
+              SELECT 
+                  YEAR(created_at) AS year,
+                  MONTHNAME(created_at) AS month,
+                  COUNT(*) AS user_count
+              FROM users
+              GROUP BY year, month
+              ORDER BY year DESC, month DESC;
+          `);
+
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching monthly user registrations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
+}
+
+export async function getTotalFineAmount(req, res) {
+  try {
+      const [results] = await pool.query(
+      `SELECT 
+          (SELECT COALESCE(SUM(fineAmount), 0) FROM bookborrowed) +
+          (SELECT COALESCE(SUM(fineAmount), 0) FROM mediaborrowed) +
+          (SELECT COALESCE(SUM(fineAmount), 0) FROM deviceborrowed) AS totalFines`
+      );
+
+      res.json(results);
+  } catch (error) {
+      console.error("Error fetch fine amounts");
+      res.status(500).json({ message: "Internal server error" });
+  }
+}
