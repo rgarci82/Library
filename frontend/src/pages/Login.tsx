@@ -13,8 +13,6 @@ const Login: React.FC = () => {
       setError("Both email and password are required.");
     } else {
       setError("");
-      console.log("Email:", email);
-      console.log("Password:", password);
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/login`, {
@@ -31,7 +29,6 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("User logged in successfully", data);
         localStorage.setItem("token", data.token);
         navigate('/user');
         // Handle successful user creation, e.g., redirect or display success message

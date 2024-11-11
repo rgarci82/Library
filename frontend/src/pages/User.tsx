@@ -55,16 +55,19 @@ interface RequestedDevice {
 }
 
 interface bookHold {
+  bTitle: string;
   holddate: string | number | Date;
   status: string;
 }
 
 interface mediaHold {
+  mTitle: string;
   holddate: string | number | Date;
   status: string;
 }
 
 interface deviceHold {
+  dName: string;
   holddate: string | number | Date;
   status: string;
 }
@@ -508,7 +511,7 @@ const UserPage: React.FC = () => {
             {activeTab === 'media' && (
               userBorrowedMedia.length > 0 ? (
                 userBorrowedMedia.map((media) => (
-                  <div key={media.itemID} className="info-box media-box">
+                  <div className="info-box media-box">
                     <h3 className="title-css">Title: {media.mTitle}</h3>
                     <ul>
                       <li className="info-text-css">Author: {media.mAuthor}</li>
@@ -654,7 +657,8 @@ const UserPage: React.FC = () => {
                     {userbookHold.length > 0 ? (
                       userbookHold.map((bookhold, index) => (
                         <div key={index} className="info-box item-requested-box">
-                          <ul>
+                          <ul >
+                            <h3>Book Title: {bookhold.bTitle}</h3>
                             <li>Request Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
                             <li>Status: {bookhold.status}</li>
                           </ul>
@@ -672,6 +676,7 @@ const UserPage: React.FC = () => {
                       usermediaHold.map((mediahold, index) => (
                         <div key={index} className="info-box item-requested-box">
                           <ul>
+                            <h3>Media Title: {mediahold.mTitle}</h3>
                             <li>Request Date: {new Date(mediahold.holddate).toLocaleDateString()}</li>
                             <li>Status: {mediahold.status}</li>
                           </ul>
@@ -689,6 +694,7 @@ const UserPage: React.FC = () => {
                       userdeviceHold.map((devicehold, index) => (
                         <div key={index} className="info-box item-requested-box">
                           <ul>
+                            <h3>Device Name: {devicehold.dName}</h3>
                             <li>Hold Date: {new Date(devicehold.holddate).toLocaleDateString()}</li>
                             <li>Status: {devicehold.status}</li>
                           </ul>
