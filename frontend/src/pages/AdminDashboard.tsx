@@ -74,6 +74,10 @@ interface MonthlyRegistrationRecord {
   user_count: number;
 }
 
+interface TotalFines {
+  totalFines: number;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -126,6 +130,7 @@ const AdminDashboard = () => {
   const [monthlyRegistrations, setMonthlyRegistrations] = useState<
     MonthlyRegistrationRecord[]
   >([]);
+  const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -544,6 +549,7 @@ const AdminDashboard = () => {
       console.error(error);
     }
   };
+  
   const fetchMonthlyRegistrations = async () => {
     try {
       const response = await fetch(
@@ -559,6 +565,22 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchTotalFineAmount = async () => {
+    try{
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/totalFineAmount`, 
+        {
+          method: 'GET'
+        }
+      );
+
+      const data = await response.json();
+      
+      setTotalFines(data[0]);
+    }catch (error) {
+      console.error(error)
+    }
+  }
+
   const refreshItems = async () => {
     await fetchBooks();
     await fetchDevies();
@@ -573,6 +595,7 @@ const AdminDashboard = () => {
     fetchMediaRequests();
     fetchDeviceRequests();
     fetchMonthlyRegistrations();
+    fetchTotalFineAmount();
   }, []);
 
   const handleSignOut = () => {
@@ -1129,9 +1152,26 @@ const AdminDashboard = () => {
 
         {activeTab == "dataQueries" && (
           <>
-            <div className="media-requests">
-              <h1>Monthly Registrations</h1>
-              <table className="requests-table">
+            <div className="report-container">
+              <h2>Total Fines Report</h2>
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Total Fines</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="total-amount">${totalFines?.totalFines}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Monthly Registrations Report */}
+            <div className="report-container">
+              <h2>Monthly Registrations Report</h2>
+              <table className="report-table">
                 <thead>
                   <tr>
                     <th>Year</th>
