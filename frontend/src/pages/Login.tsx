@@ -30,8 +30,12 @@ const Login: React.FC = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        navigate('/user');
-        // Handle successful user creation, e.g., redirect or display success message
+        if (data.userType === 'Admin'){ //Admin Page
+          navigate('/adminDashboard');
+        }
+        else{ //User/Faculty page
+          navigate('/user');
+        }
       } else {
         setError(data.message || "An error occurred");
       }

@@ -51,7 +51,7 @@ const AdminRegister: React.FC = () => {
           const data = await response.json();
     
           if (response.ok) {
-            navigate('/adminLogin');
+            navigate('/login');
             // Handle successful user creation, e.g., redirect or display success message
           } else {
             setError(data.message || "An error occurred");

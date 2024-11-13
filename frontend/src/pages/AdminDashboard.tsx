@@ -1097,7 +1097,7 @@ const AdminDashboard = () => {
                       <strong>Serial Number:</strong> {device.serialNumber}
                     </p>
                     <p>
-                      <strong>Status:</strong> {device.status.charAt(0).toUpperCase() + device.status.slice(1)}
+                      <strong>Status:</strong> {device.status.charAt(0)+ device.status.slice(1)}
                     </p>
                     <button onClick={() => handleEditClick(device)}>
                       Edit
@@ -1152,7 +1152,7 @@ const AdminDashboard = () => {
                       <td>{request.edition}</td>
                       <td>{request.genre}</td>
                       <td>{request.publisher}</td>
-                      <td>{request.status.toUpperCase()}</td>
+                      <td>{request.status}</td>
                       <td>{request.userID}</td>
                       <td>
                         <button
@@ -1198,7 +1198,7 @@ const AdminDashboard = () => {
                       <td>{request.edition}</td>
                       <td>{request.genre}</td>
                       <td>{request.publisher}</td>
-                      <td>{request.status.toUpperCase()}</td>{" "}
+                      <td>{request.status}</td>{" "}
                       {/* Capitalized status */}
                       <td>{request.userID}</td>
                       <td>
@@ -1241,7 +1241,7 @@ const AdminDashboard = () => {
                       <td>{request.dName}</td>
                       <td>{request.brand}</td>
                       <td>{request.model}</td>
-                      <td>{request.Status.toUpperCase()}</td>
+                      <td>{request.Status}</td>
                       <td>{request.userID}</td>
                       <td>
                         <button

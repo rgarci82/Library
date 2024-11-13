@@ -561,7 +561,7 @@ const UserPage: React.FC = () => {
               <div className="info-box fines-box">
                 <h3 className="title-css">Fine</h3>
                 <ul>
-                  <li className="fine-text-css">Amount: ${userFine.totalFine}</li>
+                  <li className="fine-text-css">Amount: ${parseFloat(userFine.totalFine).toFixed(2)}</li>
                 </ul>
               </div>
             )}
