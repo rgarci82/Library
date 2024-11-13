@@ -8,7 +8,6 @@ import User from "./pages/User";
 import Browse from "./pages/Browse";
 import Request from "./pages/Request";
 import AdminDashboard from "./pages/AdminDashboard";
-import ProtectedRoute from "./pages/ProtectedRouteAdmin";
 
 const App: React.FC = () => {
   return (
@@ -19,7 +18,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/user" element={<User />} /> {/* Ensure your file is Users.tsx */}
         <Route path="/adminRegister" element={<AdminRegister />} />
-        <Route path="/adminDashboard" element={<ProtectedRoute element={<AdminDashboard />} />} />
+        <Route path="/adminDashboard" element={<AdminDashboard />} />
         <Route path="/browse" element={<Browse />} />
         <Route path="/request" element={<Request />} />
       </Routes>
