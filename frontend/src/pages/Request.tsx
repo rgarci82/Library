@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 import { Bounce, toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 interface JwtPayload {
   id: number;
@@ -277,284 +278,294 @@ const Request: React.FC = () => {
 
 
   return (
-    <div style={styles.container}>
-      <div style={styles.registrationBox}>
-        <h1 style={styles.title}>Registration</h1>
-        <form onSubmit={handleNext} style={styles.form}>
-          {error && <p style={styles.error}>{error}</p>}
-          {step === 1 && (
-            <>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Item Type</label>
-                <select
-                  value={itemType}
-                  onChange={(e) => {
-                    setItemType(e.target.value);
-                  }}
-                  required
-                  style={styles.input}
-                >
-                  <option value="Book">Book</option>
-                  <option value="Media">Media</option>
-                  <option value="Device">Device</option>
-                </select>
-              </div>
-            </>
-          )}
-          {step === 2 && itemType === 'Book' && (
-            <>
-              <div style={styles.row}>
+    <div>
+      <div style={styles.navbar}>
+        <div style={styles.libraryName}>
+          <Link to={'/'} style={styles.libraryNameLink}>My Library</Link>
+        </div>
+        <div style={styles.libraryName}>
+          <Link to={'/browse'} style={styles.libraryNameLink}>Browse</Link>
+        </div>
+      </div>
+      <div style={styles.container}>
+        <div style={styles.registrationBox}>
+          <h1 style={styles.title}>Registration</h1>
+          <form onSubmit={handleNext} style={styles.form}>
+            {error && <p style={styles.error}>{error}</p>}
+            {step === 1 && (
+              <>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>Book Title</label>
-                  <input
-                    type="text"
-                    value={bookTitle}
+                  <label style={styles.label}>Item Type</label>
+                  <select
+                    value={itemType}
                     onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setBookTitle(sanitizedValue);
+                      setItemType(e.target.value);
                     }}
-                    placeholder="Enter the book title"
                     required
                     style={styles.input}
-                  />
+                  >
+                    <option value="Book">Book</option>
+                    <option value="Media">Media</option>
+                    <option value="Device">Device</option>
+                  </select>
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>ISBN</label>
-                  <input
-                    type="text"
-                    value={bookISBN}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setISBN(sanitizedValue);
-                    }}
-                    placeholder="Enter the ISBN"
-                    required
-                    style={styles.input}
-                  />
+              </>
+            )}
+            {step === 2 && itemType === 'Book' && (
+              <>
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Book Title</label>
+                    <input
+                      type="text"
+                      value={bookTitle}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setBookTitle(sanitizedValue);
+                      }}
+                      placeholder="Enter the book title"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>ISBN</label>
+                    <input
+                      type="text"
+                      value={bookISBN}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setISBN(sanitizedValue);
+                      }}
+                      placeholder="Enter the ISBN"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Book Author</label>
-                  <input
-                    type="text"
-                    value={bookAuthor}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setBookAuthor(sanitizedValue);
-                    }}
-                    placeholder="Enter the author"
-                    required
-                    style={styles.input}
-                  />
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Book Author</label>
+                    <input
+                      type="text"
+                      value={bookAuthor}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setBookAuthor(sanitizedValue);
+                      }}
+                      placeholder="Enter the author"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Book Publisher</label>
+                    <input
+                      type="text"
+                      value={bookPublisher}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setBookPublisher(sanitizedValue);
+                      }}
+                      placeholder="Enter the publisher"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Book Publisher</label>
-                  <input
-                    type="text"
-                    value={bookPublisher}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setBookPublisher(sanitizedValue);
-                    }}
-                    placeholder="Enter the publisher"
-                    required
-                    style={styles.input}
-                  />
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Genre</label>
+                    <input
+                      type="text"
+                      value={bookGenre}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setBookGenre(sanitizedValue);
+                      }}
+                      placeholder="Enter the genre"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Edition (Optional)</label>
+                    <input
+                      type="text"
+                      value={bookEdition}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+                        setBookEdition(sanitizedValue);
+                      }}
+                      placeholder="Enter the edition"
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Genre</label>
-                  <input
-                    type="text"
-                    value={bookGenre}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setBookGenre(sanitizedValue);
-                    }}
-                    placeholder="Enter the genre"
-                    required
-                    style={styles.input}
-                  />
+              </>
+            )}
+            {step === 2 && itemType === 'Media' && (
+              <>
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Media Title</label>
+                    <input
+                      type="text"
+                      value={mediaTitle}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setMediaTitle(sanitizedValue);
+                      }}
+                      placeholder="Enter the media title"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>MediaID</label>
+                    <input
+                      type="text"
+                      value={mediaID}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setMediaID(sanitizedValue);
+                      }}
+                      placeholder="Enter the ISBN"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Edition (Optional)</label>
-                  <input
-                    type="text"
-                    value={bookEdition}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-                      setBookEdition(sanitizedValue);
-                    }}
-                    placeholder="Enter the edition"
-                    style={styles.input}
-                  />
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Media Author</label>
+                    <input
+                      type="text"
+                      value={mediaAuthor}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setMediaAuthor(sanitizedValue);
+                      }}
+                      placeholder="Enter the author"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Media Publisher</label>
+                    <input
+                      type="text"
+                      value={mediaPublisher}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setMediaPublisher(sanitizedValue);
+                      }}
+                      placeholder="Enter the publisher"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-          {step === 2 && itemType === 'Media' && (
-            <>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Media Title</label>
-                  <input
-                    type="text"
-                    value={mediaTitle}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setMediaTitle(sanitizedValue);
-                    }}
-                    placeholder="Enter the media title"
-                    required
-                    style={styles.input}
-                  />
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Genre</label>
+                    <input
+                      type="text"
+                      value={mediaGenre}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setMediaGenre(sanitizedValue);
+                      }}
+                      placeholder="Enter the genre"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Edition (Optional)</label>
+                    <input
+                      type="text"
+                      value={mediaEdition}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+                        setMediaEdition(sanitizedValue);
+                      }}
+                      placeholder="Enter the edition"
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>MediaID</label>
-                  <input
-                    type="text"
-                    value={mediaID}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setMediaID(sanitizedValue);
-                    }}
-                    placeholder="Enter the ISBN"
-                    required
-                    style={styles.input}
-                  />
+              </>
+            )}
+            {step === 2 && itemType === 'Device' && (
+              <>
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Device Title</label>
+                    <input
+                      type="text"
+                      value={deviceTitle}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setDeviceTitle(sanitizedValue);
+                      }}
+                      placeholder="Enter the device title"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Serial Number</label>
+                    <input
+                      type="text"
+                      value={serialNumber}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setSerialNumber(sanitizedValue);
+                      }}
+                      placeholder="Enter the serial number"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Media Author</label>
-                  <input
-                    type="text"
-                    value={mediaAuthor}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setMediaAuthor(sanitizedValue);
-                    }}
-                    placeholder="Enter the author"
-                    required
-                    style={styles.input}
-                  />
+                <div style={styles.row}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Brand</label>
+                    <input
+                      type="text"
+                      value={brand}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setBrand(sanitizedValue);
+                      }}
+                      placeholder="Enter the brand"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.label}>Model</label>
+                    <input
+                      type="text"
+                      value={model}
+                      onChange={(e) => {
+                        const sanitizedValue = e.target.value;
+                        setModel(sanitizedValue);
+                      }}
+                      placeholder="Enter the model"
+                      required
+                      style={styles.input}
+                    />
+                  </div>
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Media Publisher</label>
-                  <input
-                    type="text"
-                    value={mediaPublisher}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setMediaPublisher(sanitizedValue);
-                    }}
-                    placeholder="Enter the publisher"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-              </div>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Genre</label>
-                  <input
-                    type="text"
-                    value={mediaGenre}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setMediaGenre(sanitizedValue);
-                    }}
-                    placeholder="Enter the genre"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Edition (Optional)</label>
-                  <input
-                    type="text"
-                    value={mediaEdition}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-                      setMediaEdition(sanitizedValue);
-                    }}
-                    placeholder="Enter the edition"
-                    style={styles.input}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-          {step === 2 && itemType === 'Device' && (
-            <>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Device Title</label>
-                  <input
-                    type="text"
-                    value={deviceTitle}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setDeviceTitle(sanitizedValue);
-                    }}
-                    placeholder="Enter the device title"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Serial Number</label>
-                  <input
-                    type="text"
-                    value={serialNumber}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setSerialNumber(sanitizedValue);
-                    }}
-                    placeholder="Enter the serial number"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-              </div>
-              <div style={styles.row}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Brand</label>
-                  <input
-                    type="text"
-                    value={brand}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setBrand(sanitizedValue);
-                    }}
-                    placeholder="Enter the brand"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>Model</label>
-                  <input
-                    type="text"
-                    value={model}
-                    onChange={(e) => {
-                      const sanitizedValue = e.target.value;
-                      setModel(sanitizedValue);
-                    }}
-                    placeholder="Enter the model"
-                    required
-                    style={styles.input}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-          <button type="submit" style={styles.button}>
-            {step === 1 ? "Next" : "Request Item"}
-          </button>
-        </form>
+              </>
+            )}
+            <button type="submit" style={styles.button}>
+              {step === 1 ? "Next" : "Request Item"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -572,6 +583,32 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
+  },
+  navbar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 20px',
+    backgroundColor: '#333',
+    color: '#fff',
+    position: 'fixed',
+    left: '0',
+    right: '0',
+    zIndex: 100,
+  },
+  libraryName: {
+    backgroundColor: '#C8102E',
+    fontWeight: 'bold',
+    fontSize: '24px',
+    justifyContent: 'center',
+    padding: '10px',
+    borderRadius: '10px',
+    margin: '0 20px'
+  },
+  libraryNameLink: {
+    color: 'white',
+    cursor: 'pointer',
+    textDecoration: 'none',
   },
   registrationBox: {
     width: "52.5vw",

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 
@@ -20,7 +21,7 @@ const Login: React.FC = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/login`, {
@@ -48,11 +49,11 @@ const Login: React.FC = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
-        if (data.userType === 'Admin'){ //Admin Page
+        });
+        if (data.userType === 'Admin') { //Admin Page
           navigate('/adminDashboard');
         }
-        else{ //User/Faculty page
+        else { //User/Faculty page
           navigate('/user');
         }
       } else {
@@ -66,8 +67,8 @@ const Login: React.FC = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
-          return;
+        });
+        return;
       }
     } catch (error) {
       toast.error('Failed to log in user. Please try again.', {
@@ -80,46 +81,56 @@ const Login: React.FC = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.loginBox}>
-        <h1 style={styles.title}>Login</h1>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              style={styles.input}
-            />
-          </div>
-          <button type="submit" style={styles.button}>
-            Login
-          </button>
-          <div style={styles.links}>
-            <a href="/register" style={styles.link}>
-              Don't have an account? Register here
-            </a>
-          </div>
-        </form>
+    <div>
+      <div style={styles.navbar}>
+        <div style={styles.libraryName}>
+          <Link to={'/'} style={styles.libraryNameLink}>My Library</Link>
+        </div>
+        <div style={styles.libraryName}>
+          <Link to={'/browse'} style={styles.libraryNameLink}>Browse</Link>
+        </div>
+      </div>
+      <div style={styles.container}>
+        <div style={styles.loginBox}>
+          <h1 style={styles.title}>Login</h1>
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                style={styles.input}
+              />
+            </div>
+            <button type="submit" style={styles.button}>
+              Login
+            </button>
+            <div style={styles.links}>
+              <a href="/register" style={styles.link}>
+                Don't have an account? Register here
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -138,6 +149,32 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
   },
+  navbar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 20px',
+    backgroundColor: '#333',
+    color: '#fff',
+    position: 'fixed',
+    left: '0',
+    right: '0',
+    zIndex: 100,
+  },
+  libraryName: {
+    backgroundColor: '#C8102E',
+    fontWeight: 'bold',
+    fontSize: '24px',
+    justifyContent: 'center',
+    padding: '10px',
+    borderRadius: '10px',
+    margin: '0 20px'
+  },
+  libraryNameLink: {
+    color: 'white',
+    cursor: 'pointer',
+    textDecoration: 'none',
+  },
   loginBox: {
     backgroundColor: "#ffffff",
     padding: "40px",
@@ -145,7 +182,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     minHeight: "40vh",
     maxHeight: "90vh",
     display: "flex",
-    flexDirection: "column", // This is now correctly typed
+    flexDirection: "column",
     justifyContent: "center",
     borderRadius: "10px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",

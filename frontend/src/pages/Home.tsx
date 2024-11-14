@@ -42,7 +42,7 @@ const Home: React.FC = () => {
 
     return (
         <>
-            <nav>
+            <nav className='nav__home'>
                 <div className="nav__container">
                     <Link to='/' className="logo"><b>Library</b></Link>
                     <ul className="nav__links">

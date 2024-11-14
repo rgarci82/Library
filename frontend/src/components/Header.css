@@ -1,7 +1,7 @@
-.logo{
+.logo {
   font-size: 32px;
   color: #C8102E;
-  
+
 }
 
 .nav__container {
@@ -14,7 +14,7 @@
   margin: 0 auto;
 }
 
-.nav__links{
+.nav__links {
   display: flex;
 }
 
@@ -59,4 +59,12 @@
 .underline:hover:after {
   left: 0;
   width: 100%;
+}
+
+.nav__home {
+  height: 80px;
+  display: flex;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
+  background-color: white;
+  position: relative;
 }
