@@ -1,18 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
-      setError("Both email and password are required.");
-    } else {
-      setError("");
+      toast.error("Both email and password are required.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/login`, {
@@ -30,6 +38,17 @@ const Login: React.FC = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        toast.success('Logged in successfully', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         if (data.userType === 'Admin'){ //Admin Page
           navigate('/adminDashboard');
         }
@@ -37,11 +56,31 @@ const Login: React.FC = () => {
           navigate('/user');
         }
       } else {
-        setError(data.message || "An error occurred");
+        toast.error(`${data.message}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
+          return;
       }
     } catch (error) {
-      setError("Failed to log in user. Please try again.");
-      console.error("Error:", error);
+      toast.error('Failed to log in user. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
     }
   };
 
@@ -50,7 +89,6 @@ const Login: React.FC = () => {
       <div style={styles.loginBox}>
         <h1 style={styles.title}>Login</h1>
         <form onSubmit={handleSubmit} style={styles.form}>
-          {error && <p style={styles.error}>{error}</p>}
           <div style={styles.inputGroup}>
             <label style={styles.label}>Email</label>
             <input
