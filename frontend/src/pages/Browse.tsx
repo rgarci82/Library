@@ -8,6 +8,14 @@ enum ItemStatus {
   Borrowed = 'borrowed',
 }
 
+interface User {
+  userID: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNum: number;
+  userType: string;
+}
 // Define the type for each item
 interface Book {
   ISBN: string;
@@ -47,7 +55,7 @@ const BrowsePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
 
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<User>();
   const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [allMedia, setAllMedia] = useState<Media[]>([]);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
@@ -85,7 +93,7 @@ const BrowsePage: React.FC = () => {
       const userData = await response.json();
       setUserData(userData);
       setIsLoggedIn(true)
-
+      
       if (!userData.userID) {
         console.error("User data is not available.");
         return; // Return early if userID is undefined
@@ -95,6 +103,25 @@ const BrowsePage: React.FC = () => {
     }
   };
 
+  const fetchAllBooks = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }), // Send book as JSON
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all unborrowed books by user.");
+
+      const data = await response.json();
+
+      setAllBooks(data);
+    } catch (error) {
+      console.error("Error:", error);
+    } 
+  }
 
   const fetchBookCopies = async (ISBN: string, book: Book) => {
     try {
@@ -103,6 +130,7 @@ const BrowsePage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ userData, book }), // Send book as JSON
       });
 
       if (!response.ok) throw new Error("Failed to fetch all books");
@@ -304,7 +332,7 @@ const BrowsePage: React.FC = () => {
   };
 
   //Fetch user data
-  useEffect(() => { fetchUserData(); });
+  useEffect(() => { fetchUserData(); }, []);
 
   // Get the search term from the URL query parameter
   useEffect(() => {
@@ -315,26 +343,10 @@ const BrowsePage: React.FC = () => {
 
   //Fetch all books
   useEffect(() => {
-    const fetchAllBooks = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all books");
-
-        const data = await response.json();
-
-        setAllBooks(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+    if (userData){
+      fetchAllBooks();
     }
-    fetchAllBooks();
-  }, []);
+  }, [userData]);
 
   //Fetch all media
   useEffect(() => {

@@ -1,9 +1,12 @@
 import pool from "../config/db.js";
 
 export async function getBooks(req, res) {
+  const { userData } = req.body;
+
   try {
-    const [rows] = await pool.query("SELECT * FROM book WHERE is_deleted = 0");
-    res.json(rows);
+    console.log(userData);
+    /*const [rows] = await pool.query("SELECT * FROM book WHERE is_deleted = 0");
+    res.json(rows);*/
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
