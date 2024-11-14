@@ -5,6 +5,7 @@ import DeleteModal from "./DeleteModal";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 type ItemType = "books" | "media" | "devices";
 
@@ -117,6 +118,10 @@ interface TotalFines {
   totalFines: number;
 }
 
+interface JwtPayload {
+  id: number;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -175,6 +180,9 @@ const AdminDashboard = () => {
   const [monthlyDeviceRequests, setMonthlyDeviceRequests] = useState<MonthlyDeviceRequest[]>([]);
   const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
 
+  const [userData, setUserData] = useState<any>(null);
+
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuantity(value === "" ? "" : Number(value));
@@ -222,7 +230,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         return;
       }
 
@@ -236,7 +244,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
 
       setISBN("");
       setBTitle("");
@@ -256,7 +264,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
     }
   };
 
@@ -297,7 +305,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         return;
       }
 
@@ -311,7 +319,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
 
       setMediaID("");
       setMTitle("");
@@ -331,7 +339,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
     }
   };
 
@@ -369,7 +377,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         return;
       }
 
@@ -383,7 +391,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
 
       setSerialNumber("");
       setDname("");
@@ -400,7 +408,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
     }
   };
 
@@ -450,9 +458,9 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
-          setIsDeleting(false)
-         return;
+        });
+        setIsDeleting(false)
+        return;
       }
 
       toast.success('Item deleted successfully', {
@@ -465,7 +473,7 @@ const AdminDashboard = () => {
         progress: undefined,
         theme: "light",
         transition: Bounce,
-        });
+      });
 
       setIsDeleting(false);
       setSelectedItemDelete(null);
@@ -515,7 +523,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchBookRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -529,7 +537,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -555,7 +563,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchMediaRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -569,7 +577,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -596,7 +604,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchDeviceRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -610,7 +618,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -636,7 +644,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchDeviceRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -650,7 +658,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       alert(error);
@@ -676,7 +684,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchMediaRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -690,7 +698,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -716,7 +724,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
         fetchBookRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -730,7 +738,7 @@ const AdminDashboard = () => {
           progress: undefined,
           theme: "light",
           transition: Bounce,
-          });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -739,7 +747,12 @@ const AdminDashboard = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/getBooks`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ userData })
+        },
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch books");
       }
@@ -752,7 +765,12 @@ const AdminDashboard = () => {
 
   const fetchMedia = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/getMedia`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ userData })
+        },
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch books");
       }
@@ -766,7 +784,11 @@ const AdminDashboard = () => {
   const fetchDevices = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/devices`
+        `${import.meta.env.VITE_API_URL}/api/devices/getDevices`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ userData })
+        },
       );
       if (!response.ok) {
         throw new Error("Failed to fetch books");
@@ -926,6 +948,39 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
+      if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+      // Fetch user data
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch user data");
+
+      const userData = await response.json();
+      setUserData(userData);
+
+      if (!userData.userID) {
+        console.error("User data is not available.");
+        return; // Return early if userID is undefined
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const refreshItems = async () => {
     await fetchBooks();
     await fetchDevices();
@@ -933,6 +988,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    fetchUserData();
     fetchBooks();
     fetchMedia();
     fetchDevices();
@@ -960,7 +1016,7 @@ const AdminDashboard = () => {
       progress: undefined,
       theme: "light",
       transition: Bounce,
-      });
+    });
     navigate("/");
     localStorage.clear();
   };
@@ -1317,7 +1373,7 @@ const AdminDashboard = () => {
                       <strong>Serial Number:</strong> {device.serialNumber}
                     </p>
                     <p>
-                      <strong>Status:</strong> {device.status.charAt(0)+ device.status.slice(1)}
+                      <strong>Status:</strong> {device.status.charAt(0) + device.status.slice(1)}
                     </p>
                     <button onClick={() => handleEditClick(device)}>
                       Edit
