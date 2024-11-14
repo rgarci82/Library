@@ -1,10 +1,11 @@
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './User.css';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, Link } from 'react-router-dom';
+import { Bounce, toast } from 'react-toastify';
 
 interface JwtPayload {
-  id: number; 
+  id: number;
 }
 interface BorrowedBook {
   ISBN: string;
@@ -12,8 +13,8 @@ interface BorrowedBook {
   bAuthor: string;
   publisher: string;
   genre: string;
-  edition: number | null; 
-  itemID: number; 
+  edition: number | null;
+  itemID: number;
   dueDate: string;
 }
 
@@ -92,56 +93,158 @@ const UserPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
 
-  const returnItem = async (selectedItem: borrowedItem) => {   
-    if ("ISBN" in selectedItem){
+  const returnItem = async (selectedItem: borrowedItem) => {
+    if ("ISBN" in selectedItem) {
       try {
         const bookResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/books/return`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({selectedItem}),
+          body: JSON.stringify({ selectedItem }),
         });
 
-        if (!bookResponse.ok) throw new Error("Failed to return borrowed book");
-        
+        if (!bookResponse.ok) {
+          toast.error(`Failed to return borrowed book`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        toast.success(`Returned book successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
         window.location.reload();
       } catch (error) {
-        console.error("Error:", error);
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
-    else if ("MediaID" in selectedItem){
+    else if ("MediaID" in selectedItem) {
       try {
         const mediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/media/return`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({selectedItem}),
+          body: JSON.stringify({ selectedItem }),
         });
 
-        if (!mediaResponse.ok) throw new Error("Failed to return borrowed media");
-        
+        if (!mediaResponse.ok) {
+          toast.error(`Failed to return borrowed media`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        toast.success(`Returned media successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
         window.location.reload();
       } catch (error) {
-        console.error("Error:", error);
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
-    else if ("serialNumber" in selectedItem){
+    else if ("serialNumber" in selectedItem) {
       try {
         const deviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/return`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({selectedItem}),
+          body: JSON.stringify({ selectedItem }),
         });
 
-        if (!deviceResponse.ok) throw new Error("Failed to return borrowed device");
-        
+        if (!deviceResponse.ok) {
+          toast.error(`Failed to return borrowed device`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        toast.success(`Returned device successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
         window.location.reload();
       } catch (error) {
-        console.error("Error:", error);
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     }
   };
@@ -153,10 +256,10 @@ const UserPage: React.FC = () => {
 
   const handleConfirmReturn = () => {
     // Proceed with the return action
-    if (selectedItem){
+    if (selectedItem) {
       returnItem(selectedItem);
     }
-    else{
+    else {
       console.log("No item selected");
     }
     setShowModal(false); // Close the modal
@@ -236,7 +339,7 @@ const UserPage: React.FC = () => {
         setLoading(false);
       }
     };
-  fetchUserFine();
+    fetchUserFine();
   }, [userData, userDataLoading]);
 
   //Book Borrowed
@@ -263,7 +366,7 @@ const UserPage: React.FC = () => {
         setLoading(false);
       }
     };
-  fetchUserBorrowedBooks();
+    fetchUserBorrowedBooks();
   }, [userData, userDataLoading]);
 
   //Media Borrowed
@@ -284,40 +387,40 @@ const UserPage: React.FC = () => {
 
         const mediaBorrowedData = await borrowedMediaResponse.json();
         setUserBorrowedMedia(mediaBorrowedData.borrowedMedia);
-        
+
       } catch (error) {
         console.error("Error:", error);
       } finally {
         setLoading(false);
       }
     };
-  fetchUserBorrowedMedia();
+    fetchUserBorrowedMedia();
   }, [userData, userDataLoading]);
 
   //Device Borrowed
   useEffect(() => {
-      if (userDataLoading || !userData?.userID) return;
+    if (userDataLoading || !userData?.userID) return;
 
-      const fetchUserBorrowedDevice = async () => {
-        setLoading(true);
-        try {
-          const borrowedDeviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceBorrowed`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+    const fetchUserBorrowedDevice = async () => {
+      setLoading(true);
+      try {
+        const borrowedDeviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceBorrowed`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-          if (!borrowedDeviceResponse.ok) throw new Error("Failed to fetch borrowed media");
+        if (!borrowedDeviceResponse.ok) throw new Error("Failed to fetch borrowed media");
 
-          const deviceBorrowedData = await borrowedDeviceResponse.json();
-          setUserBorrowedDevice(deviceBorrowedData.borrowedDevice);
-        } catch (error) {
-          console.error("Error:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
+        const deviceBorrowedData = await borrowedDeviceResponse.json();
+        setUserBorrowedDevice(deviceBorrowedData.borrowedDevice);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchUserBorrowedDevice();
   }, [userData, userDataLoading]);
 
@@ -373,7 +476,7 @@ const UserPage: React.FC = () => {
     };
     fetchUserRequestedItems();
   }, [userData, userDataLoading]);
-  
+
   //Items Hold
   useEffect(() => {
     if (userDataLoading || !userData?.userID) return;
@@ -447,15 +550,15 @@ const UserPage: React.FC = () => {
           <Link to={"/"} className="admin__link">My Library</Link>
 
         </div>
-  
+
         <div className="navbar-section search-section">
           <Link to="/browse" className="browseButton">Browse</Link>
 
           <div className="nav-icons">
-            <button className = "logOutButton" onClick={() => handleSignOut()}>Sign out</button>
+            <button className="logOutButton" onClick={() => handleSignOut()}>Sign out</button>
           </div>
         </div>
-  
+
         <div className="navbar-section tabs">
           <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Books</div>
           <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
@@ -466,7 +569,7 @@ const UserPage: React.FC = () => {
           <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
         </div>
       </div>
-  
+
       <div className="user-info-boxes">
         {userData ? (
           <>
@@ -483,7 +586,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">ItemID: {book.itemID}</li>
                       <li className="info-text-css">Due Date: {new Date(book.dueDate).toLocaleDateString()}</li>
                     </ul>
-                    <div className="button-container" onClick={()=> handleReturnClick(book)}>
+                    <div className="button-container" onClick={() => handleReturnClick(book)}>
                       <button className="button-text return-button">
                         Return
                       </button>
@@ -509,7 +612,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">ItemID: {media.itemID}</li>
                       <li className="info-text-css">Due Date: {new Date(media.dueDate).toLocaleDateString()}</li>
                     </ul>
-                    <div className="button-container" onClick={()=> handleReturnClick(media)}>
+                    <div className="button-container" onClick={() => handleReturnClick(media)}>
                       <button className="button-text return-button">
                         Return
                       </button>
@@ -534,7 +637,7 @@ const UserPage: React.FC = () => {
                       <li className="info-text-css">Due Date: {new Date(device.dueDate).toLocaleDateString()}</li>
                     </ul>
                     <div className="button-container">
-                      <button className="button-text return-button" onClick={()=> handleReturnClick(device)}>
+                      <button className="button-text return-button" onClick={() => handleReturnClick(device)}>
                         Return
                       </button>
                     </div>
@@ -555,7 +658,7 @@ const UserPage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Fines */}
             {activeTab === 'fines' && (
               <div className="info-box fines-box">
@@ -565,7 +668,7 @@ const UserPage: React.FC = () => {
                 </ul>
               </div>
             )}
-  
+
             {/* Item Requests */}
             {activeTab === 'itemRequested' && (
               <div>
@@ -590,7 +693,7 @@ const UserPage: React.FC = () => {
                     ) : (
                       <p className="not-found-css">No requested books found.</p>
                     )}
-  
+
                     {/* Display requested media */}
                     <div className="title-container">
                       <h2 className="requested-title">Requested Media</h2>
@@ -630,7 +733,7 @@ const UserPage: React.FC = () => {
                 )}
               </div>
             )}
-  
+
             {/* Item Hold */}
             {activeTab === 'itemHold' && (
               <div>
@@ -654,7 +757,7 @@ const UserPage: React.FC = () => {
                       ))
                     ) : (
                       <p className="not-found-css">No books holds found.</p>
-                    )}       
+                    )}
 
                     {/* Display media holds*/}
                     <div className="title-container">
@@ -690,12 +793,12 @@ const UserPage: React.FC = () => {
                       ))
                     ) : (
                       <p className="not-found-css">No device holds found.</p>
-                    )}    
+                    )}
                   </>
                 )}
               </div>
             )}
-             
+
             {/* Notifications */}
             {/*activeTab === 'notifications' && (
               notificationsData.length > 0 ? (
@@ -715,8 +818,8 @@ const UserPage: React.FC = () => {
         ) : (
           <p>Loading user data...</p>
         )}
-      </div> 
+      </div>
     </div>
   );
 }
-  export default UserPage;
+export default UserPage;
