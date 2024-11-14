@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Book, Media, Device } from './AdminDashboard';
+import { Bounce, toast } from "react-toastify";
 
 interface EditModalProps {
     selectedItem: Book | Media | Device | null;
@@ -70,11 +71,32 @@ const EditModal: React.FC<EditModalProps> = ({ selectedItem, onClose, onRefresh 
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update item');
+              toast.error('Failed to edit item', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+                });
             }
 
             onRefresh()
             onClose()
+            toast.success('Item edited successfully', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+              });
 
         } catch (error) {
             console.error("Failed to update item:", error);

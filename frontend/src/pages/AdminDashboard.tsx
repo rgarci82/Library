@@ -4,6 +4,7 @@ import EditModal from "./EditModal";
 import DeleteModal from "./DeleteModal";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 
 type ItemType = "books" | "media" | "devices";
 
@@ -67,7 +68,7 @@ interface DeviceRequest {
   dName: string;
   brand: string;
   model: string;
-  Status: string;
+  status: string;
 }
 
 interface MonthlyRegistrationRecord {
@@ -213,12 +214,31 @@ const AdminDashboard = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.message);
+        toast.error(`Error: ${errorData}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         return;
       }
 
-      setErrorMessage(null);
-      setSuccessMessage("Book created successfully!");
+      toast.success('Book created successfully', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
 
       setISBN("");
       setBTitle("");
@@ -228,8 +248,17 @@ const AdminDashboard = () => {
       setEdition("");
       setQuantity(1);
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("An unexpected error occurred.");
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
     }
   };
 
@@ -260,12 +289,31 @@ const AdminDashboard = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.message);
+        toast.error(`Error: ${errorData}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         return;
       }
 
-      setErrorMessage(null);
-      setSuccessMessage("Media created successfully!");
+      toast.success('Media created successfully', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
 
       setMediaID("");
       setMTitle("");
@@ -275,8 +323,17 @@ const AdminDashboard = () => {
       setMEdition("");
       setMQuantity(1);
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("An unexpected error occurred.");
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
     }
   };
 
@@ -304,22 +361,48 @@ const AdminDashboard = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrorMessage(errorData.message);
-        setSuccessMessage(null);
+        toast.error(`Error: ${errorData}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         return;
       }
 
-      setErrorMessage(null);
-      setSuccessMessage("Device created successfully!");
+      toast.success('Device created successfully', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
 
       setSerialNumber("");
       setDname("");
       setBrand("");
       setModel("");
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("An unexpected error occurred.");
-      setSuccessMessage(null);
+      toast.error(`Error: ${error}.`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
     }
   };
 
@@ -359,12 +442,32 @@ const AdminDashboard = () => {
       );
 
       if (response.status === 409) {
-        const result = await response.json();
-        alert(result.message);
-        return;
+        toast.error('Error: Some copies are currently being borrowed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
+          setIsDeleting(false)
+         return;
       }
 
-      if (!response.ok) throw new Error("Failed to delete item");
+      toast.success('Item deleted successfully', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+        });
 
       setIsDeleting(false);
       setSelectedItemDelete(null);
@@ -404,10 +507,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request accepted.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchBookRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       console.error(error);
@@ -423,10 +547,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request accepted.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchMediaRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       console.error(error);
@@ -443,10 +588,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request accepted.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchDeviceRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       console.error(error);
@@ -462,10 +628,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request denied successfully.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchDeviceRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       alert(error);
@@ -481,10 +668,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request denied successfully.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchMediaRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       console.error(error);
@@ -500,10 +708,31 @@ const AdminDashboard = () => {
         }
       );
       if (response.status === 200) {
+        toast.success('Request denied successfully.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
         fetchBookRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
-        alert("This request has already been processed");
+        toast.error('Request has already been processed.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+          });
       }
     } catch (error) {
       console.error(error);
@@ -723,6 +952,17 @@ const AdminDashboard = () => {
   }, []);
 
   const handleSignOut = () => {
+    toast.success('Logged out successfully', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+      });
     navigate("/");
     localStorage.clear();
   };
@@ -862,12 +1102,6 @@ const AdminDashboard = () => {
                 Create Book
               </button>
             </form>
-            {successMessage && (
-              <div className="success-message">{successMessage}</div>
-            )}
-            {errorMessage && (
-              <div className="error-message">{errorMessage}</div>
-            )}
           </div>
         )}
         {activeTab === "media" && (
@@ -944,12 +1178,6 @@ const AdminDashboard = () => {
                 Create Media
               </button>
             </form>
-            {successMessage && (
-              <div className="success-message">{successMessage}</div>
-            )}
-            {errorMessage && (
-              <div className="error-message">{errorMessage}</div>
-            )}
           </div>
         )}
         {activeTab === "devices" && (
@@ -1006,12 +1234,6 @@ const AdminDashboard = () => {
                 Create Device
               </button>
             </form>
-            {successMessage && (
-              <div className="success-message">{successMessage}</div>
-            )}
-            {errorMessage && (
-              <div className="error-message">{errorMessage}</div>
-            )}
           </div>
         )}
         {activeTab === "manageItems" && (
@@ -1241,7 +1463,7 @@ const AdminDashboard = () => {
                       <td>{request.dName}</td>
                       <td>{request.brand}</td>
                       <td>{request.model}</td>
-                      <td>{request.Status}</td>
+                      <td>{request.status}</td>
                       <td>{request.userID}</td>
                       <td>
                         <button

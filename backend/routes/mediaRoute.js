@@ -24,7 +24,6 @@ route.get("/media/:MediaID", getMediaByID);
 route.post("/media/return", returnMedia);
 route.post("/media/hold", holdMedia);
 route.put("/media/:MediaID", updateMedia);
-route.delete("/media/:MediaID", deleteMedia);
 route.post("/media/request", requestMedia);
 route.get("/media/request/all", getAllMediaRequests);
 route.put("/media/request/accept/:requestID", mediaRequestAccepted);
