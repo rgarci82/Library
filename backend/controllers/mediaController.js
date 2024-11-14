@@ -1,12 +1,29 @@
 import pool from "../config/db.js";
 
 export async function getMedia(req, res) {
-  try {
-    const [rows] = await pool.query("SELECT * FROM media WHERE is_deleted = 0");
+  const { userData } = req.body;
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!userData){
+    try {
+      const [rows] = await pool.query("SELECT * FROM media WHERE is_deleted = 0");
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }  
+  }
+  else{
+    try {
+      const [rows] = await pool.query(`SELECT m.*
+      FROM media AS m
+      EXCEPT
+      SELECT m.*
+      FROM media AS m, mediaborrowed AS mb, mediacopy AS mc
+      WHERE mb.userID = ? AND mb.itemID = mc.itemID AND m.MediaID = mc.MediaID AND mb.returnDate IS NULL AND is_deleted = 0;
+      `, [userData.userID]);
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 

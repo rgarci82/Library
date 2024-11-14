@@ -102,7 +102,7 @@ const BrowsePage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userData }), // Send book as JSON
+        body: JSON.stringify({ userData }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch all unborrowed books by user.");
@@ -113,6 +113,44 @@ const BrowsePage: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
     } 
+  }
+
+  const fetchAllMedia = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/getMedia`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all media");
+
+      const data = await response.json();
+      setAllMedia(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  const fetchAllDevices = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/getDevices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all devices");
+
+      const data = await response.json();
+      setAllDevices(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
 
   const fetchBookCopies = async (ISBN: string, book: Book) => {
@@ -337,51 +375,9 @@ const BrowsePage: React.FC = () => {
   //Fetch all books
   useEffect(() => {
     fetchAllBooks();
-  }, [userData]);
-
-  //Fetch all media
-  useEffect(() => {
-    const fetchAllMedia = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all media");
-
-        const data = await response.json();
-        setAllMedia(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
     fetchAllMedia();
-  }, []);
-
-  //Fetch all device
-  useEffect(() => {
-    const fetchAllDevices = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all devices");
-
-        const data = await response.json();
-        setAllDevices(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
     fetchAllDevices();
-  }, []);
+  }, [userData]);
 
   // Function to filter items based on the search term and selected type
   useEffect(() => {

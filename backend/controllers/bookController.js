@@ -18,7 +18,7 @@ export async function getBooks(req, res) {
       EXCEPT
       SELECT b.*
       FROM book AS b, bookborrowed AS bb, bookcopy AS bc
-      WHERE bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL;
+      WHERE bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL AND is_deleted = 0;
       `, [userData.userID]);
       res.json(rows);
     } catch (error) {
