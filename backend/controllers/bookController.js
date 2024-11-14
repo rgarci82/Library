@@ -15,6 +15,7 @@ export async function getBooks(req, res) {
     try {
       const [rows] = await pool.query(`SELECT b.*
       FROM book AS b
+      WHERE b.is_deleted = 0
       EXCEPT
       SELECT b.*
       FROM book AS b, bookborrowed AS bb, bookcopy AS bc

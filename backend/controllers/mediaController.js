@@ -15,6 +15,7 @@ export async function getMedia(req, res) {
     try {
       const [rows] = await pool.query(`SELECT m.*
       FROM media AS m
+      WHERE m.is_deleted = 0
       EXCEPT
       SELECT m.*
       FROM media AS m, mediaborrowed AS mb, mediacopy AS mc

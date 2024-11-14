@@ -15,6 +15,7 @@ export async function getDevices(req, res) {
     try {
       const [rows] = await pool.query(`SELECT d.*
       FROM device AS d
+      WHERE d.is_deleted = 0
       EXCEPT
       SELECT d.*
       FROM device AS d, deviceborrowed AS db
