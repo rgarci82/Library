@@ -381,9 +381,13 @@ export async function borrowDevice(req, res) {
       serialNumber: serialNumber
     });
   } catch (error) {
-    console.error('Error occurred:', error);
-    // Send an appropriate error response to the client
-    return { success: false, message: 'Internal Server Error', error: error.message };
+    // Check if it's the custom trigger error
+    if (error.code === 'ER_SIGNAL_EXCEPTION') {
+        res.status(400).json({ error: error.sqlMessage });
+    } else {
+        // Handle other errors
+        res.status(500).json({ error: 'An unexpected error occurred' });
+    }
   }
 }
 

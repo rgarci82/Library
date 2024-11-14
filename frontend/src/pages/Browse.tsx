@@ -216,13 +216,25 @@ const BrowsePage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userData, book }), // Send book as JSON
+        body: JSON.stringify({ userData, book }),
       });
 
-      await response.json(); // Parse JSON after fetch completes
-
+      const result = await response.json();
+      
       if (response.ok) {
         toast.success(`${book.bTitle} borrowed successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } else {
+        toast.error(result.error || 'An error occurred while borrowing the book', {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -262,10 +274,22 @@ const BrowsePage: React.FC = () => {
         body: JSON.stringify({ userData, media }), // Send book as JSON
       });
 
-      await response.json(); // Parse JSON after fetch completes
+      const result = await response.json(); // Parse JSON after fetch completes
 
       if (response.ok) {
         toast.success(`${media.mTitle} borrowed successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } else {
+        toast.error(result.error || 'An error occurred while borrowing the book', {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -307,7 +331,7 @@ const BrowsePage: React.FC = () => {
             body: JSON.stringify({ userData, device }), // Send device as JSON
           });
 
-          await response.json(); // Parse JSON after fetch completes
+          const result = await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
             toast.success(`${device.dName} borrowed successfully`, {
@@ -322,7 +346,20 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
-          else {
+          else if (response.status === 400){
+            toast.error(result.error || 'An error occurred while borrowing the book', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
+          else if (response.status === 404){
             setSelectedHoldItem(device);
             setShowHoldPopup(true);
           }
