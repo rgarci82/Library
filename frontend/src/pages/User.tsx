@@ -93,6 +93,228 @@ const UserPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
 
+  //Fetch user's data
+  const fetchUserData = async () => {
+    setUserDataLoading(true);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
+      if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+      // Fetch user data
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch user data");
+
+      const userData = await response.json();
+      setUserData(userData);
+
+      if (!userData.userID) {
+        console.error("User data is not available.");
+        return; // Return early if userID is undefined
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+      setUserDataLoading(false);
+    }
+  };
+
+  //Fetch user's borrowed books
+  const fetchUserBorrowedBooks = async () => {
+    setLoading(true);
+    try {
+      const borrowedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksBorrowed`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!borrowedBooksResponse.ok) throw new Error("Failed to fetch borrowed books");
+
+      const booksBorrowedData = await borrowedBooksResponse.json();
+      setUserBorrowedBooks(booksBorrowedData.borrowedBooks);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Fetch user's borrowed media
+  const fetchUserBorrowedMedia = async () => {
+    setLoading(true);
+    try {
+      const borrowedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaBorrowed`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!borrowedMediaResponse.ok) throw new Error("Failed to fetch borrowed media");
+
+      const mediaBorrowedData = await borrowedMediaResponse.json();
+      setUserBorrowedMedia(mediaBorrowedData.borrowedMedia);
+
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Fetch user's borrowed device
+  const fetchUserBorrowedDevice = async () => {
+    setLoading(true);
+    try {
+      const borrowedDeviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceBorrowed`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!borrowedDeviceResponse.ok) throw new Error("Failed to fetch borrowed media");
+
+      const deviceBorrowedData = await borrowedDeviceResponse.json();
+      setUserBorrowedDevice(deviceBorrowedData.borrowedDevice);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Fetch user's fines
+  const fetchUserFine = async () => {
+    setLoading(true);
+    try {
+      const finesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/fines`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
+
+      const finesData = await finesResponse.json();
+      setUserFine(finesData);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Fetch user's requested items
+  const fetchUserRequestedItems = async () => {
+    setLoading(true);
+    try {
+      // Fetch requested media
+      const requestedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!requestedMediaResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const mediarequestedData = await requestedMediaResponse.json();
+      setUserRequestedMedia(mediarequestedData.userRequestedMedia || []); // Ensure you access the correct property
+
+      // You could also fetch requested books here if you have a similar API endpoint
+      const requestedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!requestedBooksResponse.ok) throw new Error("Failed to fetch requested books");
+
+      const booksRequestedData = await requestedBooksResponse.json();
+      setUserRequestedBooks(booksRequestedData.userRequestedBooks || []); // Ensure you access the correct property
+      //device
+      const requestedDeviceReponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceRequested`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!requestedDeviceReponse.ok) throw new Error("Failed to fetch requested media");
+
+      const deviceRequestedData = await requestedDeviceReponse.json();
+      setUserRequestedDevice(deviceRequestedData.userRequestedDevice || []); // Ensure you access the correct property
+    } catch (error) {
+      console.error("Error featching requested device data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Fetch user's items on hold
+  const fetchUserItemHold = async () => {
+    setLoading(true);
+    try {
+      // Fetch bookhold
+      const bookHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/bookHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!bookHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const bookholdData = await bookHoldResponse.json();
+      setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
+      // Fetch devicehold
+      const deviceHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!deviceHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const deviceholdData = await deviceHoldResponse.json();
+      setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
+      // Fetch mediahold
+      const mediaHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaHold`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!mediaHoldResponse.ok) throw new Error("Failed to fetch requested media");
+
+      const mediaholdData = await mediaHoldResponse.json();
+      setUsermediaHold(mediaholdData.usermediaHold || []); // Ensure you access the correct property
+    } catch (error) {
+      console.error("Error featching requested device data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Returning item
   const returnItem = async (selectedItem: borrowedItem) => {
     if ("ISBN" in selectedItem) {
       try {
@@ -118,6 +340,8 @@ const UserPage: React.FC = () => {
           });
         };
 
+        fetchUserBorrowedBooks();
+
         toast.success(`Returned book successfully`, {
           position: "top-right",
           autoClose: 3000,
@@ -130,7 +354,6 @@ const UserPage: React.FC = () => {
           transition: Bounce,
         });
 
-        window.location.reload();
       } catch (error) {
         toast.error(`Error: ${error}`, {
           position: "top-right",
@@ -169,6 +392,8 @@ const UserPage: React.FC = () => {
           });
         };
 
+        fetchUserBorrowedMedia();
+
         toast.success(`Returned media successfully`, {
           position: "top-right",
           autoClose: 3000,
@@ -181,7 +406,6 @@ const UserPage: React.FC = () => {
           transition: Bounce,
         });
 
-        window.location.reload();
       } catch (error) {
         toast.error(`Error: ${error}`, {
           position: "top-right",
@@ -220,6 +444,8 @@ const UserPage: React.FC = () => {
           });
         };
 
+        fetchUserBorrowedDevice();
+
         toast.success(`Returned device successfully`, {
           position: "top-right",
           autoClose: 3000,
@@ -231,8 +457,6 @@ const UserPage: React.FC = () => {
           theme: "light",
           transition: Bounce,
         });
-
-        window.location.reload();
       } catch (error) {
         toast.error(`Error: ${error}`, {
           position: "top-right",
@@ -249,283 +473,46 @@ const UserPage: React.FC = () => {
     }
   };
 
+  //Return confirmation modal
   const handleReturnClick = (item: borrowedItem) => {
     setSelectedItem(item);
     setShowModal(true);
   };
 
+  //Confirming return button
   const handleConfirmReturn = () => {
-    // Proceed with the return action
     if (selectedItem) {
       returnItem(selectedItem);
     }
     else {
       console.log("No item selected");
     }
-    setShowModal(false); // Close the modal
+    setShowModal(false);
   };
 
+  //Return cancel button
   const handleCancel = () => {
-    setShowModal(false); // Close the modal without returning
+    setShowModal(false);
     setSelectedItem(null);
   };
 
   const [loading, setLoading] = useState(true);
 
-
   const navigate = useNavigate();
 
   // First useEffect to fetch user data
   useEffect(() => {
-    const fetchUserData = async () => {
-      setUserDataLoading(true);
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found");
-
-        const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
-        if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
-
-        // Fetch user data
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch user data");
-
-        const userData = await response.json();
-        setUserData(userData);
-
-        if (!userData.userID) {
-          console.error("User data is not available.");
-          return; // Return early if userID is undefined
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-        setUserDataLoading(false);
-      }
-    };
     fetchUserData();
   }, []);
 
   //Fines
   useEffect(() => {
     if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserFine = async () => {
-      setLoading(true);
-      try {
-        const finesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/fines`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
-
-        const finesData = await finesResponse.json();
-        setUserFine(finesData);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserFine();
-  }, [userData, userDataLoading]);
-
-  //Book Borrowed
-  useEffect(() => {
-    if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserBorrowedBooks = async () => {
-      setLoading(true);
-      try {
-        const borrowedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksBorrowed`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!borrowedBooksResponse.ok) throw new Error("Failed to fetch borrowed books");
-
-        const booksBorrowedData = await borrowedBooksResponse.json();
-        setUserBorrowedBooks(booksBorrowedData.borrowedBooks);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserBorrowedBooks();
-  }, [userData, userDataLoading]);
-
-  //Media Borrowed
-  useEffect(() => {
-    if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserBorrowedMedia = async () => {
-      setLoading(true);
-      try {
-        const borrowedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaBorrowed`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!borrowedMediaResponse.ok) throw new Error("Failed to fetch borrowed media");
-
-        const mediaBorrowedData = await borrowedMediaResponse.json();
-        setUserBorrowedMedia(mediaBorrowedData.borrowedMedia);
-
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserBorrowedMedia();
-  }, [userData, userDataLoading]);
-
-  //Device Borrowed
-  useEffect(() => {
-    if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserBorrowedDevice = async () => {
-      setLoading(true);
-      try {
-        const borrowedDeviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceBorrowed`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!borrowedDeviceResponse.ok) throw new Error("Failed to fetch borrowed media");
-
-        const deviceBorrowedData = await borrowedDeviceResponse.json();
-        setUserBorrowedDevice(deviceBorrowedData.borrowedDevice);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserBorrowedDevice();
-  }, [userData, userDataLoading]);
-
-  //Items Requested
-  useEffect(() => {
-    if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserRequestedItems = async () => {
-      setLoading(true);
-      try {
-        // Fetch requested media
-        const requestedMediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaRequested`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!requestedMediaResponse.ok) throw new Error("Failed to fetch requested media");
-
-        const mediarequestedData = await requestedMediaResponse.json();
-        setUserRequestedMedia(mediarequestedData.userRequestedMedia || []); // Ensure you access the correct property
-
-        // You could also fetch requested books here if you have a similar API endpoint
-        const requestedBooksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/booksRequested`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!requestedBooksResponse.ok) throw new Error("Failed to fetch requested books");
-
-        const booksRequestedData = await requestedBooksResponse.json();
-        setUserRequestedBooks(booksRequestedData.userRequestedBooks || []); // Ensure you access the correct property
-        //device
-        const requestedDeviceReponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceRequested`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!requestedDeviceReponse.ok) throw new Error("Failed to fetch requested media");
-
-        const deviceRequestedData = await requestedDeviceReponse.json();
-        setUserRequestedDevice(deviceRequestedData.userRequestedDevice || []); // Ensure you access the correct property
-      } catch (error) {
-        console.error("Error featching requested device data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserRequestedItems();
-  }, [userData, userDataLoading]);
-
-  //Items Hold
-  useEffect(() => {
-    if (userDataLoading || !userData?.userID) return;
-
-    const fetchUserItemHold = async () => {
-      setLoading(true);
-      try {
-        // Fetch bookhold
-        const bookHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/bookHold`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!bookHoldResponse.ok) throw new Error("Failed to fetch requested media");
-
-        const bookholdData = await bookHoldResponse.json();
-        setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
-        // Fetch devicehold
-        const deviceHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceHold`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!deviceHoldResponse.ok) throw new Error("Failed to fetch requested media");
-
-        const deviceholdData = await deviceHoldResponse.json();
-        setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
-        // Fetch mediahold
-        const mediaHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaHold`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!mediaHoldResponse.ok) throw new Error("Failed to fetch requested media");
-
-        const mediaholdData = await mediaHoldResponse.json();
-        setUsermediaHold(mediaholdData.usermediaHold || []); // Ensure you access the correct property
-      } catch (error) {
-        console.error("Error featching requested device data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserItemHold();
   }, [userData, userDataLoading]);
 
