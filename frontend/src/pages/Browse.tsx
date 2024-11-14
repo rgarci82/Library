@@ -222,7 +222,7 @@ const BrowsePage: React.FC = () => {
       await response.json(); // Parse JSON after fetch completes
 
       if (response.ok) {
-        toast.success('Borrowed Book successfully', {
+        toast.success(`${book.bTitle} borrowed successfully`, {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -265,7 +265,7 @@ const BrowsePage: React.FC = () => {
       await response.json(); // Parse JSON after fetch completes
 
       if (response.ok) {
-        toast.success('Borrowed device successfully', {
+        toast.success(`${media.mTitle} borrowed successfully`, {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -310,7 +310,7 @@ const BrowsePage: React.FC = () => {
           await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
-            toast.success('Borrowed device successfully', {
+            toast.success(`${device.dName} borrowed successfully`, {
               position: "top-right",
               autoClose: 3000,
               hideProgressBar: false,
