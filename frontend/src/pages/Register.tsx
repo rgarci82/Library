@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 
 const Register: React.FC = () => {
     const [step, setStep] = useState(1);
@@ -9,7 +10,6 @@ const Register: React.FC = () => {
     const [lastName, setLastName] = useState<string>("");
     const [userType, setUserType] = useState<string>("Student");
     const [phoneNum, setPhoneNum] = useState<string>("");
-    const [error, setError] = useState<string>("");
     const navigate = useNavigate();
 
     const handleNext = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,17 +17,47 @@ const Register: React.FC = () => {
     
       if (step === 1) {
         if (!email || !password) {
-          setError("Please fill in all fields");
+          toast.error("Please fill in all fields", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+            });
           return;
         }
         setStep(2);
       } else {
         if (!firstName || !lastName || !userType || !phoneNum) {
-          setError("Please fill in all fields");
+          toast.error("Please fill in all fields", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+            });
           return;
         }
         if (phoneNum.length !== 10) {
-          setError("Phone number must be exactly 10 digits");
+          toast.error("Phone number must be exactly 10 digits", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+            });
           return;
         }
     
@@ -50,15 +80,44 @@ const Register: React.FC = () => {
           const data = await response.json();
     
           if (response.ok) {
-            console.log("User created successfully", data);
+            toast.success("User created successfully", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+              });
             navigate('/login/');
             // Handle successful user creation, e.g., redirect or display success message
           } else {
-            setError(data.message || "An error occurred");
+            toast.error(`${data.message}`, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+              });
           }
         } catch (error) {
-          setError("Failed to create user. Please try again.");
-          console.error("Error:", error);
+          toast.error("Failed to create user. Please try again.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+            });
         }
       }
     };
@@ -70,7 +129,6 @@ const Register: React.FC = () => {
       <div style={styles.registrationBox}>
         <h1 style={styles.title}>Registration</h1>
         <form onSubmit={handleNext} style={styles.form}>
-          {error && <p style={styles.error}>{error}</p>}
           {step === 1 && (
             <>
               <div style={styles.inputGroup}>
@@ -160,7 +218,6 @@ const Register: React.FC = () => {
                   <select
                     value={userType}
                     onChange={(e) => {
-                      console.log(e.target.value);
                       setUserType(e.target.value);
                     }}
                     required

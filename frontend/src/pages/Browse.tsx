@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { Bounce, toast } from 'react-toastify';
 
 enum ItemStatus {
   Available = 'available',
@@ -64,7 +65,7 @@ const BrowsePage: React.FC = () => {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token){
+      if (!token) {
         return;
       }
 
@@ -85,7 +86,7 @@ const BrowsePage: React.FC = () => {
       const userData = await response.json();
       setUserData(userData);
       setIsLoggedIn(true)
-      
+
       if (!userData.userID) {
         console.error("User data is not available.");
         return; // Return early if userID is undefined
@@ -112,7 +113,7 @@ const BrowsePage: React.FC = () => {
       setAllBooks(data);
     } catch (error) {
       console.error("Error:", error);
-    } 
+    }
   }
 
   const fetchAllMedia = async () => {
@@ -207,7 +208,7 @@ const BrowsePage: React.FC = () => {
 
   const borrowBook = async (book: Book) => {
     try {
-      if(!userData){
+      if (!userData) {
         navigate('/login')
       }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
@@ -221,17 +222,36 @@ const BrowsePage: React.FC = () => {
       await response.json(); // Parse JSON after fetch completes
 
       if (response.ok) {
-        console.log("Book borrowed successfully");
-        navigate('/user');
+        toast.success(`${book.bTitle} borrowed successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
   const borrowMedia = async (media: Media) => {
     try {
-      if(!userData){
+      if (!userData) {
         navigate('/login')
       }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/borrow`, {
@@ -245,17 +265,36 @@ const BrowsePage: React.FC = () => {
       await response.json(); // Parse JSON after fetch completes
 
       if (response.ok) {
-        console.log("Media borrowed successfully");
-        navigate('/user');
+        toast.success(`${media.mTitle} borrowed successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
-    }
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    };
   };
 
   const borrowDevice = async (device: Device) => {
     try {
-      if(!userData){
+      if (!userData) {
         navigate('/login')
       }
       if (userData) {
@@ -271,20 +310,48 @@ const BrowsePage: React.FC = () => {
           await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
-            console.log("Device borrowed successfully");
-            navigate('/user');
+            toast.success(`${device.dName} borrowed successfully`, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
           }
           else {
             setSelectedHoldItem(device);
             setShowHoldPopup(true);
           }
         } catch (error) {
-
-          console.error("Error:", error);
+          toast.error(`Error: ${error}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         }
       }
     } catch (error) {
-      console.error("Error:", error);
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
@@ -303,10 +370,30 @@ const BrowsePage: React.FC = () => {
           await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
-            navigate('/user');
+            toast.success('Book held successfully', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
           }
         } catch (error) {
-          console.error("Error:", error);
+          toast.error(`Error: ${error}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         }
       }
       else if ("MediaID" in selectedHoldItem) {
@@ -322,10 +409,30 @@ const BrowsePage: React.FC = () => {
           await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
-            navigate('/user');
+            toast.success('Media held successfully', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
           }
         } catch (error) {
-          console.error("Error:", error);
+          toast.error(`Error: ${error}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         }
       }
       else if ("serialNumber" in selectedHoldItem) {
@@ -341,10 +448,30 @@ const BrowsePage: React.FC = () => {
           await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
-            navigate('/user');
+            toast.success('Device held successfully', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
           }
         } catch (error) {
-          console.error("Error:", error);
+          toast.error(`Error: ${error}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
         }
       }
     }
@@ -361,8 +488,8 @@ const BrowsePage: React.FC = () => {
   };
 
   //Fetch user data
-  useEffect(() => { 
-    fetchUserData(); 
+  useEffect(() => {
+    fetchUserData();
   }, []);
 
   // Get the search term from the URL query parameter
