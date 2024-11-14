@@ -19,7 +19,7 @@ import {
 
 const route = express.Router();
 
-route.get("/books", getBooks);
+route.post("/books/getBooks", getBooks);
 route.post("/books", createBook);
 route.get("/books/:ISBN/bookcopy", getBookCopy);
 route.post("/books/borrow", borrowBook);

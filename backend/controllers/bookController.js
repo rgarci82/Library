@@ -1,11 +1,29 @@
 import pool from "../config/db.js";
 
 export async function getBooks(req, res) {
-  try {
-    const [rows] = await pool.query("SELECT * FROM book WHERE is_deleted = 0");
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const { userData } = req.body;
+
+  if (!userData){
+    try {
+      const [rows] = await pool.query("SELECT * FROM book WHERE is_deleted = 0");
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }  
+  }
+  else{
+    try {
+      const [rows] = await pool.query(`SELECT b.*
+      FROM book AS b
+      EXCEPT
+      SELECT b.*
+      FROM book AS b, bookborrowed AS bb, bookcopy AS bc
+      WHERE bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL AND is_deleted = 0;
+      `, [userData.userID]);
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 

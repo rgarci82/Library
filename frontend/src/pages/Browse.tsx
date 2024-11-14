@@ -85,7 +85,7 @@ const BrowsePage: React.FC = () => {
       const userData = await response.json();
       setUserData(userData);
       setIsLoggedIn(true)
-
+      
       if (!userData.userID) {
         console.error("User data is not available.");
         return; // Return early if userID is undefined
@@ -95,6 +95,63 @@ const BrowsePage: React.FC = () => {
     }
   };
 
+  const fetchAllBooks = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/getBooks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all unborrowed books by user.");
+
+      const data = await response.json();
+
+      setAllBooks(data);
+    } catch (error) {
+      console.error("Error:", error);
+    } 
+  }
+
+  const fetchAllMedia = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/getMedia`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all media");
+
+      const data = await response.json();
+      setAllMedia(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  const fetchAllDevices = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/getDevices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all devices");
+
+      const data = await response.json();
+      setAllDevices(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
   const fetchBookCopies = async (ISBN: string, book: Book) => {
     try {
@@ -304,7 +361,9 @@ const BrowsePage: React.FC = () => {
   };
 
   //Fetch user data
-  useEffect(() => { fetchUserData(); });
+  useEffect(() => { 
+    fetchUserData(); 
+  }, []);
 
   // Get the search term from the URL query parameter
   useEffect(() => {
@@ -315,70 +374,10 @@ const BrowsePage: React.FC = () => {
 
   //Fetch all books
   useEffect(() => {
-    const fetchAllBooks = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all books");
-
-        const data = await response.json();
-
-        setAllBooks(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
     fetchAllBooks();
-  }, []);
-
-  //Fetch all media
-  useEffect(() => {
-    const fetchAllMedia = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all media");
-
-        const data = await response.json();
-        setAllMedia(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
     fetchAllMedia();
-  }, []);
-
-  //Fetch all device
-  useEffect(() => {
-    const fetchAllDevices = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch all devices");
-
-        const data = await response.json();
-        setAllDevices(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
     fetchAllDevices();
-  }, []);
+  }, [userData]);
 
   // Function to filter items based on the search term and selected type
   useEffect(() => {

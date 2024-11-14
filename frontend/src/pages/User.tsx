@@ -499,7 +499,7 @@ const UserPage: React.FC = () => {
             {activeTab === 'media' && (
               userBorrowedMedia.length > 0 ? (
                 userBorrowedMedia.map((media) => (
-                  <div className="info-box media-box">
+                  <div key={media.itemID} className="info-box media-box">
                     <h3 className="title-css">Title: {media.mTitle}</h3>
                     <ul>
                       <li className="info-text-css">Author: {media.mAuthor}</li>

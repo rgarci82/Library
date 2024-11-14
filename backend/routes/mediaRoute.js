@@ -18,7 +18,7 @@ import {
 } from "../controllers/mediaController.js";
 const route = express.Router();
 
-route.get("/media", getMedia);
+route.post("/media/getMedia", getMedia);
 route.post("/media", createMedia);
 route.get("/media/:MediaID", getMediaByID);
 route.post("/media/return", returnMedia);

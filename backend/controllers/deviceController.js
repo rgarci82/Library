@@ -1,14 +1,29 @@
 import pool from "../config/db.js";
 
 export async function getDevices(req, res) {
-  try {
-    const [rows] = await pool.query(
-      "SELECT * FROM device WHERE is_deleted = 0"
-    );
+  const { userData } = req.body;
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!userData){
+    try {
+      const [rows] = await pool.query("SELECT * FROM device WHERE is_deleted = 0");
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }  
+  }
+  else{
+    try {
+      const [rows] = await pool.query(`SELECT d.*
+      FROM device AS d
+      EXCEPT
+      SELECT d.*
+      FROM device AS d, deviceborrowed AS db
+      WHERE db.userID = ? AND d.serialNumber = db.serialNumber AND db.returnDate IS NULL AND is_deleted = 0;
+      `, [userData.userID]);
+      res.json(rows);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 

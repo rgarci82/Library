@@ -18,7 +18,7 @@ import {
 
 const route = express.Router();
 
-route.get("/devices", getDevices);
+route.post("/devices/getDevices", getDevices);
 route.post("/devices", createDevice);
 route.post("/devices/return", returnDevice);
 route.post("/devices/hold", holdDevice);
