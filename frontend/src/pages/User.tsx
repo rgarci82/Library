@@ -531,6 +531,17 @@ const UserPage: React.FC = () => {
 
   //Handle Signing Out
   const handleSignOut = () => {
+    toast.success(`Logged out successfully`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
     navigate('/')
     localStorage.clear();
   }
