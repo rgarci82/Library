@@ -8,14 +8,6 @@ enum ItemStatus {
   Borrowed = 'borrowed',
 }
 
-interface User {
-  userID: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNum: number;
-  userType: string;
-}
 // Define the type for each item
 interface Book {
   ISBN: string;
@@ -55,7 +47,7 @@ const BrowsePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchBy, setSearchBy] = useState<'book' | 'media' | 'device'>('book');
 
-  const [userData, setUserData] = useState<User>();
+  const [userData, setUserData] = useState<any>(null);
   const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [allMedia, setAllMedia] = useState<Media[]>([]);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
@@ -105,7 +97,7 @@ const BrowsePage: React.FC = () => {
 
   const fetchAllBooks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/getBooks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +122,6 @@ const BrowsePage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userData, book }), // Send book as JSON
       });
 
       if (!response.ok) throw new Error("Failed to fetch all books");
@@ -332,7 +323,9 @@ const BrowsePage: React.FC = () => {
   };
 
   //Fetch user data
-  useEffect(() => { fetchUserData(); }, []);
+  useEffect(() => { 
+    fetchUserData(); 
+  }, []);
 
   // Get the search term from the URL query parameter
   useEffect(() => {
@@ -343,9 +336,7 @@ const BrowsePage: React.FC = () => {
 
   //Fetch all books
   useEffect(() => {
-    if (userData){
-      fetchAllBooks();
-    }
+    fetchAllBooks();
   }, [userData]);
 
   //Fetch all media
