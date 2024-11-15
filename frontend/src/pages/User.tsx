@@ -748,7 +748,7 @@ const UserPage: React.FC = () => {
                         <div key={index} className="info-box item-requested-box">
                           <ul >
                             <h3>Book Title: {bookhold.bTitle}</h3>
-                            <li>Request Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
+                            <li>Hold Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
                             <li>Status: {bookhold.status}</li>
                           </ul>
                         </div>
