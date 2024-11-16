@@ -13,15 +13,17 @@ export async function getBooks(req, res) {
   }
   else{
     try {
-      const [rows] = await pool.query(`SELECT b.*
+      const [rows] = await pool.query(`
+      SELECT DISTINCT b.*
       FROM book AS b
       WHERE b.is_deleted = 0
       EXCEPT
-      SELECT b.*
-      FROM book AS b, bookborrowed AS bb, bookcopy AS bc
-      WHERE bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL AND is_deleted = 0;
-      `, [userData.userID]);
-      res.json(rows);
+      SELECT DISTINCT b.*
+      FROM book AS b, bookborrowed AS bb, bookcopy AS bc, bookhold AS bh
+      WHERE (bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL 
+      AND is_deleted = 0) OR (bh.userID = ? AND bh.ISBN = b.ISBN AND bh.status = 'OnHold');
+      `, [userData.userID, userData.userID]);
+      res.json(rows); 
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -173,6 +175,20 @@ export async function returnBook(req, res) {
       WHERE itemID = ?`,
       [selectedItem.itemID]
     );
+
+    const holdExist = await pool.query(
+      `SELECT bh.*
+      FROM bookhold AS bh, bookcopy AS bc
+      WHERE bc.itemID = ? AND bh.ISBN = bc.ISBN
+      ORDER BY bh.holddate ASC
+      LIMIT 1
+      `,
+      [selectedItem.itemID]
+    );
+
+    if (holdExist){
+      console.log("HOLDING ITEM:", holdExist);
+    }
 
     // Return a success response with a 201 status
     if (returnDateResult && returnStatusResult) {

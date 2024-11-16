@@ -94,6 +94,7 @@ body {
 }
 
 .tab {
+  position: relative;
   padding: 10px 20px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -103,6 +104,41 @@ body {
 
 .tab:hover {
   border-bottom: 2px solid white;
+}
+
+.item-container {
+  display: flex;
+  align-items: center;
+  position: relative; /* Add this to enable positioning of children */
+}
+
+.item-number {
+  position: absolute; /* Position relative to .tab */
+  top: -5px; /* Adjust vertical positioning */
+  right: -10px; /* Adjust horizontal positioning */
+  color: white;
+  font-size: 14px;
+  border-radius: 50%; /* Optional, for a circular appearance */
+  width: 20px; /* Optional, for circular appearance */
+  height: 20px; /* Optional, for circular appearance */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the number inside */
+}
+
+.fines-warning {
+  position: absolute; /* Position relative to .tab */
+  top: -5px; /* Adjust vertical positioning */
+  right: -10px; /* Adjust horizontal positioning */
+  color: white;
+  background-color: red;
+  font-size: 14px;
+  border-radius: 50%; /* Optional, for a circular appearance */
+  width: 20px; /* Optional, for circular appearance */
+  height: 20px; /* Optional, for circular appearance */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the number inside */
 }
 
 .active {
@@ -182,6 +218,7 @@ body {
 .notifications-box::before {
   background-image: url('https://img.icons8.com/?size=100&id=8OqTN9Qyurt6&format=png&color=000000');
 }
+
 /* Ensure the list items appear vertically */
 .info-box ul {
   list-style-type: none; /* Remove bullet points */

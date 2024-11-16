@@ -43,9 +43,8 @@ interface RequestedBooks {
 }
 
 interface RequestedMedia {
-  requestDate: string | number | Date;
   mTitle: string;
-  RequestDate: Date;
+  requestDate: Date;
   status: string;
 }
 
@@ -57,19 +56,19 @@ interface RequestedDevice {
 
 interface bookHold {
   bTitle: string;
-  holddate: string | number | Date;
+  holdDate: string | number | Date;
   status: string;
 }
 
 interface mediaHold {
   mTitle: string;
-  holddate: string | number | Date;
+  holdDate: string | number | Date;
   status: string;
 }
 
 interface deviceHold {
   dName: string;
-  holddate: string | number | Date;
+  holdDate: string | number | Date;
   status: string;
 }
 
@@ -283,6 +282,7 @@ const UserPage: React.FC = () => {
 
       const bookholdData = await bookHoldResponse.json();
       setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
+      console.log(bookholdData.userbookHold);
       // Fetch devicehold
       const deviceHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceHold`, {
         method: 'GET',
@@ -558,13 +558,32 @@ const UserPage: React.FC = () => {
         </div>
 
         <div className="navbar-section tabs">
-          <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Books</div>
-          <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
-          <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Devices</div>
-          <div className={`tab ${activeTab === 'fines' ? 'active' : ''}`} onClick={() => handleTabClick('fines')}>Fines</div>
-          {/*<div className={`tab ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => handleTabClick('notifications')}>Notifications</div>*/}
-          <div className={`tab ${activeTab === 'itemRequested' ? 'active' : ''}`} onClick={() => handleTabClick('itemRequested')}>Item Requested</div>
-          <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
+          <div className='item-container'>
+            <div className={`tab ${activeTab === 'books' ? 'active' : ''}`} onClick={() => handleTabClick('books')}>Books</div>
+            <div className='item-number'>{userBorrowedBooks.length}</div>
+          </div>
+          <div className='item-container'>
+            <div className={`tab ${activeTab === 'media' ? 'active' : ''}`} onClick={() => handleTabClick('media')}>Media</div>
+            <div className='item-number'>{userBorrowedMedia.length}</div>
+          </div>
+          <div className='item-container'>
+            <div className={`tab ${activeTab === 'devices' ? 'active' : ''}`} onClick={() => handleTabClick('devices')}>Devices</div>
+            <div className='item-number'>{userBorrowedDevice.length}</div>
+          </div>
+          <div className="item-container">
+            <div className={`tab ${activeTab === 'fines' ? 'active' : ''}`} onClick={() => handleTabClick('fines')}>Fines</div>
+            {userFine && parseFloat(userFine.totalFine) > 0 && (
+              <div className="fines-warning">!</div>
+            )}
+          </div>
+          <div className='item-container'>
+            <div className={`tab ${activeTab === 'itemRequested' ? 'active' : ''}`} onClick={() => handleTabClick('itemRequested')}>Item Requested</div>
+            <div className='item-number'>{userRequestedBooks.length + userRequestedMedia.length + userRequestedDevice.length}</div>
+          </div>
+          <div className='item-container'>
+            <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
+            <div className='item-number'>{userbookHold.length + usermediaHold.length + userdeviceHold.length}</div>
+          </div>
         </div>
       </div>
 
@@ -748,7 +767,7 @@ const UserPage: React.FC = () => {
                         <div key={index} className="info-box item-requested-box">
                           <ul >
                             <h3>Book Title: {bookhold.bTitle}</h3>
-                            <li>Request Date: {new Date(bookhold.holddate).toLocaleDateString()}</li>
+                            <li>Hold Date: {new Date(bookhold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {bookhold.status}</li>
                           </ul>
                         </div>
@@ -766,7 +785,7 @@ const UserPage: React.FC = () => {
                         <div key={index} className="info-box item-requested-box">
                           <ul>
                             <h3>Media Title: {mediahold.mTitle}</h3>
-                            <li>Request Date: {new Date(mediahold.holddate).toLocaleDateString()}</li>
+                            <li>Request Date: {new Date(mediahold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {mediahold.status}</li>
                           </ul>
                         </div>
@@ -784,7 +803,7 @@ const UserPage: React.FC = () => {
                         <div key={index} className="info-box item-requested-box">
                           <ul>
                             <h3>Device Name: {devicehold.dName}</h3>
-                            <li>Hold Date: {new Date(devicehold.holddate).toLocaleDateString()}</li>
+                            <li>Hold Date: {new Date(devicehold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {devicehold.status}</li>
                           </ul>
                         </div>
