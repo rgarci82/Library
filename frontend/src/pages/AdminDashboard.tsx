@@ -181,11 +181,25 @@ const AdminDashboard = () => {
   const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
 
   const [userData, setUserData] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenMedia, setIsModalOpenMedia] = useState(false);
+  const [selectedRequestID, setSelectedRequestID] = useState<number | null>(null);
+  const [quantityRequestBook, setQuantityRequestBook] = useState<number | "">(1);
+  const [quantityRequestMedia, setQuantityRequestMedia] = useState<number | "">(1);
 
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuantity(value === "" ? "" : Number(value));
+  };
+
+  const handleQuantityRequestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuantityRequestBook(value === "" ? "" : Number(value));
+  };
+  const handleQuantityRequestMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuantityRequestMedia(value === "" ? "" : Number(value));
   };
 
   const handleMQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -504,12 +518,14 @@ const AdminDashboard = () => {
     setIsDeleting(true);
   };
 
-  const handleAccept = async (requestID: number) => {
+  const handleAccept = async (requestID: number, quantity: number | "") => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/books/request/accept/${requestID}`,
         {
           method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quantity }),
         }
       );
       if (response.status === 200) {
@@ -524,7 +540,8 @@ const AdminDashboard = () => {
           theme: "light",
           transition: Bounce,
         });
-        fetchBookRequests(); // Refresh the list after accepting
+        setIsModalOpen(false)
+        fetchBookRequests();
       }
       if (response.status == 400) {
         toast.error('Request has already been processed.', {
@@ -540,16 +557,48 @@ const AdminDashboard = () => {
         });
       }
     } catch (error) {
-      console.error(error);
+      toast.error('Request has already been processed.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
-  const handleMediaAccept = async (requestID: number) => {
+  const handleOpenModal = (requestID: number) => {
+    setSelectedRequestID(requestID);
+    setQuantityRequestBook(1);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenModalMedia = (requestID: number) => {
+    setSelectedRequestID(requestID);
+    setQuantityRequestMedia(1);
+    setIsModalOpenMedia(true);
+  };
+
+  const handleCancel = () => {
+    setQuantityRequestBook(1);
+    setQuantityRequestMedia(1);
+    setIsModalOpen(false);
+    setIsModalOpenMedia(false);
+    setSelectedRequestID(null);
+  };
+
+  const handleMediaAccept = async (requestID: number, quantity: number | "") => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/media/request/accept/${requestID}`,
         {
           method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quantity }),
         }
       );
       if (response.status === 200) {
@@ -564,6 +613,7 @@ const AdminDashboard = () => {
           theme: "light",
           transition: Bounce,
         });
+        setIsModalOpenMedia(false)
         fetchMediaRequests(); // Refresh the list after accepting
       }
       if (response.status == 400) {
@@ -580,7 +630,17 @@ const AdminDashboard = () => {
         });
       }
     } catch (error) {
-      console.error(error);
+      toast.error(`Error: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
@@ -1425,7 +1485,7 @@ const AdminDashboard = () => {
                       <td>{request.ISBN}</td>
                       <td>{request.bTitle}</td>
                       <td>{request.bAuthor}</td>
-                      <td>{request.edition}</td>
+                      <td>{request.edition ? request.edition : "N/A"}</td>
                       <td>{request.genre}</td>
                       <td>{request.publisher}</td>
                       <td>{request.status}</td>
@@ -1433,7 +1493,7 @@ const AdminDashboard = () => {
                       <td>
                         <button
                           className="accept-btn"
-                          onClick={() => handleAccept(request.requestID)}
+                          onClick={() => handleOpenModal(request.requestID)}
                         >
                           Accept
                         </button>
@@ -1454,7 +1514,6 @@ const AdminDashboard = () => {
               <table className="requests-table">
                 <thead>
                   <tr>
-                    <th>Media ID</th>
                     <th>Title</th>
                     <th>Author</th>
                     <th>Edition</th>
@@ -1468,19 +1527,17 @@ const AdminDashboard = () => {
                 <tbody>
                   {mediaRequests.map((request) => (
                     <tr key={request.requestID}>
-                      <td>{request.MediaID}</td>
                       <td>{request.mTitle}</td>
                       <td>{request.mAuthor}</td>
-                      <td>{request.edition}</td>
+                      <td>{request.edition ? request.edition : "N/A"}</td>
                       <td>{request.genre}</td>
                       <td>{request.publisher}</td>
-                      <td>{request.status}</td>{" "}
-                      {/* Capitalized status */}
+                      <td>{request.status}</td>
                       <td>{request.userID}</td>
                       <td>
                         <button
                           className="accept-btn"
-                          onClick={() => handleMediaAccept(request.requestID)}
+                          onClick={() => handleOpenModalMedia(request.requestID)}
                         >
                           Accept
                         </button>
@@ -1539,6 +1596,60 @@ const AdminDashboard = () => {
               </table>
             </div>
           </>
+        )}
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal--request">
+              <h3>Enter Quantity</h3>
+              <input
+                type="number"
+                min="1"
+                value={quantityRequestBook}
+                onChange={handleQuantityRequestChange}
+              />
+              <div className="modal-actions">
+                <button
+                  className="accept-btn"
+                  onClick={() =>
+                    selectedRequestID !== null &&
+                    handleAccept(selectedRequestID, quantityRequestBook)
+                  }
+                >
+                  Approve
+                </button>
+                <button className="deny-btn" onClick={handleCancel}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isModalOpenMedia && (
+          <div className="modal-overlay">
+            <div className="modal--request">
+              <h3>Enter Quantity</h3>
+              <input
+                type="number"
+                min="1"
+                value={quantityRequestMedia}
+                onChange={handleQuantityRequestMediaChange}
+              />
+              <div className="modal-actions">
+                <button
+                  className="accept-btn"
+                  onClick={() =>
+                    selectedRequestID !== null &&
+                    handleMediaAccept(selectedRequestID, quantityRequestMedia)
+                  }
+                >
+                  Approve
+                </button>
+                <button className="deny-btn" onClick={handleCancel}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {activeTab == "dataQueries" && (
@@ -1711,7 +1822,7 @@ const AdminDashboard = () => {
           </>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

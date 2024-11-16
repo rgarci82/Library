@@ -325,9 +325,14 @@ export async function getAllBookRequests(req, res) {
 }
 
 export async function bookRequestAccepted(req, res) {
-  const { requestID } = req.params;
+  const { requestID } = req.params
+  const { quantity } = req.body;
   try {
-    // Get the request details
+
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ message: "Quantity must be a positive number." });
+    }
+
     const [requestDetails] = await pool.query(
       "SELECT * FROM bookrequest WHERE requestID = ?",
       [requestID]
@@ -349,13 +354,32 @@ export async function bookRequestAccepted(req, res) {
         .json({ message: "This request has already been processed." });
     }
 
-    // Insert the new book into the 'book' table
+    const [existingBook] = await pool.query(
+      "SELECT * FROM book WHERE ISBN = ?",
+      [ISBN]
+    );
+
+    if (existingBook.length > 0) {
+      return res.status(409).json({
+        message: `Book with ISBN ${ISBN} already exists.`,
+      });
+    }
+    
     await pool.query(
       "INSERT INTO book (ISBN, bTitle, bAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?, ?)",
       [ISBN, bTitle, bAuthor, publisher, genre, edition || null]
     );
 
-    // Update the request status to 'accepted'
+    const bookCopyPromises = [];
+
+    for (let i = 0; i < quantity; i++) {
+      bookCopyPromises.push(
+        pool.query("INSERT INTO bookcopy (isbn) VALUES (?)", [ISBN])
+      );
+    }
+
+    await Promise.all(bookCopyPromises);
+
     await pool.query(
       "UPDATE bookrequest SET status = 'approved' WHERE requestID = ?",
       [requestID]
