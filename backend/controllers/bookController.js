@@ -179,7 +179,7 @@ export async function returnBook(req, res) {
     const holdExist = await pool.query(
       `SELECT bh.*
       FROM bookhold AS bh, bookcopy AS bc
-      WHERE bc.itemID = ? AND bh.ISBN = bc.ISBN
+      WHERE bc.itemID = ? AND bh.ISBN = bc.ISBN AND bh.status == 'OnHold'
       ORDER BY bh.holddate ASC
       LIMIT 1
       `,
@@ -187,7 +187,43 @@ export async function returnBook(req, res) {
     );
 
     if (holdExist){
-      console.log("HOLDING ITEM:", holdExist);
+      // Updates book hold to checked out
+      const [holdUpdate] = await pool.query(
+        `UPDATE bookhold
+        SET status = 'CheckedOut'
+        WHERE holdID = ?
+        `,
+        [holdExist[0][0].holdID]
+      )
+      // Find the first available itemID for the book ISBN
+      const [availableCopy] = await pool.query(
+        `SELECT itemID FROM bookcopy 
+        WHERE ISBN = ? AND status = 'available' 
+        ORDER BY itemID ASC 
+        LIMIT 1`,
+        [holdExist[0][0].ISBN]
+      );
+
+      const userID = holdExist[0][0].userID;
+      const itemID = availableCopy[0].itemID;
+
+      //Insert the borrow record into the 'bookborrowed' table
+      const [borrowResult] = await pool.query(
+        `INSERT INTO bookborrowed (userID, itemID) VALUES (?, ?)`,
+        [userID, itemID]
+      );
+
+      // Update the status of the borrowed book copy in the 'bookcopy' table
+      const [updateResult] = await pool.query(
+        `UPDATE bookcopy SET status = 'borrowed' WHERE itemID = ?`,
+        [itemID]
+      );
+
+      // Return a success response with a 201 status
+      res.status(201).json({
+        message: "Book borrowed successfully, ",
+        itemID: itemID,
+      });
     }
 
     // Return a success response with a 201 status

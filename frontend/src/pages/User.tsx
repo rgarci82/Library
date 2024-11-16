@@ -282,7 +282,6 @@ const UserPage: React.FC = () => {
 
       const bookholdData = await bookHoldResponse.json();
       setUserbookHold(bookholdData.userbookHold || []); // Ensure you access the correct property
-      console.log(bookholdData.userbookHold);
       // Fetch devicehold
       const deviceHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/deviceHold`, {
         method: 'GET',
