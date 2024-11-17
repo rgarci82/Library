@@ -5,6 +5,7 @@ import {
   getMediaByID,
   returnMedia,
   holdMedia,
+  cancelHold,
   updateMedia,
   deleteMedia,
   requestMedia,
@@ -23,6 +24,7 @@ route.post("/media", createMedia);
 route.get("/media/:MediaID", getMediaByID);
 route.post("/media/return", returnMedia);
 route.post("/media/hold", holdMedia);
+route.post("/media/cancelHold", cancelHold);
 route.put("/media/:MediaID", updateMedia);
 route.post("/media/request", requestMedia);
 route.get("/media/request/all", getAllMediaRequests);

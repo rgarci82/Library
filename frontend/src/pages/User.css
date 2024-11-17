@@ -284,6 +284,14 @@ body {
   text-align: center;
 }
 
+.hold-cancel-button {
+  padding: 1rem 3rem;
+  cursor: pointer;
+  background-color: #C8102E;
+  border: none;
+  border-radius: 5px;
+}
+
 .not-found-css {
   text-align: center;
   font-size: 25px;

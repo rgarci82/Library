@@ -55,24 +55,28 @@ interface RequestedDevice {
 }
 
 interface bookHold {
+  ISBN: string;
   bTitle: string;
   holdDate: string | number | Date;
   status: string;
 }
 
 interface mediaHold {
+  MediaID: number;
   mTitle: string;
   holdDate: string | number | Date;
   status: string;
 }
 
 interface deviceHold {
+  serialNumber: string;
   dName: string;
   holdDate: string | number | Date;
   status: string;
 }
 
 type borrowedItem = BorrowedBook | BorrowedMedia | BorrowedDevice;
+type holdItem = bookHold | mediaHold | deviceHold;
 
 const UserPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('books');
@@ -90,7 +94,9 @@ const UserPage: React.FC = () => {
   const [userdeviceHold, setUserdeviceHold] = useState<deviceHold[]>([]);
 
   const [showModal, setShowModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
+  const [selectedHold, setSelectedHold] = useState<holdItem | null>(null);
 
   //Fetch user's data
   const fetchUserData = async () => {
@@ -472,6 +478,165 @@ const UserPage: React.FC = () => {
     }
   };
 
+  //Cancel hold item
+  const cancelHold = async (selectedItem: holdItem) => {
+    if ("ISBN" in selectedItem) {
+      try {
+        const bookResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/books/cancelHold`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ selectedItem }),
+        });
+
+        if (!bookResponse.ok) {
+          toast.error(`Failed to cancel book on hold`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        fetchUserItemHold();
+
+        toast.success(`Book hold cancelled successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
+      } catch (error) {
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
+    else if ("MediaID" in selectedItem) {
+      try {
+        const mediaResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/media/cancelHold`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ selectedItem }),
+        });
+
+        if (!mediaResponse.ok) {
+          toast.error(`Failed to cancel media on hold`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        fetchUserItemHold();
+
+        toast.success(`Media hold cancelled successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
+      } catch (error) {
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
+    else if ("serialNumber" in selectedItem) {
+      try {
+        const deviceResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/cancelHold`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ selectedItem }),
+        });
+
+        if (!deviceResponse.ok) {
+          toast.error(`Failed to cancel device on hold`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        };
+
+        fetchUserItemHold();
+
+        toast.success(`Device hold cancelled successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      } catch (error) {
+        toast.error(`Error: ${error}`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
+  };
+
   //Return confirmation modal
   const handleReturnClick = (item: borrowedItem) => {
     setSelectedItem(item);
@@ -493,6 +658,29 @@ const UserPage: React.FC = () => {
   const handleCancel = () => {
     setShowModal(false);
     setSelectedItem(null);
+  };
+
+  //Cancel hold confirmation modal
+  const handleCancelClick = (item: holdItem) => {
+    setSelectedHold(item);
+    setShowCancelModal(true);
+  };
+
+  //Confirming cancel hold button
+  const handleConfirmCancel = () => {
+    if (selectedHold) {
+      cancelHold(selectedHold);
+    }
+    else {
+      console.log("No item on hold selected");
+    }
+    setShowCancelModal(false);
+  };
+
+  //Cancel hold confirmation modal
+  const handleHoldCancel = () => {
+    setSelectedHold(null);
+    setShowCancelModal(false);
   };
 
   const [loading, setLoading] = useState(true);
@@ -764,11 +952,18 @@ const UserPage: React.FC = () => {
                     {userbookHold.length > 0 ? (
                       userbookHold.map((bookhold, index) => (
                         <div key={index} className="info-box item-requested-box">
-                          <ul >
+                          <ul>
                             <h3>Book Title: {bookhold.bTitle}</h3>
                             <li>Hold Date: {new Date(bookhold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {bookhold.status}</li>
                           </ul>
+                          <div className="button-container">
+                          {bookhold.status === 'OnHold' && (
+                            <button className="button-text hold-cancel-button" onClick={() => handleCancelClick(bookhold)}>
+                              Cancel Hold
+                            </button>
+                          )}
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -787,6 +982,13 @@ const UserPage: React.FC = () => {
                             <li>Request Date: {new Date(mediahold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {mediahold.status}</li>
                           </ul>
+                          <div className="button-container">
+                            {mediahold.status === 'OnHold' && (
+                              <button className="button-text hold-cancel-button" onClick={() => handleCancelClick(mediahold)}>
+                                Cancel Hold
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -805,6 +1007,13 @@ const UserPage: React.FC = () => {
                             <li>Hold Date: {new Date(devicehold.holdDate).toLocaleDateString()}</li>
                             <li>Status: {devicehold.status}</li>
                           </ul>
+                          <div className="button-container">
+                            {devicehold.status === 'OnHold' && (
+                              <button className="button-text hold-cancel-button" onClick={() => handleCancelClick(devicehold)}>
+                                Cancel Hold
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -814,22 +1023,16 @@ const UserPage: React.FC = () => {
                 )}
               </div>
             )}
-
-            {/* Notifications */}
-            {/*activeTab === 'notifications' && (
-              notificationsData.length > 0 ? (
-                notificationsData.map((notification, index) => (
-                  <div key={index} className="info-box notifications-box">
-                    <h3>Notification</h3>
-                    <ul>
-                      <li>{notification.reminder}</li>
-                    </ul>
-                  </div>
-                ))
-              ) : (
-                <p className="not-found-css">No notifications found.</p>
-              )
-            )*/}
+            {/* Modal */}
+            {showCancelModal && selectedHold && (
+              <div className="modal">
+                <div className="modal-content">
+                  <p className="confirmation-text">Are you sure you want to cancel this hold?</p>
+                  <button onClick={handleConfirmCancel} className="yes-button">Yes</button>
+                  <button onClick={handleHoldCancel} className="cancel-button">Cancel</button>
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <p>Loading user data...</p>

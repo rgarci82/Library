@@ -6,6 +6,7 @@ import {
   borrowBook,
   returnBook,
   holdBook,
+  cancelHold,
   requestBook,
   getBookByISBN,
   updateBook,
@@ -25,6 +26,7 @@ route.get("/books/:ISBN/bookcopy", getBookCopy);
 route.post("/books/borrow", borrowBook);
 route.post("/books/return", returnBook);
 route.post("/books/hold", holdBook);
+route.post("/books/cancelHold", cancelHold);
 route.post("/books/request", requestBook);
 route.get("/books/request", getAllBookRequests);
 route.put("/books/request/accept/:requestID", bookRequestAccepted);

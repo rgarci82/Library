@@ -4,6 +4,7 @@ import {
   createDevice,
   returnDevice,
   holdDevice,
+  cancelHold,
   requestDevice,
   getDeviceBySN,
   updateDevice,
@@ -22,6 +23,7 @@ route.post("/devices/getDevices", getDevices);
 route.post("/devices", createDevice);
 route.post("/devices/return", returnDevice);
 route.post("/devices/hold", holdDevice);
+route.post("/devices/cancelHold", cancelHold);
 route.post("/devices/request", requestDevice);
 route.get("/devices/request", getAllDeviceRequests);
 route.put("/devices/request/accept/:requestID", deviceRequestAccepted);

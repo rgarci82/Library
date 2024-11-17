@@ -75,10 +75,59 @@ export async function returnMedia(req, res) {
       [selectedItem.itemID]
     );
 
+    const holdExist = await pool.query(
+      `SELECT mh.*
+      FROM mediahold AS mh, mediacopy AS mc
+      WHERE mc.itemID = ? AND mh.MediaID = mc.MediaID AND mh.status = 'OnHold'
+      ORDER BY mh.holddate ASC
+      LIMIT 1
+      `,
+      [selectedItem.itemID]
+    );
+
+    if (holdExist[0]){
+      // Updates media hold to checked out
+      const [holdUpdate] = await pool.query(
+        `UPDATE mediahold
+        SET status = 'CheckedOut'
+        WHERE holdID = ?
+        `,
+        [holdExist[0][0].holdID]
+      )
+      // Find the first available itemID for the media MediaID
+      const [availableCopy] = await pool.query(
+        `SELECT itemID FROM mediacopy 
+        WHERE MediaID = ? AND status = 'available' 
+        ORDER BY itemID ASC 
+        LIMIT 1`,
+        [holdExist[0][0].MediaID]
+      );
+
+      const userID = holdExist[0][0].userID;
+      const itemID = availableCopy[0].itemID;
+
+      //Insert the borrow record into the 'mediaborrowed' table
+      const [borrowResult] = await pool.query(
+        `INSERT INTO mediaborrowed (userID, itemID) VALUES (?, ?)`,
+        [userID, itemID]
+      );
+
+      // Update the status of the borrowed media copy in the 'mediacopy' table
+      const [updateResult] = await pool.query(
+        `UPDATE mediacopy SET status = 'borrowed' WHERE itemID = ?`,
+        [itemID]
+      );
+    }
+
     // Return a success response with a 201 status
     if (returnDateResult && returnStatusResult) {
       res.status(201).json({
         message: "Media returned successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to return media.",
       });
     }
   } catch (error) {
@@ -124,6 +173,39 @@ export async function holdMedia(req, res) {
     });
   } catch (error) {
     console.error("Error occured:", error);
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
+  }
+}
+
+export async function cancelHold(req, res) {
+  const { selectedItem } = req.body;
+  
+  try {
+    const cancelHoldResult = await pool.query(
+      `UPDATE mediahold 
+      SET status = 'Deleted'
+      WHERE MediaID = ?`,
+      [selectedItem.MediaID]
+    );
+
+    // Return a success response with a 201 status
+    if (cancelHoldResult) {
+      res.status(201).json({
+        message: "Media hold cancelled successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to cancel hold.",
+      });
+    }
+  } catch (error) {
+    console.error("Error occurred:", error);
+    // Send an appropriate error response to the client
     return {
       success: false,
       message: "Internal Server Error",

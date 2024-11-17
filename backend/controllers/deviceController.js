@@ -75,10 +75,60 @@ export async function returnDevice(req, res) {
       [selectedItem.serialNumber]
     );
 
+    const holdExist = await pool.query(
+      `SELECT dh.*
+      FROM devicehold AS dh, device AS d
+      WHERE d.serialNumber = ? AND dh.status = 'OnHold'
+      ORDER BY dh.holddate ASC
+      LIMIT 1
+      `,
+      [selectedItem.serialNumber]
+    );
+
+    if (holdExist[0]){
+      // Updates device hold to checked out
+      const [holdUpdate] = await pool.query(
+        `UPDATE devicehold
+        SET status = 'CheckedOut'
+        WHERE holdID = ?
+        `,
+        [holdExist[0][0].holdID]
+      )
+
+      // Find the first available serialNumber for the device
+      const [availableCopy] = await pool.query(
+        `SELECT serialNumber FROM device 
+        WHERE serialNumber = ? AND status = 'available' 
+        LIMIT 1`,
+        [holdExist[0][0].serialNumber]
+      );
+
+      const userID = holdExist[0][0].userID;
+
+      
+      const serialNumber = availableCopy[0].serialNumber;
+      //Insert the borrow record into the 'deviceborrowed' table
+      const [borrowResult] = await pool.query(
+        `INSERT INTO deviceborrowed (userID, serialNumber) VALUES (?, ?)`,
+        [userID, serialNumber]
+      );
+
+      // Update the status of the borrowed device in the 'device' table
+      const [updateResult] = await pool.query(
+        `UPDATE device SET status = 'borrowed' WHERE serialNumber = ?`,
+        [serialNumber]
+      );
+    }
+
     // Return a success response with a 201 status
     if (returnDateResult && returnStatusResult){
       res.status(201).json({
         message: "Device returned successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to return device.",
       });
     }
   } catch (error) {
@@ -122,6 +172,39 @@ export async function holdDevice(req, res){
   catch (error){
     console.error('Error occured:', error);
     return { success: false, message: 'Internal Server Error', error: error.message };
+  }
+}
+
+export async function cancelHold(req, res) {
+  const { selectedItem } = req.body;
+  
+  try {
+    const cancelHoldResult = await pool.query(
+      `UPDATE devicehold 
+      SET status = 'Deleted'
+      WHERE serialNumber = ?`,
+      [selectedItem.serialNumber]
+    );
+
+    // Return a success response with a 201 status
+    if (cancelHoldResult) {
+      res.status(201).json({
+        message: "Device hold cancelled successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to cancel hold.",
+      });
+    }
+  } catch (error) {
+    console.error("Error occurred:", error);
+    // Send an appropriate error response to the client
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
   }
 }
 

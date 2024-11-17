@@ -179,14 +179,14 @@ export async function returnBook(req, res) {
     const holdExist = await pool.query(
       `SELECT bh.*
       FROM bookhold AS bh, bookcopy AS bc
-      WHERE bc.itemID = ? AND bh.ISBN = bc.ISBN AND bh.status == 'OnHold'
+      WHERE bc.itemID = ? AND bh.ISBN = bc.ISBN AND bh.status = 'OnHold'
       ORDER BY bh.holddate ASC
       LIMIT 1
       `,
       [selectedItem.itemID]
     );
 
-    if (holdExist){
+    if (holdExist[0]){
       // Updates book hold to checked out
       const [holdUpdate] = await pool.query(
         `UPDATE bookhold
@@ -218,18 +218,17 @@ export async function returnBook(req, res) {
         `UPDATE bookcopy SET status = 'borrowed' WHERE itemID = ?`,
         [itemID]
       );
-
-      // Return a success response with a 201 status
-      res.status(201).json({
-        message: "Book borrowed successfully, ",
-        itemID: itemID,
-      });
     }
 
     // Return a success response with a 201 status
     if (returnDateResult && returnStatusResult) {
       res.status(201).json({
         message: "Book returned successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to return book.",
       });
     }
   } catch (error) {
@@ -275,6 +274,39 @@ export async function holdBook(req, res) {
     });
   } catch (error) {
     console.error("Error occured:", error);
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
+  }
+}
+
+export async function cancelHold(req, res) {
+  const { selectedItem } = req.body;
+  
+  try {
+    const cancelHoldResult = await pool.query(
+      `UPDATE bookhold 
+      SET status = 'Deleted'
+      WHERE ISBN = ?`,
+      [selectedItem.ISBN]
+    );
+
+    // Return a success response with a 201 status
+    if (cancelHoldResult) {
+      res.status(201).json({
+        message: "Book hold cancelled successfully",
+      });
+    }
+    else {
+      res.status(500).json({
+        message: "Failed to cancel hold.",
+      });
+    }
+  } catch (error) {
+    console.error("Error occurred:", error);
+    // Send an appropriate error response to the client
     return {
       success: false,
       message: "Internal Server Error",
