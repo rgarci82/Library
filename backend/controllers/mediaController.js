@@ -288,6 +288,7 @@ export async function getAllMediaRequests(req, res) {
 
 export async function mediaRequestAccepted(req, res) {
   const { requestID } = req.params;
+  const { mQuantity } = req.body
   try {
     const [requestDetails] = await pool.query(
       "SELECT * FROM mediarequest WHERE requestID = ?",
@@ -298,7 +299,7 @@ export async function mediaRequestAccepted(req, res) {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    const { ISBN, mTitle, mAuthor, publisher, genre, edition, userID } =
+    const { mTitle, mAuthor, publisher, genre, edition, userID } =
       requestDetails[0];
 
     if (
@@ -310,10 +311,21 @@ export async function mediaRequestAccepted(req, res) {
         .json({ message: "This request has already been processed." });
     }
 
-    await pool.query(
+    const [result] = await pool.query(
       "INSERT INTO media (mTitle, mAuthor, publisher, genre, edition) VALUES (?, ?, ?, ?, ?)",
       [mTitle, mAuthor, publisher, genre, edition || null]
     );
+
+    const newMediaID = result.insertId;
+
+    const mediaCopyPromises = [];
+    for (let i = 0; i < mQuantity; i++) {
+      mediaCopyPromises.push(
+        pool.query("INSERT INTO mediacopy (MediaID) VALUES (?)", [newMediaID])
+      );
+    }
+
+    await Promise.all(mediaCopyPromises);
 
     await pool.query(
       "UPDATE mediarequest SET status = 'approved' WHERE requestID = ?",
