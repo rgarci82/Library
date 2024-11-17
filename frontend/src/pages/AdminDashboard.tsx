@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 type ItemType = "books" | "media" | "devices";
 
@@ -122,6 +124,20 @@ interface JwtPayload {
   id: number;
 }
 
+interface ReportData {
+  title?: string;
+  user?: string;
+  author?: string;
+  genre?: string;
+  copiesAvailable?: number;
+  requestedCount?: number;
+  borrowedCount?: number;
+  overdueCount?: number;
+  fineAmount?: number;
+  onHoldDuration?: string;
+  requestDuration?: string;
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -179,6 +195,11 @@ const AdminDashboard = () => {
   const [monthlyDeviceBorrows, setMonthlyDeviceBorrows] = useState<MonthlyDeviceBorrow[]>([]);
   const [monthlyDeviceRequests, setMonthlyDeviceRequests] = useState<MonthlyDeviceRequest[]>([]);
   const [totalFines, setTotalFines] = useState<TotalFines | null>(null);
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [reports, setReports] = useState<Record<string, ReportData[]>>({});
+  const [loading, setLoading] = useState(false);
 
   const [userData, setUserData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1047,6 +1068,60 @@ const AdminDashboard = () => {
     await fetchMedia();
   };
 
+  const fetchReports = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/admin-reports?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}`
+      );
+      const data = await response.json();
+      setReports(data);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilter = () => {
+    if (startDate && endDate) {
+      fetchReports();
+    } else {
+      alert("Please select both start and end dates.");
+    }
+  };
+
+  const renderTable = (title: string, data: ReportData[], columns: string[]) => (
+    <div className="report-section">
+      <h2>{title}</h2>
+      <table className="report-table">
+        <thead>
+          <tr>
+            {columns.map((col, idx) => (
+              <th key={idx}>{col}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((item, idx) => (
+              <tr key={idx}>
+                {columns.map((col) => (
+                  <td key={col}>{(item as any)[col.toLowerCase()] || "N/A"}</td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns.length}>No data available</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
   useEffect(() => {
     fetchUserData();
     fetchBooks();
@@ -1124,10 +1199,28 @@ const AdminDashboard = () => {
           Item Requests
         </div>
         <div
-          className={`tab ${activeTab === "dataQueries" ? "active" : ""}`}
-          onClick={() => handleTabClick("dataQueries")}
+          className={`tab ${activeTab === "bookReports" ? "active" : ""}`}
+          onClick={() => handleTabClick("bookReports")}
         >
-          Data Queries
+          Book Reports
+        </div>
+        <div
+          className={`tab ${activeTab === "mediaReports" ? "active" : ""}`}
+          onClick={() => handleTabClick("mediaReports")}
+        >
+          Media Reports
+        </div>
+        <div
+          className={`tab ${activeTab === "deviceReports" ? "active" : ""}`}
+          onClick={() => handleTabClick("deviceReports")}
+        >
+          Device Reports
+        </div>
+        <div
+          className={`tab ${activeTab === "userReports" ? "active" : ""}`}
+          onClick={() => handleTabClick("userReports")}
+        >
+          User Reports
         </div>
       </div>
       <div className="admin-info-boxes">
@@ -1652,175 +1745,222 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab == "dataQueries" && (
-          <>
-            <div className="report-container">
-              <h2>Total Fines Report</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Total Fines</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="total-amount">${totalFines?.totalFines}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        {activeTab === "bookReports" && (
+            <>
+              <div className="filter-section">
+                <label>Select Date Range:</label>
+                <div className="date-pickers">
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    placeholderText="Start Date"
+                  />
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    placeholderText="End Date"
+                  />
+                </div>
+                <button className="filter-button" onClick={handleFilter}>
+                  Filter
+                </button>
+              </div>
+              {renderTable(
+                "Most Requested Books",
+                reports.mostBorrowedBooks || [],
+                ["Title", "User", "Author"]
+              )}
+              {renderTable(
+                "List of Available Book Copies",
+                reports.availableBookCopies || [],
+                ["Title", "CopiesAvailable"]
+              )}
+              {renderTable(
+                "Currently Borrowed Books with Users",
+                reports.currentlyBorrowedBooks || [],
+                ["Title", "User"]
+              )}
+              {renderTable(
+                "Most and Least Borrowed Books",
+                reports.borrowedBooksStats || [],
+                ["Title", "BorrowedCount"]
+              )}
+              {renderTable(
+                "Fulfilled and Unfulfilled Book Requests",
+                reports.bookRequestsStatus || [],
+                ["Title", "User", "RequestedCount"]
+              )}
+              {renderTable(
+                "Books on Hold with Users",
+                reports.booksOnHold || [],
+                ["Title", "User", "OnHoldDuration"]
+              )}
+              {renderTable(
+                "Request to Fulfillment Duration for Books",
+                reports.bookRequestDuration || [],
+                ["Title", "RequestDuration"]
+              )}
+            </>
+          )}
 
-            {/* Monthly Registrations Report */}
-            <div className="report-container">
-              <h2>Monthly Registrations Report</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>User Count</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyRegistrations.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.user_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {activeTab === "mediaReports" && (
+            <>
+                  <div className="filter-section">
+                    <label>Select Date Range:</label>
+                    <div className="date-pickers">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        placeholderText="Start Date"
+                      />
+                      <DatePicker
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                        placeholderText="End Date"
+                      />
+                    </div>
+                    <button className="filter-button" onClick={handleFilter}>
+                      Filter
+                    </button>
+                  </div>
+              {renderTable(
+                "Most Requested Media",
+                reports.mostBorrowedMedia || [],
+                ["Title", "User", "Author"]
+              )}
+              {renderTable(
+                "List of Available Media Copies",
+                reports.availableMediaCopies || [],
+                ["Title", "CopiesAvailable"]
+              )}
+              {renderTable(
+                "Currently Borrowed Media with Users",
+                reports.currentlyBorrowedMedia || [],
+                ["Title", "User"]
+              )}
+              {renderTable(
+                "Most and Least Borrowed Media",
+                reports.borrowedMediaStats || [],
+                ["Title", "BorrowedCount"]
+              )}
+              {renderTable(
+                "Fulfilled and Unfulfilled Media Requests",
+                reports.mediaRequestsStatus || [],
+                ["Title", "User", "RequestedCount"]
+              )}
+              {renderTable(
+                "Media on Hold with Users",
+                reports.mediaOnHold || [],
+                ["Title", "User", "OnHoldDuration"]
+              )}
+              {renderTable(
+                "Request to Fulfillment Duration for Media",
+                reports.mediaRequestDuration || [],
+                ["Title", "RequestDuration"]
+              )}
+            </>
+          )}
 
-            <div className="report-container">
-              <h2>Monthly Books Borrowed</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Books Borrowed</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyBookBorrows.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.books_borrowed_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="report-container">
-              <h2>Monthly Books Requested</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Books Requested</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyBookRequests.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.books_requested_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="report-container">
-              <h2>Monthly Media Borrowed</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Media Borrowed</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyMediaBorrows.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.media_borrowed_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="report-container">
-              <h2>Monthly Media Requested</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Media Requested</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyMediaRequests.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.media_requested_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="report-container">
-              <h2>Monthly Devices Borrowed</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Devices Borrowed</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyDeviceBorrows.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.devices_borrowed_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="report-container">
-              <h2>Monthly Devices Requested</h2>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Devices Requested</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monthlyDeviceRequests.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.year}</td>
-                      <td>{record.month}</td>
-                      <td>{record.devices_requested_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+          {activeTab === "deviceReports" && (
+            <>
+                  <div className="filter-section">
+                    <label>Select Date Range:</label>
+                    <div className="date-pickers">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        placeholderText="Start Date"
+                      />
+                      <DatePicker
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                        placeholderText="End Date"
+                      />
+                    </div>
+                    <button className="filter-button" onClick={handleFilter}>
+                      Filter
+                    </button>
+                  </div>
+              {renderTable(
+                "Most Requested Devices",
+                reports.mostBorrowedDevices || [],
+                ["Title", "User", "Brand"]
+              )}
+              {renderTable(
+                "List of Available Devices",
+                reports.availableDeviceCopies || [],
+                ["Title", "Serial Number"]
+              )}
+              {renderTable(
+                "Currently Borrowed Devices with Users",
+                reports.currentlyBorrowedDevices || [],
+                ["Title", "User"]
+              )}
+              {renderTable(
+                "Most and Least Borrowed Devices",
+                reports.borrowedDevicesStats || [],
+                ["Title", "BorrowedCount"]
+              )}
+              {renderTable(
+                "Fulfilled and Unfulfilled Device Requests",
+                reports.deviceRequestsStatus || [],
+                ["Title", "User", "RequestedCount"]
+              )}
+              {renderTable(
+                "Devices on Hold with Users",
+                reports.devicesOnHold || [],
+                ["Title", "User", "OnHoldDuration"]
+              )}
+              {renderTable(
+                "Request to Fulfillment Duration for Devices",
+                reports.deviceRequestDuration || [],
+                ["Title", "RequestDuration"]
+              )}
+            </>
+          )}
+
+          {activeTab === "userReports" && (
+            <>
+                  <div className="filter-section">
+                    <label>Select Date Range:</label>
+                    <div className="date-pickers">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        placeholderText="Start Date"
+                      />
+                      <DatePicker
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                        placeholderText="End Date"
+                      />
+                    </div>
+                    <button className="filter-button" onClick={handleFilter}>
+                      Filter
+                    </button>
+                  </div>
+              {renderTable(
+                "Most Active Borrowers",
+                reports.mostActiveBorrowers || [],
+                ["User", "BorrowedCount"]
+              )}
+              {renderTable(
+                "Users with Most Overdue Items",
+                reports.usersWithMostOverdue || [],
+                ["User", "OverdueCount"]
+              )}
+              {renderTable(
+                "Users with Current Fines",
+                reports.usersWithFines || [],
+                ["User", "FineAmount"]
+              )}
+              {renderTable(
+                "Users with Unpaid Fines",
+                reports.usersWithUnpaidFines || [],
+                ["User", "FineAmount"]
+              )}
+            </>
+          )}
       </div>
     </div >
   );
