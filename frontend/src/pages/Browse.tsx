@@ -206,6 +206,32 @@ const BrowsePage: React.FC = () => {
     }
   }
 
+  const fetchDeviceAvailability = async (serialNumber: string, device: Device) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/${serialNumber}/getDeviceAvailability`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all media");
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        borrowDevice(device);
+        return;
+      }
+      else if (data.length === 0) {
+        setSelectedHoldItem(device);
+        setShowHoldPopup(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
   const borrowBook = async (book: Book) => {
     try {
       if (!userData) {
@@ -233,6 +259,7 @@ const BrowsePage: React.FC = () => {
           theme: "light",
           transition: Bounce,
         });
+        fetchAllBooks();
       } else {
         toast.error(result.error || 'An error occurred while borrowing the book', {
           position: "top-right",
@@ -288,6 +315,7 @@ const BrowsePage: React.FC = () => {
           theme: "light",
           transition: Bounce,
         });
+        fetchAllMedia();
       } else {
         toast.error(result.error || 'An error occurred while borrowing the book', {
           position: "top-right",
@@ -321,64 +349,44 @@ const BrowsePage: React.FC = () => {
       if (!userData) {
         navigate('/login')
       }
-      if (userData) {
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userData, device }), // Send device as JSON
-          });
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/borrow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData, device }), // Send device as JSON
+      });
 
-          const result = await response.json(); // Parse JSON after fetch completes
+      const result = await response.json(); // Parse JSON after fetch completes
 
-          if (response.ok) {
-            toast.success(`${device.dName} borrowed successfully`, {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-              transition: Bounce,
-            });
-          }
-          else if (response.status === 400) {
-            toast.error(result.error || 'An error occurred while borrowing the book', {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-              transition: Bounce,
-            });
-          }
-          else if (response.status === 404) {
-            setSelectedHoldItem(device);
-            setShowHoldPopup(true);
-          }
-        } catch (error) {
-          toast.error(`Error: ${error}`, {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
-        }
+      if (response.ok) {
+        toast.success(`${device.dName} borrowed successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        fetchAllDevices();
+      } else {
+        toast.error(result.error || 'An error occurred while borrowing the device', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     } catch (error) {
-      toast.error(`Error: ${error}`, {
+        toast.error(`Error: ${error}`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -419,6 +427,8 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
+
+          fetchAllBooks();
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
@@ -458,6 +468,7 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
+          fetchAllMedia();
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
@@ -497,6 +508,7 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
+          fetchAllDevices();
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
@@ -689,7 +701,7 @@ const BrowsePage: React.FC = () => {
                         </p>
                         <p style={styles.genreText}>{device.model}</p>
                         <div style={styles.buttonContainer}>
-                          <button style={styles.borrowButton} onClick={() => borrowDevice(device)}>Borrow</button>
+                          <button style={styles.borrowButton} onClick={() => fetchDeviceAvailability(device.serialNumber, device)}>Borrow</button>
                           <button style={styles.detailsButton} onClick={() => openPopup(device)}>Details</button>
                         </div>
                       </div>

@@ -13,6 +13,7 @@ import {
   deviceRequestAccepted,
   deviceRequestDeny,
   borrowDevice,
+  getDeviceAvailability,
   getMonthlyDeviceBorrow,
   getMonthlyDeviceRequests,
 } from "../controllers/deviceController.js";
@@ -32,6 +33,7 @@ route.get("/devices/:serialNumber", getDeviceBySN);
 route.put("/devices/:serialNumber", updateDevice);
 route.post("/devices/borrow", borrowDevice);
 route.put("/devices/:serialNumber/softDelete", deleteDevice);
+route.get("/devices/:serialNumber/getDeviceAvailability", getDeviceAvailability);
 route.get("/devices/borrow/monthly", getMonthlyDeviceBorrow)
 route.get("/devices/request/monthly", getMonthlyDeviceRequests)
 

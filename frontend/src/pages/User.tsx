@@ -300,7 +300,6 @@ const UserPage: React.FC = () => {
 
       const deviceholdData = await deviceHoldResponse.json();
       setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
-      console.log(userdeviceHold);
       // Fetch mediahold
       const mediaHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaHold`, {
         method: 'GET',
@@ -770,7 +769,9 @@ const UserPage: React.FC = () => {
           </div>
           <div className='item-container'>
             <div className={`tab ${activeTab === 'itemHold' ? 'active' : ''}`} onClick={() => handleTabClick('itemHold')}>Item Holds</div>
-            <div className='item-number'>{userbookHold.length + usermediaHold.length + userdeviceHold.length}</div>
+            <div className='item-number'>{userbookHold.filter(item => item.status === 'OnHold').length + 
+            usermediaHold.filter(item => item.status === 'OnHold').length + 
+            userdeviceHold.filter(item => item.status === 'OnHold').length || null}</div>
           </div>
         </div>
       </div>

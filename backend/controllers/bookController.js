@@ -20,8 +20,8 @@ export async function getBooks(req, res) {
       EXCEPT
       SELECT DISTINCT b.*
       FROM book AS b, bookborrowed AS bb, bookcopy AS bc, bookhold AS bh
-      WHERE (bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL 
-      AND is_deleted = 0) OR (bh.userID = ? AND bh.ISBN = b.ISBN AND bh.status = 'OnHold');
+      WHERE (bb.userID = ? AND bb.itemID = bc.itemID AND b.ISBN = bc.ISBN AND bb.returnDate IS NULL AND is_deleted = 0) 
+      OR (bh.userID = ? AND bh.ISBN = b.ISBN AND bh.status = 'OnHold');
       `, [userData.userID, userData.userID]);
       res.json(rows); 
     } catch (error) {
@@ -186,7 +186,7 @@ export async function returnBook(req, res) {
       [selectedItem.itemID]
     );
 
-    if (holdExist[0]){
+    if (holdExist[0][0]){
       // Updates book hold to checked out
       const [holdUpdate] = await pool.query(
         `UPDATE bookhold
