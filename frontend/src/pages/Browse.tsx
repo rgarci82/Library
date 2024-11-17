@@ -800,6 +800,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '1.5rem',
   },
   browseContainer: {
+    backgroundColor: '#b8b1a3',
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
     height: '100%',
