@@ -3,14 +3,21 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./AdminDashboard.css";
 
-
 interface ReportData {
-  title?: string;
-  user?: string;
-  author?: string;
+  bTitle?: string;
+  userID?: string;
+  bAuthor?: string;
+  publisher?: string;
   genre?: string;
-  copiesAvailable?: number;
+  edition?: string;
+  ISBN?: string;
+  MediaID?: string;
+  mTitle?: string;
+  mAuthor?: string;
   requestedCount?: number;
+  copiesAvailable?: number;
+  holdID?: string;
+  status?: string;
 }
 
 const AdminReportsDashboard: React.FC = () => {
@@ -20,31 +27,45 @@ const AdminReportsDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("bookReports");
 
-  const fetchReports = async () => {
+  const fetchAdminReports = async () => {
+    if (!startDate || !endDate) return;
+
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `/api/admin-reports?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}`
-      );
+      const response = await fetch(`/api/reports?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`);
       const data = await response.json();
-      setReports(data);
+      
+      setReports({
+        availableBookCopies: data.availableBookCopies,
+        allRequestedBooks: data.allRequestedBooks,
+        mostRequestedBooks: data.mostRequestedBooks,
+        allBookHolds: data.allBookHolds,
+        availableMediaCopies: data.availableMediaCopies,
+        allRequestedMedia: data.allRequestedMedia,
+        mostRequestedMedia: data.mostRequestedMedia,
+        allMediaHolds: data.allMediaHolds,
+      });
     } catch (error) {
-      console.error("Error fetching reports:", error);
+      console.error("Failed to fetch reports:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFilter = () => {
-    if (startDate && endDate) {
-      fetchReports();
-    } else {
-      alert("Please select both start and end dates.");
-    }
+  useEffect(() => {
+    fetchAdminReports();
+  }, [startDate, endDate]);
+
+  const handleTabClick = (tab: "bookReports" | "mediaReports") => {
+    setActiveTab(tab);
   };
 
-  const renderTable = (title: string, data: ReportData[], columns: string[]) => (
+  const renderTable = (
+    title: string,
+    data: ReportData[],
+    columns: string[]
+  ) => (
     <div className="report-section">
       <h2>{title}</h2>
       <table className="report-table">
@@ -59,9 +80,10 @@ const AdminReportsDashboard: React.FC = () => {
           {data.length > 0 ? (
             data.map((item, idx) => (
               <tr key={idx}>
-                {columns.map((col) => (
-                  <td key={col}>{(item as any)[col.toLowerCase()] || "N/A"}</td>
-                ))}
+                {columns.map((col) => {
+                  const key = col.toLowerCase().replace(/ /g, "");
+                  return <td key={key}>{item[key as keyof ReportData] || "N/A"}</td>;
+                })}
               </tr>
             ))
           ) : (
@@ -74,8 +96,12 @@ const AdminReportsDashboard: React.FC = () => {
     </div>
   );
 
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+  const handleFilter = () => {
+    if (startDate && endDate) {
+      fetchAdminReports();
+    } else {
+      alert("Please select both start and end dates.");
+    }
   };
 
   return (
@@ -123,29 +149,26 @@ const AdminReportsDashboard: React.FC = () => {
           {activeTab === "bookReports" && (
             <>
               {renderTable(
-                "Most Requested Books",
-                reports.mostRequestedBooks || [],
-                ["Title", "User", "Author"]
-              )}
-              {renderTable(
                 "Available Book Copies",
                 reports.availableBookCopies || [],
-                ["Title", "CopiesAvailable"]
+                ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
               )}
               {renderTable(
                 "All Requested Books",
                 reports.allRequestedBooks || [],
-                ["Title", "User", "RequestedCount"]
+                ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
               )}
+              {renderTable(
+                "Most Requested Books",
+                reports.mostRequestedBooks || [],
+                ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
+              )}
+              
+              
               {renderTable(
                 "All Book Holds",
                 reports.allBookHolds || [],
-                ["Title", "User"]
-              )}
-              {renderTable(
-                "Most Borrowed Book Genres",
-                reports.mostBorrowedBookGenres || [],
-                ["Genre", "RequestedCount"]
+                ["bTitle", "MediaID", "bAuthor", "publisher", "genre", "edition", "holdID", "status"]
               )}
             </>
           )}
@@ -153,29 +176,25 @@ const AdminReportsDashboard: React.FC = () => {
           {activeTab === "mediaReports" && (
             <>
               {renderTable(
-                "Most Requested Media",
-                reports.mostRequestedMedia || [],
-                ["Title", "User", "Author"]
-              )}
-              {renderTable(
                 "Available Media Copies",
                 reports.availableMediaCopies || [],
-                ["Title", "CopiesAvailable"]
+                ["MediaID", "mTitle", "mAuthor", "publisher", "genre", "edition"]
               )}
               {renderTable(
                 "All Requested Media",
                 reports.allRequestedMedia || [],
-                ["Title", "User", "RequestedCount"]
+                ["MediaID", "mTitle", "mAuthor", "publisher", "genre", "edition"]
               )}
+              {renderTable(
+                "Most Requested Media",
+                reports.mostRequestedMedia || [],
+                ["MediaID", "mTitle", "mAuthor", "publisher", "genre", "edition"]
+              )}
+              
               {renderTable(
                 "All Media Holds",
                 reports.allMediaHolds || [],
-                ["Title", "User"]
-              )}
-              {renderTable(
-                "Most Borrowed Media",
-                reports.mostBorrowedMedia || [],
-                ["Title", "RequestedCount"]
+                ["mTitle", "MediaID", "mAuthor", "publisher", "genre", "edition", "holdID", "status"]
               )}
             </>
           )}

@@ -15,11 +15,16 @@
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   border-radius: 5px;
+  transition: all 0.3s ease;
 }
 
 .tab.active {
   background-color: #b22b44;
   color: white;
+}
+
+.tab:hover {
+  background-color: #e1e1e1;
 }
 
 .report-section {
@@ -29,22 +34,48 @@
 .report-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.report-table th, .report-table td {
+.report-table th {
+  background-color: #b22b44;
+  color: white;
   padding: 10px;
   text-align: left;
   border: 1px solid #ddd;
 }
 
+.report-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.report-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.report-table tr:hover {
+  background-color: #f1f1f1;
+}
+
 .filter-section {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .date-pickers {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 15px;
+}
+
+.date-pickers input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
 }
 
 .filter-button {
@@ -54,8 +85,31 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .filter-button:hover {
-  background-color: #b22b44;
+  background-color: #a11e3b;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab {
+    margin-bottom: 10px;
+    padding: 8px 15px;
+  }
+
+  .date-pickers {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-button {
+    width: 100%;
+    padding: 12px;
+  }
 }
