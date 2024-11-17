@@ -36,7 +36,7 @@ export async function createAdmin(req, res) {
   }
 }
 
-export async function getAdminProfile(req, res) {
+export async function postAdminProfile(req, res) {
   try {
     const { userID } = req.params;
 
@@ -59,10 +59,10 @@ export async function getAdminProfile(req, res) {
 
  //Fetch reports based on the selected date range.
 
-export async function getAdminReports (req, res)  {
+export async function postAdminReports (req, res)  {
  
 
-  const { startDate, endDate } = req.query;
+  const { startDate, endDate } = req.body;
 
   // Validate query parameters
   if (!startDate || !endDate) {

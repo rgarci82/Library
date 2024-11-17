@@ -20,73 +20,58 @@ interface ReportData {
   status?: string;
 }
 
-
 const AdminReportsDashboard: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [reports, setReports] = useState<Record<string, ReportData[]>>({});
+  const [reports, setReports] = useState<Record<string, ReportData[]>>({
+    availableBookCopies: [],
+    allRequestedBooks: [],
+    mostRequestedBooks: [],
+    allBookHolds: [],
+    availableMediaCopies: [],
+    allRequestedMedia: [],
+    mostRequestedMedia: [],
+    allMediaHolds: [],
+  });
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("bookReports");
+  const [activeTab, setActiveTab] = useState<"bookReports" | "mediaReports">("bookReports");
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchAdminReports = async () => {
-    if (!startDate || !endDate) return;
-
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+  
     setLoading(true);
-
+    setFetchError(null);
+  
+    const startDateISO = startDate.toISOString();
+    const endDateISO = endDate.toISOString();
+  
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/admin-reports`);
-
-      //START DEBUGGING HERE
-
-
-      //**************************************************************************************************************
-
-
-      
-      const data = await response.json();
-      
-      setReports({
-        availableBookCopies: data.availableBookCopies,
-        // allRequestedBooks: data.allRequestedBooks,
-        // mostRequestedBooks: data.mostRequestedBooks,
-        // allBookHolds: data.allBookHolds,
-        // availableMediaCopies: data.availableMediaCopies,
-        // allRequestedMedia: data.allRequestedMedia,
-        // mostRequestedMedia: data.mostRequestedMedia,
-        // allMediaHolds: data.allMediaHolds,
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/adminreports`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ startDate: startDateISO, endDate: endDateISO }),
       });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setReports(data);
     } catch (error) {
-      console.error("Failed to fetch reports:", error);
+      console.error("Fetch Error:", error);
+      setFetchError("Failed to load reports. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
-
-  /*
-  const fetchAllBooks = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/getBooks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userData }),
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch all unborrowed books by user.");
-
-      const data = await response.json();
-
-      setAllBooks(data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-  */
-
-  useEffect(() => {
-    fetchAdminReports();
-  }, [startDate, endDate]);
+  
 
   const handleTabClick = (tab: "bookReports" | "mediaReports") => {
     setActiveTab(tab);
@@ -182,7 +167,7 @@ const AdminReportsDashboard: React.FC = () => {
               {renderTable(
                 "Available Book Copies",
                 reports.availableBookCopies || [],
-                ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
+                ["bTitle", "bAuthor", "publisher", "genre", "edition", "ISBN"]
               )}
               {renderTable(
                 "All Requested Books",
