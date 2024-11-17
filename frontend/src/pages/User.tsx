@@ -300,7 +300,6 @@ const UserPage: React.FC = () => {
 
       const deviceholdData = await deviceHoldResponse.json();
       setUserdeviceHold(deviceholdData.userdeviceHold || []); // Ensure you access the correct property
-      console.log(userdeviceHold);
       // Fetch mediahold
       const mediaHoldResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/mediaHold`, {
         method: 'GET',
