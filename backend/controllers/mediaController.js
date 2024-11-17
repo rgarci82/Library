@@ -13,14 +13,16 @@ export async function getMedia(req, res) {
   }
   else{
     try {
-      const [rows] = await pool.query(`SELECT m.*
+      const [rows] = await pool.query(`
+      SELECT DISTINCT m.*
       FROM media AS m
       WHERE m.is_deleted = 0
       EXCEPT
-      SELECT m.*
-      FROM media AS m, mediaborrowed AS mb, mediacopy AS mc
-      WHERE mb.userID = ? AND mb.itemID = mc.itemID AND m.MediaID = mc.MediaID AND mb.returnDate IS NULL AND is_deleted = 0;
-      `, [userData.userID]);
+      SELECT DISTINCT m.*
+      FROM media AS m, mediaborrowed AS mb, mediacopy AS mc, mediahold AS mh
+      WHERE (mb.userID = ? AND mb.itemID = mc.itemID AND m.MediaID = mc.MediaID AND mb.returnDate IS NULL AND is_deleted = 0) 
+      OR (mh.userID = ? AND mh.MediaID = m.MediaID AND mh.status = 'OnHold');
+      `, [userData.userID, userData.userID]);
       res.json(rows);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -85,7 +87,7 @@ export async function returnMedia(req, res) {
       [selectedItem.itemID]
     );
 
-    if (holdExist[0]){
+    if (holdExist[0][0]){
       // Updates media hold to checked out
       const [holdUpdate] = await pool.query(
         `UPDATE mediahold

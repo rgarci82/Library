@@ -13,14 +13,16 @@ export async function getDevices(req, res) {
   }
   else{
     try {
-      const [rows] = await pool.query(`SELECT d.*
+      const [rows] = await pool.query(`
+      SELECT DISTINCT d.*
       FROM device AS d
       WHERE d.is_deleted = 0
       EXCEPT
-      SELECT d.*
-      FROM device AS d, deviceborrowed AS db
-      WHERE db.userID = ? AND d.serialNumber = db.serialNumber AND db.returnDate IS NULL AND is_deleted = 0;
-      `, [userData.userID]);
+      SELECT DISTINCT d.*
+      FROM device AS d, deviceborrowed AS db, devicehold AS dh
+      WHERE (db.userID = ? AND d.serialNumber = db.serialNumber AND db.returnDate IS NULL AND is_deleted = 0) 
+      OR (dh.userID = ? AND dh.serialNumber = d.serialNumber AND dh.status = 'OnHold');
+      `, [userData.userID, userData.userID]);
       res.json(rows);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -85,7 +87,7 @@ export async function returnDevice(req, res) {
       [selectedItem.serialNumber]
     );
 
-    if (holdExist[0]){
+    if (holdExist[0][0]){
       // Updates device hold to checked out
       const [holdUpdate] = await pool.query(
         `UPDATE devicehold
@@ -471,6 +473,30 @@ export async function borrowDevice(req, res) {
         // Handle other errors
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
+  }
+}
+
+
+export async function getDeviceAvailability(req, res){
+  try {
+    const { serialNumber } = req.params;
+
+    if (!serialNumber) {
+      return res.status(400).json({ message: "Serial Number is required" });
+    }
+
+    const [deviceAvailability] = await pool.query(
+      `
+      SELECT device.serialNumber, device.status
+      FROM device
+      WHERE device.serialNumber = ? AND device.status = 'available'
+      `,
+      [serialNumber]
+    );
+
+    res.json(deviceAvailability);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 }
 
