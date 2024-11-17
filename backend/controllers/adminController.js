@@ -81,7 +81,7 @@ export async function getAdminReports (req, res)  {
     console.log("Available Book Copies:", availableBookCopies);
 
     // Query for all Requested Books
-    const [allRequestedBooks] = await pool.query(
+    /*const [allRequestedBooks] = await pool.query(
       `SELECT bTitle, userID,ISBN ,bAuthor, publisher, genre, edition
        FROM bookrequest
        WHERE requestDate BETWEEN ? AND ?
@@ -90,13 +90,13 @@ export async function getAdminReports (req, res)  {
       [startDate, endDate]
     );
     console.log("All Requested Books:", allRequestedBooks);
-//most requested books
+    //most requested books
     const [mostRequestedBooks] = await pool.query(
       `SELECT ISBN,bTitle,bAuthor,publisher,genre,edition,COUNT(ISBN) AS duplicate_count
-FROM bookrequest
-GROUP BY ISBN, bTitle, bAuthor, publisher, genre, edition
-ORDER BY duplicate_count DESC
-LIMIT 10;`,
+      FROM bookrequest
+      GROUP BY ISBN, bTitle, bAuthor, publisher, genre, edition
+      ORDER BY duplicate_count DESC
+      LIMIT 10;`,
       [startDate, endDate]
     );
     console.log("Most Requested Books:", mostRequestedBooks);
@@ -104,23 +104,23 @@ LIMIT 10;`,
     //all book hold
     const [allbookholds] = await pool.query(
       `SELECT b.bTitle, b.ISBN, b.bAuthor, b.publisher, b.genre, b.edition, bh.holdID, bh.status
-FROM book b
-JOIN bookhold bh ON b.ISBN = bh.ISBN
-WHERE bh.holddate BETWEEN ? AND ?
-ORDER BY bh.holddate`,
+      FROM book b
+      JOIN bookhold bh ON b.ISBN = bh.ISBN
+      WHERE bh.holddate BETWEEN ? AND ?
+      ORDER BY bh.holddate`,
       [startDate, endDate]
     );
     console.log("All Book Holds:", allbookholds);
      // Query for Available Media Copies
      const [availableMediaCopies] = await pool.query(
       `SELECT m.MediaID, m.mTitle, m.mAuthor, m.publisher, m.genre, m.edition
-FROM media m
-JOIN mediacopy mc 
-ON mc.MediaID = m.MediaID
-WHERE mc.status = "available"`
+      FROM media m
+      JOIN mediacopy mc 
+      ON mc.MediaID = m.MediaID
+      WHERE mc.status = "available"`
     );
     console.log("Available Media Copies:", availableMediaCopies);
-// all requested media
+    // all requested media
     const [allRequestedMedia] = await pool.query(
       `SELECT mTitle, userID,MediaID, mAuthor, publisher, genre, edition
        FROM mediarequest
@@ -132,35 +132,35 @@ WHERE mc.status = "available"`
     // Query for Most Requested Media
     const [mostRequestedMedia] = await pool.query(
       `SELECT MediaID,mTitle,mAuthor,publisher,genre,edition,COUNT(MediaID) AS duplicate_count
-FROM mediarequest
-GROUP BY MediaID, mTitle, mAuthor, publisher, genre, edition
-ORDER BY duplicate_count DESC
-LIMIT 10;`,
+      FROM mediarequest
+      GROUP BY MediaID, mTitle, mAuthor, publisher, genre, edition
+      ORDER BY duplicate_count DESC
+      LIMIT 10;`,
       [startDate, endDate]
     );
     console.log("Most Requested Media:", mostRequestedMedia);
 
     const [allmediaholds] = await pool.query(
       `SELECT m.mTitle,m.MediaID, m.mAuthor, m.publisher, m.genre, m.edition, mh.holdID, mh.status
-FROM media m
-JOIN mediahold mh ON m.MediaID = mh.MediaID
-WHERE mh.holddate BETWEEN ? AND ?
-ORDER BY mh.holddate`,
+      FROM media m
+      JOIN mediahold mh ON m.MediaID = mh.MediaID
+      WHERE mh.holddate BETWEEN ? AND ?
+      ORDER BY mh.holddate`,
       [startDate, endDate]
     );
-    console.log("All medai Holds:", allmediaholds);
+    console.log("All medai Holds:", allmediaholds);*/
    
 
     // Return all results in a single response
     res.json({
       availableBookCopies:availableBookCopies || [],
-      allRequestedBooks:allRequestedBooks || [],
+      /*allRequestedBooks:allRequestedBooks || [],
       mostRequestedBooks: mostRequestedBooks || [],
       allbookholds: allbookholds || [],
       availableMediaCopies: availableMediaCopies || [],
       allRequestedMedia:allRequestedMedia || [],
       mostRequestedMedia: mostRequestedMedia || [],
-      allmediaholds:allmediaholds || []
+      allmediaholds:allmediaholds || []*/
 
     });
   } catch (error) {

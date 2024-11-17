@@ -6,6 +6,6 @@ const route = express.Router()
 
 route.post('/admin/register', createAdmin)
 route.get('/admin/:AdminID', authToken, getAdminProfile)
-route.get('/admin-reports', authToken, getAdminReports);
+route.get('/admin/admin-reports', authToken, getAdminReports);
 
 export default route;

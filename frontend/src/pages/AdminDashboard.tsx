@@ -20,6 +20,7 @@ interface ReportData {
   status?: string;
 }
 
+
 const AdminReportsDashboard: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -33,18 +34,26 @@ const AdminReportsDashboard: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/reports?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/admin-reports`);
+
+      //START DEBUGGING HERE
+
+
+      //**************************************************************************************************************
+
+
+      
       const data = await response.json();
       
       setReports({
         availableBookCopies: data.availableBookCopies,
-        allRequestedBooks: data.allRequestedBooks,
-        mostRequestedBooks: data.mostRequestedBooks,
-        allBookHolds: data.allBookHolds,
-        availableMediaCopies: data.availableMediaCopies,
-        allRequestedMedia: data.allRequestedMedia,
-        mostRequestedMedia: data.mostRequestedMedia,
-        allMediaHolds: data.allMediaHolds,
+        // allRequestedBooks: data.allRequestedBooks,
+        // mostRequestedBooks: data.mostRequestedBooks,
+        // allBookHolds: data.allBookHolds,
+        // availableMediaCopies: data.availableMediaCopies,
+        // allRequestedMedia: data.allRequestedMedia,
+        // mostRequestedMedia: data.mostRequestedMedia,
+        // allMediaHolds: data.allMediaHolds,
       });
     } catch (error) {
       console.error("Failed to fetch reports:", error);
@@ -52,6 +61,28 @@ const AdminReportsDashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  /*
+  const fetchAllBooks = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/getBooks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch all unborrowed books by user.");
+
+      const data = await response.json();
+
+      setAllBooks(data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+  */
 
   useEffect(() => {
     fetchAdminReports();
