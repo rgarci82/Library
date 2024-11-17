@@ -315,7 +315,7 @@ export async function getUserdeviceHold(req, res) {
 
         // SQL query to get all device hold by the user
         const deviceHoldResult = await pool.query(
-            `SELECT dh.serialNumber, d.dName, d.brand, dh.holddate, dh.status
+            `SELECT dh.serialNumber, d.dName, d.brand, dh.holdDate, dh.status
             FROM devicehold dh
             JOIN device d ON d.serialNumber = dh.serialNumber
             WHERE dh.userID = ? AND dh.status != 'Deleted'`,
