@@ -684,10 +684,10 @@ const BrowsePage: React.FC = () => {
                     return (
                       <div key={device.serialNumber} style={styles.itemCard}>
                         <h3 style={styles.itemTitle}>{device.dName}</h3>
-                        <p>
+                        <p style={styles.itemSubTitle}>
                           {device.brand}
                         </p>
-                        <p>{device.model}</p>
+                        <p style={styles.genreText}>{device.model}</p>
                         <div style={styles.buttonContainer}>
                           <button style={styles.borrowButton} onClick={() => borrowDevice(device)}>Borrow</button>
                           <button style={styles.detailsButton} onClick={() => openPopup(device)}>Details</button>
@@ -771,6 +771,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: '0',
     right: '0',
     zIndex: 100,
+    boxShadow: '0px 2px 5px -1px rgba(0,0,0,0.75)',
   },
   libraryName: {
     backgroundColor: '#C8102E',
@@ -789,7 +790,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   browseContainer: {
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
-    //backgroundColor: 'gray',
     height: '100%',
   },
   textContainer: {
@@ -797,7 +797,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '100%',
     textAlign: 'center',
     marginBottom: '10px',
-    // /backgroundColor: '#A0A0A0',
     padding: '20px',
     borderRadius: '8px',
     position: 'relative',
@@ -805,7 +804,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   headerTitle: {
     fontSize: '2.5rem',
     letterSpacing: '1px',
-    //wordSpacing: '10px',
     color: 'black',
   },
   headerSubtitle: {
@@ -865,22 +863,16 @@ const styles: { [key: string]: React.CSSProperties } = {
   itemsGridContainer: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start', // Aligns grid at the top of the container
-    //maxHeight: '80vh',
-    //overflowY: 'auto', // Adds vertical scroll
-    //padding: '10px',
+    alignItems: 'flex-start',
     width: '100%',
-    //backgroundColor: 'lightgray', // Optional background color
     borderRadius: '10px',
   },
   itemsGrid: {
     display: 'flex',
     flexWrap: 'wrap',
-    //flexDirection: 'column',
     gap: '20px',
     justifyContent: 'center',
-    alignItems: 'center', // Centers each card horizontally
-    //width: '100%', // Ensures full width within the container
+    alignItems: 'center',
   },
   itemCard: {
     border: '1px solid #ddd',
