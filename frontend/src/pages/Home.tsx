@@ -15,9 +15,8 @@ const Home: React.FC = () => {
     function isTokenExpired(token: string) {
         try {
             const decoded = jwtDecode(token);
-            if (!decoded.exp) return true; // No expiration field, consider it expired
+            if (!decoded.exp) return true;
 
-            // Check if the current time is past the token expiration time
             const currentTime = Date.now() / 1000;
             return decoded.exp < currentTime;
         } catch (error) {

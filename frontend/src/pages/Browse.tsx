@@ -220,7 +220,7 @@ const BrowsePage: React.FC = () => {
       });
 
       const result = await response.json();
-      
+
       if (response.ok) {
         toast.success(`${book.bTitle} borrowed successfully`, {
           position: "top-right",
@@ -346,7 +346,7 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
-          else if (response.status === 400){
+          else if (response.status === 400) {
             toast.error(result.error || 'An error occurred while borrowing the book', {
               position: "top-right",
               autoClose: 3000,
@@ -359,7 +359,7 @@ const BrowsePage: React.FC = () => {
               transition: Bounce,
             });
           }
-          else if (response.status === 404){
+          else if (response.status === 404) {
             setSelectedHoldItem(device);
             setShowHoldPopup(true);
           }
@@ -608,15 +608,6 @@ const BrowsePage: React.FC = () => {
           <h1 style={styles.headerTitle}>Browse Items</h1>
           <p style={styles.headerSubtitle}>Find the perfect item for you!</p>
 
-          <select
-            value={searchBy}
-            onChange={(e) => setSearchBy(e.target.value as 'book' | 'media' | 'device')}
-            style={styles.dropdown}
-          >
-            <option value="book">Book</option>
-            <option value="media">Media</option>
-            <option value="device">Device</option>
-          </select>
 
           <div style={styles.searchBar}>
             <input
@@ -628,6 +619,15 @@ const BrowsePage: React.FC = () => {
               onFocus={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.3)'}
               onBlur={(e) => e.target.style.boxShadow = '0 3px 10px rgba(0,0,0,0.15)'}
             />
+            <select
+              value={searchBy}
+              onChange={(e) => setSearchBy(e.target.value as 'book' | 'media' | 'device')}
+              style={styles.dropdown}
+            >
+              <option value="book">Book</option>
+              <option value="media">Media</option>
+              <option value="device">Device</option>
+            </select>
           </div>
 
           <button
@@ -647,7 +647,7 @@ const BrowsePage: React.FC = () => {
                     return (
                       <div key={book.ISBN} style={styles.itemCard}>
                         <h3 style={styles.itemTitle}>{book.bTitle}</h3>
-                        <p>
+                        <p style={styles.itemSubTitle}>
                           {book.bAuthor}
                           {publisherText}
                         </p>
@@ -666,7 +666,7 @@ const BrowsePage: React.FC = () => {
                     return (
                       <div key={media.MediaID} style={styles.itemCard}>
                         <h3 style={styles.itemTitle}>{media.mTitle}</h3>
-                        <p>
+                        <p style={styles.itemSubTitle}>
                           {media.mAuthor}
                           {publisherText}
                         </p>
@@ -685,8 +685,9 @@ const BrowsePage: React.FC = () => {
                       <div key={device.serialNumber} style={styles.itemCard}>
                         <h3 style={styles.itemTitle}>{device.dName}</h3>
                         <p>
-                          {device.brand} {device.model}
+                          {device.brand}
                         </p>
+                        <p>{device.model}</p>
                         <div style={styles.buttonContainer}>
                           <button style={styles.borrowButton} onClick={() => borrowDevice(device)}>Borrow</button>
                           <button style={styles.detailsButton} onClick={() => openPopup(device)}>Details</button>
@@ -788,15 +789,15 @@ const styles: { [key: string]: React.CSSProperties } = {
   browseContainer: {
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: 'gray',
+    //backgroundColor: 'gray',
     height: '100%',
   },
   textContainer: {
-    marginTop: '5%',
+    marginTop: '4%',
     height: '100%',
     textAlign: 'center',
     marginBottom: '10px',
-    backgroundColor: '#A0A0A0',
+    // /backgroundColor: '#A0A0A0',
     padding: '20px',
     borderRadius: '8px',
     position: 'relative',
@@ -804,12 +805,13 @@ const styles: { [key: string]: React.CSSProperties } = {
   headerTitle: {
     fontSize: '2.5rem',
     letterSpacing: '1px',
-    wordSpacing: '10px',
+    //wordSpacing: '10px',
     color: 'black',
   },
   headerSubtitle: {
     fontSize: '1.2rem',
     color: 'black',
+    marginBottom: '12px'
   },
   dropdown: {
     padding: '10px',
@@ -826,7 +828,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   requestButton: {
     position: 'absolute',
-    top: '20px',
+    top: '23px',
     right: '20px',
     padding: '10px 15px',
     fontSize: '16px',
@@ -839,6 +841,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   searchBar: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: '20px',
   },
   searchInput: {
@@ -853,27 +856,31 @@ const styles: { [key: string]: React.CSSProperties } = {
     outline: 'none',
     transition: 'box-shadow 0.3s ease',
     backgroundColor: '#f7f7f7',
+    marginRight: '12px',
   },
   genreText: {
-    marginTop: '5px',
+    marginTop: '8px',
+    fontSize: '18px',
   },
   itemsGridContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start', // Aligns grid at the top of the container
-    maxHeight: '80vh',
-    overflowY: 'auto', // Adds vertical scroll
-    padding: '10px',
+    //maxHeight: '80vh',
+    //overflowY: 'auto', // Adds vertical scroll
+    //padding: '10px',
     width: '100%',
-    backgroundColor: 'lightgray', // Optional background color
+    //backgroundColor: 'lightgray', // Optional background color
     borderRadius: '10px',
   },
   itemsGrid: {
     display: 'flex',
-    flexDirection: 'column',
+    flexWrap: 'wrap',
+    //flexDirection: 'column',
     gap: '20px',
+    justifyContent: 'center',
     alignItems: 'center', // Centers each card horizontally
-    width: '100%', // Ensures full width within the container
+    //width: '100%', // Ensures full width within the container
   },
   itemCard: {
     border: '1px solid #ddd',
@@ -883,19 +890,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#fff',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     width: '80%', // Adjust width as desired for a long rectangle look
-    maxWidth: '600px', // Optional max width to limit stretch on large screens
+    maxWidth: '400px', // Optional max width to limit stretch on large screens
     display: 'flex',
+    minHeight: '210px',
+    height: '100%',
     flexDirection: 'column',
   },
   itemTitle: {
     fontSize: '1.5rem',
-    color: '#333',
+    color: 'black',
     margin: '10px 0',
   },
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'flex-end', // Aligns buttons to the right
-    marginTop: '10px', // Optional margin to space buttons from the content above
+    justifyContent: 'center', // Aligns buttons to the right
+    marginTop: 'auto', // Optional margin to space buttons from the content above
   },
   borrowButton: {
     padding: '10px 25px',
@@ -967,7 +976,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '#C8102E',
     borderRadius: '4px',
     cursor: 'pointer',
-  }
+  },
+  itemSubTitle: {
+    fontSize: '18px'
+  },
 }
 
 export default BrowsePage;
