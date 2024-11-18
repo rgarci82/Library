@@ -15,6 +15,7 @@ import {
   getUserdeviceHold,
   getMonthlyUserRegistrations,
   getTotalFineAmount,
+  activeBorrowers,
 } from "../controllers/userController.js";
 import { authToken } from "../middleware/authMiddleware.js";
 
@@ -36,4 +37,5 @@ route.get("/users/:userID/mediaHold", getUsermediaHold);
 route.get("/users/:userID/deviceHold", getUserdeviceHold);
 route.get("/user-registrations", getMonthlyUserRegistrations);
 route.get("/totalFineAmount", getTotalFineAmount);
+route.get("/users/getActiveBorrowers", activeBorrowers);
 export default route;

@@ -200,7 +200,8 @@ const AdminDashboard = () => {
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([]);
-
+  //users
+  const [mostActiveBorrows, setMostActiveBorrows] = useState([])
   //reports
   const [monthlyRegistrations, setMonthlyRegistrations] = useState<
     MonthlyRegistrationRecord[]
@@ -1110,11 +1111,32 @@ const fetchAvailableBookCopies = async () => {
 };
 
 
-//most requested
-const fetchMostRequestedBooks = async () => {
+// //most requested
+// const fetchMostRequestedBooks = async () => {
+//   try {
+//     const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP Error: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+//     setMostRequestedBooks(data)
+//     console.log (mostrequestedbooks)
+//   } catch (error) {
+//     console.error("Error fetching most requested:", error);
+//   }
+// };
+
+const fetchMostActiveBorrowers = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
-      method: "POST",
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/getActiveBorrowers`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -1125,8 +1147,8 @@ const fetchMostRequestedBooks = async () => {
     }
 
     const data = await response.json();
-    setMostRequestedBooks(data)
-    console.log (mostrequestedbooks)
+    setMostActiveBorrows(data)
+    console.log (data)
   } catch (error) {
     console.error("Error fetching most requested:", error);
   }
@@ -1134,7 +1156,7 @@ const fetchMostRequestedBooks = async () => {
 
 const handleFilter = () => {
   if (startDate && endDate) {
-    fetchMostRequestedBooks ();
+    // fetchMostRequestedBooks ();
   } else {
     alert("Please select both start and end dates.");
   }
@@ -1187,9 +1209,9 @@ const handleFilter = () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
-
     fetchAvailableBookCopies ();
-    fetchMostRequestedBooks ();
+    // fetchMostRequestedBooks ();
+    fetchMostActiveBorrowers();
   }, []);
 
   const handleSignOut = () => {
