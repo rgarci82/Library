@@ -392,6 +392,24 @@ export async function activeBorrowers(req, res) {
     }
 }
 
+export async function currentFines(req, res) {
+    try{
+      const [activeBorrowers] = await pool.query(`
+    SELECT 
+    u.userId AS User,
+    SUM(f.fineAmount) AS TotalFineAmount
+FROM users u
+LEFT JOIN fines f ON u.userId = f.userId
+GROUP BY u.userId
+ORDER BY TotalFineAmount DESC
+LIMIT 10;`);
+
+      res.json(activeBorrowers)
+    }catch(error){
+      console.error("Error fetch fine amounts");
+      res.status(500).json({ message: "Internal server error" });
+      }
+  }
 //    // Query for Users with Current Fines
 //    const [currentFines] = await db.query(`
 //     SELECT 

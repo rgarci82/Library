@@ -2012,7 +2012,7 @@ const AdminDashboard = () => {
             {renderTable(
               "Most Active Borrowers",
               reports.mostActiveBorrowers || [],
-              ["User", "BorrowedCount"]
+              ["User", "BorrowedCount"] 
             )}
             {renderTable(
               "Available Book Copies",
