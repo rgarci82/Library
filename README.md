@@ -14,8 +14,9 @@ cd backend
 
 npm i
 
-
 then, do 'npm run dev'
+
+
 
 NOTE: Refer to the google doc to make .env files appropriately to deploy this project.
 
