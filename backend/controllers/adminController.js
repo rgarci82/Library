@@ -91,37 +91,88 @@ export const getAdminReport = async (req, res) => {
 };
 
 //Books
-export async function postAvailableBookCopies(req, res) {
+export async function postMostBooksBorrowed(req, res) {
   try {
-    const [availableBookCopies] = await pool.query(`
-      SELECT bTitle, bAuthor, b.publisher, b.genre, b.edition, b.ISBN
-      FROM book b
-      JOIN bookcopy bc ON bc.ISBN = b.ISBN
-      WHERE bc.status = "available"
-    `);
+    // Extract startDate and endDate from the request body
+    const { startDate, endDate } = req.body;
 
-    res.json(availableBookCopies);
+    // Check if the dates are provided
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+    // Run the query to get the most borrowed books
+    const [mostBooksBorrowed] = await pool.query(`
+      SELECT b.ISBN, b.bTitle, b.bAuthor, b.publisher, b.genre, b.edition, COUNT(bb.borrowID) AS borrowCount
+      FROM bookborrowed bb
+      JOIN bookcopy bc ON bb.itemID = bc.itemID
+      JOIN book b ON bc.ISBN = b.ISBN
+      WHERE bb.borrowDate BETWEEN ? AND ?
+      GROUP BY b.ISBN, b.bTitle, b.bAuthor, b.publisher, b.genre, b.edition
+      ORDER BY borrowCount DESC
+      LIMIT 10
+    `, [startDate, endDate]);
+
+    // Send the response with the result
+    res.json(mostBooksBorrowed);
   } catch (error) {
-    console.error("Error fetching available book copies:", error);
-    res.status(500).json({ error: "Failed to fetch available book copies." });
+    console.error("Error fetching most borrowed books:", error);
+    res.status(500).json({ error: "Failed to fetch most borrowed books" });
   }
 }
+
 
 //most requested 
 export async function postMostRequestedBooks(req, res) {
   try {
+    const { startDate, endDate } = req.body;
+    console.log(startDate, endDate)
     const [mostrequestedbooks] = await pool.query(`
-      SELECT bTitle, userID, bAuthor, publisher, genre, edition
+      SELECT bTitle, userID, bAuthor, publisher, genre, edition, COUNT(ISBN) AS requestCount
 FROM bookrequest
-WHERE requestDate BETWEEN '2024-11-11' AND '2024-11-14'
-ORDER BY requestDate DESC
-LIMIT 10
-    `);
+WHERE requestDate BETWEEN ? AND ?
+GROUP BY ISBN, bTitle, userID, bAuthor, publisher, genre, edition
+ORDER BY requestCount DESC
 
+LIMIT 10
+
+    `,
+    [startDate, endDate]
+
+  );
+    
+    console.log(mostrequestedbooks)
     res.json(mostrequestedbooks);
+  
   } catch (error) {
     console.error("Error fetching most requested books:", error);
     res.status(500).json({ error: "Failed to fetch most requested books" });
   }
 }
 
+export async function postMostRequestedMedia(req, res) {
+  try {
+    const { startDate, endDate } = req.body;
+    console.log(startDate, endDate);
+
+    // Run the query
+    const [mostrequestedmedia] = await pool.query(`
+      SELECT mTitle, userID, MediaID, mAuthor, publisher, genre, edition, COUNT(MediaID) AS requestCount
+      FROM mediarequest
+      WHERE requestDate BETWEEN ? AND ?
+      GROUP BY MediaID, mTitle, userID, mAuthor, publisher, genre, edition
+      ORDER BY requestCount DESC
+      LIMIT 10
+    `, [startDate, endDate]);
+
+    // Log the result
+    console.log(mostrequestedmedia);
+
+    // Send the response with the result
+    res.json(mostrequestedmedia);
+  
+  } catch (error) {
+    console.error("Error fetching most requested media:", error);
+    res.status(500).json({ error: "Failed to fetch most requested media" });
+  }
+}

@@ -138,7 +138,7 @@ interface ReportData {
   requestDuration?: string;
 }
 
-interface AvailableBookCopies{
+interface MostBooksBorrowed{
   bTitle?: string;  
   
   bAuthor?: string;
@@ -154,6 +154,18 @@ interface MostRequestedBooks{
   publisher?: string;
   genre?:string;
   ISBN?: string;
+  requestCount?: number;
+}
+
+interface MostRequestedMedia{
+  mTitle?: string;
+  userID?: number; 
+  mediaID?: number;
+  mAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  edition?: number;
+  requestCount?: number;
 }
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -224,8 +236,9 @@ const AdminDashboard = () => {
   const [selectedRequestID, setSelectedRequestID] = useState<number | null>(null);
   const [quantityRequestBook, setQuantityRequestBook] = useState<number | "">(1);
   const [quantityRequestMedia, setQuantityRequestMedia] = useState<number | "">(1);
-  const [availableBookCopies, setAvailableBookCopies] = useState<AvailableBookCopies[]>([]);
+  const [mostBooksBorrowed, setMostBooksBorrowed] = useState<MostBooksBorrowed[]>([]);
   const [mostrequestedbooks, setMostRequestedBooks] = useState<MostRequestedBooks[]>([]);
+  const [mostrequestedmedia, setMostRequestedMedia] = useState<MostRequestedMedia[]>([]);
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuantity(value === "" ? "" : Number(value));
@@ -1087,37 +1100,51 @@ const AdminDashboard = () => {
 
   
 
-// Bookreport 
-const fetchAvailableBookCopies = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/available-books`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+  const fetchMostBooksBorrowed = async (startDate: string | null, endDate: string | null) => {
+    try {
+      // Check if both startDate and endDate are provided
+      if (!startDate || !endDate) {
+        throw new Error("Start Date and End Date are required.");
+      }
+  
+      // Make a POST request with the provided date range
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostborrowedbooks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ startDate, endDate }), // Include the date range in the request body
+      });
+  
+      // Handle non-OK responses
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+  
+      // Parse the JSON response
+      const data = await response.json();
+  
+      // Update state with the fetched data (assuming you have setMostBooksBorrowed function)
+      setMostBooksBorrowed(data);
+  
+    } catch (error) {
+      // Log any errors for debugging
+      console.error("Error fetching most borrowed books:", error);
     }
-
-    const data = await response.json();
-    setAvailableBookCopies(data)
-    console.log (availableBookCopies)
-  } catch (error) {
-    console.error("Error fetching available book copies:", error);
-  }
-};
+  };
+  
 
 
 //most requested
 const fetchMostRequestedBooks = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostrequestedbooks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+
       },
+      body:JSON.stringify({startDate, endDate})
     });
 
     if (!response.ok) {
@@ -1126,7 +1153,7 @@ const fetchMostRequestedBooks = async () => {
 
     const data = await response.json();
     setMostRequestedBooks(data)
-    console.log (mostrequestedbooks)
+    console.log (data)
   } catch (error) {
     console.error("Error fetching most requested:", error);
   }
@@ -1137,6 +1164,40 @@ const handleFilter = () => {
     fetchMostRequestedBooks ();
   } else {
     alert("Please select both start and end dates.");
+  }
+};
+//most requested media
+const fetchMostRequestedMedia = async () => {
+  try {
+
+    if (!startDate || !endDate) {
+      throw new Error("Start Date and End Date must be provided.");
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostrequestedmedia`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ startDate, endDate }), // Send the date range in the request body
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+   
+    if (Array.isArray(data)) {
+      setMostRequestedMedia(data); // Update state with the fetched data
+      console.log(data); // Log the response for debugging
+    } else {
+      throw new Error("Unexpected data format received.");
+    }
+  } catch (error) {
+  
+    console.error("Error fetching most requested:", error);
   }
 };
 
@@ -1157,7 +1218,7 @@ const handleFilter = () => {
             data.map((item, idx) => (
               <tr key={idx}>
                 {columns.map((col) => (
-                  <td key={col}>{(item as any)[col.toLowerCase()] || "N/A"}</td>
+                  <td key={col}>{(item as any)[col] || "N/A"}</td>
                 ))}
               </tr>
             ))
@@ -1188,8 +1249,9 @@ const handleFilter = () => {
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
 
-    fetchAvailableBookCopies ();
+   
     fetchMostRequestedBooks ();
+    fetchMostRequestedMedia ();
   }, []);
 
   const handleSignOut = () => {
@@ -1818,15 +1880,15 @@ const handleFilter = () => {
                 </button>
               </div>
               {renderTable(
-                "AvailableBookCopies",
-                availableBookCopies|| [],
-                ["bTitle","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
+                "Most Borrowed Books",
+                mostBooksBorrowed|| [],
+                ["bTitle","bAuthor", "publisher", "genre", "edition", "ISBN", ]
               )}
               
               {renderTable(
                 "Most Requested Books",
                 mostrequestedbooks || [],
-                ["bTitle","userID","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
+                ["bTitle","userID","bAuthor", "publisher", "genre", "edition", "ISBN", "requestCount"]
               )}
               {renderTable(
                 "Most and Least Borrowed Books",
@@ -1873,8 +1935,8 @@ const handleFilter = () => {
                   </div>
               {renderTable(
                 "Most Requested Media",
-                reports.mostBorrowedMedia || [],
-                ["Title", "User", "Author"]
+                mostrequestedmedia || [],
+                ["mTitle", "userID", "MediaID", "mAuthor", "publisher", "genre", "edition"]
               )}
               {renderTable(
                 "List of Available Media Copies",
