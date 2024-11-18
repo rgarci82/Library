@@ -1,15 +1,19 @@
 In the frontend directory, do 'npm i' in the terminal
 
 cd frontend
+
 npm i
 
 then, do 'npm run dev'
 
 
+
 In the backend directory, do 'npm i' in the terminal
 
 cd backend
+
 npm i
+
 
 then, do 'npm run dev'
 
