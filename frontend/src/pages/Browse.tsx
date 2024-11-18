@@ -412,7 +412,7 @@ const BrowsePage: React.FC = () => {
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
 
-          await response.json(); // Parse JSON after fetch completes
+          const result = await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
             toast.success('Book held successfully', {
@@ -426,9 +426,21 @@ const BrowsePage: React.FC = () => {
               theme: "light",
               transition: Bounce,
             });
+            fetchAllBooks();
           }
-
-          fetchAllBooks();
+          else {
+            toast.error(result.error || 'An error occurred while borrowing the book', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
@@ -453,7 +465,7 @@ const BrowsePage: React.FC = () => {
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
 
-          await response.json(); // Parse JSON after fetch completes
+          const result = await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
             toast.success('Media held successfully', {
@@ -467,8 +479,21 @@ const BrowsePage: React.FC = () => {
               theme: "light",
               transition: Bounce,
             });
+            fetchAllMedia();
           }
-          fetchAllMedia();
+          else {
+            toast.error(result.error || 'An error occurred while borrowing the media', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
@@ -493,7 +518,7 @@ const BrowsePage: React.FC = () => {
             body: JSON.stringify({ userData, selectedHoldItem }), // Send book as JSON
           });
 
-          await response.json(); // Parse JSON after fetch completes
+          const result = await response.json(); // Parse JSON after fetch completes
 
           if (response.ok) {
             toast.success('Device held successfully', {
@@ -507,8 +532,21 @@ const BrowsePage: React.FC = () => {
               theme: "light",
               transition: Bounce,
             });
+            fetchAllDevices();
           }
-          fetchAllDevices();
+          else {
+            toast.error(result.error || 'An error occurred while borrowing the device', {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
         } catch (error) {
           toast.error(`Error: ${error}`, {
             position: "top-right",
