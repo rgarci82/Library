@@ -138,6 +138,23 @@ interface ReportData {
   requestDuration?: string;
 }
 
+interface AvailableBookCopies{
+  bTitle?: string;  
+  
+  bAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  ISBN?: string;
+}
+
+interface MostRequestedBooks{
+  bTitle?: string;
+  userID?: number; 
+  bAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  ISBN?: string;
+}
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -207,8 +224,8 @@ const AdminDashboard = () => {
   const [selectedRequestID, setSelectedRequestID] = useState<number | null>(null);
   const [quantityRequestBook, setQuantityRequestBook] = useState<number | "">(1);
   const [quantityRequestMedia, setQuantityRequestMedia] = useState<number | "">(1);
-
-
+  const [availableBookCopies, setAvailableBookCopies] = useState<AvailableBookCopies[]>([]);
+  const [mostrequestedbooks, setMostRequestedBooks] = useState<MostRequestedBooks[]>([]);
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuantity(value === "" ? "" : Number(value));
@@ -1068,31 +1085,63 @@ const AdminDashboard = () => {
     await fetchMedia();
   };
 
-  const fetchReports = async () => {
-    setLoading(true);
+  
 
-    try {
-      const response = await fetch(
-        `/api/admin-reports?startDate=${startDate?.toISOString()}&endDate=${endDate?.toISOString()}`
-      );
-      const data = await response.json();
-      setReports(data);
-    } catch (error) {
-      console.error("Error fetching reports:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+// Bookreport 
+const fetchAvailableBookCopies = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/available-books`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  const handleFilter = () => {
-    if (startDate && endDate) {
-      fetchReports();
-    } else {
-      alert("Please select both start and end dates.");
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+    setAvailableBookCopies(data)
+    console.log (availableBookCopies)
+  } catch (error) {
+    console.error("Error fetching available book copies:", error);
+  }
+};
+
+
+//most requested
+const fetchMostRequestedBooks = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setMostRequestedBooks(data)
+    console.log (mostrequestedbooks)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+
+const handleFilter = () => {
+  if (startDate && endDate) {
+    fetchMostRequestedBooks ();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
 
   const renderTable = (title: string, data: ReportData[], columns: string[]) => (
+
     <div className="report-section">
       <h2>{title}</h2>
       <table className="report-table">
@@ -1138,6 +1187,9 @@ const AdminDashboard = () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
+
+    fetchAvailableBookCopies ();
+    fetchMostRequestedBooks ();
   }, []);
 
   const handleSignOut = () => {
@@ -1766,19 +1818,15 @@ const AdminDashboard = () => {
                 </button>
               </div>
               {renderTable(
+                "AvailableBookCopies",
+                availableBookCopies|| [],
+                ["bTitle","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
+              )}
+              
+              {renderTable(
                 "Most Requested Books",
-                reports.mostBorrowedBooks || [],
-                ["Title", "User", "Author"]
-              )}
-              {renderTable(
-                "List of Available Book Copies",
-                reports.availableBookCopies || [],
-                ["Title", "CopiesAvailable"]
-              )}
-              {renderTable(
-                "Currently Borrowed Books with Users",
-                reports.currentlyBorrowedBooks || [],
-                ["Title", "User"]
+                mostrequestedbooks || [],
+                ["bTitle","userID","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
               )}
               {renderTable(
                 "Most and Least Borrowed Books",
@@ -1943,6 +1991,11 @@ const AdminDashboard = () => {
                 "Most Active Borrowers",
                 reports.mostActiveBorrowers || [],
                 ["User", "BorrowedCount"]
+              )}
+              {renderTable(
+                "Available Book Copies",
+                reports.availableBookCopies || [],
+                ["bTitle", "bAuthor", "publisher", "genre", "edition", "ISBN"]
               )}
               {renderTable(
                 "Users with Most Overdue Items",
