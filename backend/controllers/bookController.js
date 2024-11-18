@@ -273,12 +273,13 @@ export async function holdBook(req, res) {
       message: "Book on hold successfully",
     });
   } catch (error) {
-    console.error("Error occured:", error);
-    return {
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    };
+    // Check if it's the custom trigger error
+    if (error.code === 'ER_SIGNAL_EXCEPTION') {
+        res.status(400).json({ error: error.sqlMessage });
+    } else {
+        // Handle other errors
+        res.status(500).json({ error: 'An unexpected error occurred' });
+    }
   }
 }
 

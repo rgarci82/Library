@@ -6,37 +6,54 @@ import '../components/Header.css'
 import '../components/SearchBar.css'
 import { jwtDecode } from 'jwt-decode';
 
+interface JwtPayload {
+    id: number;
+}
+
 const Home: React.FC = () => {
     const [inputText, setInputText] = useState<string>("")
     const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [userData, setUserData] = useState<any>(null);
+
 
     const navigate = useNavigate()
 
-    function isTokenExpired(token: string) {
+    const fetchUserData = async () => {
         try {
-            const decoded = jwtDecode(token);
-            if (!decoded.exp) return true; // No expiration field, consider it expired
+            const token = localStorage.getItem("token");
+            if (!token) {
+                return;
+            }
 
-            // Check if the current time is past the token expiration time
-            const currentTime = Date.now() / 1000;
-            return decoded.exp < currentTime;
+            const decoded: JwtPayload | null = jwtDecode(token); // Decode the token
+            if (!decoded || !decoded.id) throw new Error("Invalid token or ID not found");
+
+            // Fetch user data
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch user data");
+
+            const userData = await response.json();
+            setUserData(userData);
+            setIsLoggedIn(true)
+
+            if (!userData.userID) {
+                console.error("User data is not available.");
+                return; // Return early if userID is undefined
+            }
         } catch (error) {
-            // Invalid token format
-            return true;
+            console.error("Error:", error);
         }
-    }
+    };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setIsLoggedIn(false);
-        }
-        else if (isTokenExpired(token)) {
-            setIsLoggedIn(false);
-        }
-        else {
-            setIsLoggedIn(true);
-        }
+        fetchUserData();
     }, [])
 
 
@@ -51,7 +68,7 @@ const Home: React.FC = () => {
                         </li>
                         {isLoggedIn ? (
                             <li className='nav__list'>
-                                <Link to={localStorage.getItem('isAdmin') === 'True' ? '/adminDashboard' : '/user'} className='nav__link nav__link--primary'>Profile</Link>
+                                <Link to={userData.userType === 'Admin' ? '/adminDashboard' : '/user'} className='nav__link nav__link--primary'>Profile</Link>
                             </li>
                         ) : (
                             <>
