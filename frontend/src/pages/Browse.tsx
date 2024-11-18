@@ -157,6 +157,7 @@ const BrowsePage: React.FC = () => {
   const fetchBookCopies = async (ISBN: string, book: Book) => {
     if (!userData) {
       navigate('/login')
+      return;
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
@@ -186,6 +187,7 @@ const BrowsePage: React.FC = () => {
   const fetchMediaCopies = async (MediaID: number, media: Media) => {
     if (!userData) {
       navigate('/login')
+      return;
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
@@ -215,6 +217,7 @@ const BrowsePage: React.FC = () => {
   const fetchDeviceAvailability = async (serialNumber: string, device: Device) => {
     if (!userData) {
       navigate('/login')
+      return;
     }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/${serialNumber}/getDeviceAvailability`, {
