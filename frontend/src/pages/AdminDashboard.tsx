@@ -138,21 +138,21 @@ interface ReportData {
   requestDuration?: string;
 }
 
-interface AvailableBookCopies{
-  bTitle?: string;  
-  
+interface AvailableBookCopies {
+  bTitle?: string;
+
   bAuthor?: string;
   publisher?: string;
-  genre?:string;
+  genre?: string;
   ISBN?: string;
 }
 
-interface MostRequestedBooks{
+interface MostRequestedBooks {
   bTitle?: string;
-  userID?: number; 
+  userID?: number;
   bAuthor?: string;
   publisher?: string;
-  genre?:string;
+  genre?: string;
   ISBN?: string;
 }
 const AdminDashboard = () => {
@@ -1086,81 +1086,81 @@ const AdminDashboard = () => {
     await fetchMedia();
   };
 
-  
 
-// Bookreport 
-const fetchAvailableBookCopies = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/available-books`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+  // Bookreport 
+  const fetchAvailableBookCopies = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/available-books`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAvailableBookCopies(data)
+      //console.log(availableBookCopies)
+    } catch (error) {
+      console.error("Error fetching available book copies:", error);
     }
-
-    const data = await response.json();
-    setAvailableBookCopies(data)
-    console.log (availableBookCopies)
-  } catch (error) {
-    console.error("Error fetching available book copies:", error);
-  }
-};
+  };
 
 
-// //most requested
-// const fetchMostRequestedBooks = async () => {
-//   try {
-//     const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     });
+  // //most requested
+  // const fetchMostRequestedBooks = async () => {
+  //   try {
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/mostrequestedbooks`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
 
-//     if (!response.ok) {
-//       throw new Error(`HTTP Error: ${response.status}`);
-//     }
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP Error: ${response.status}`);
+  //     }
 
-//     const data = await response.json();
-//     setMostRequestedBooks(data)
-//     console.log (mostrequestedbooks)
-//   } catch (error) {
-//     console.error("Error fetching most requested:", error);
-//   }
-// };
+  //     const data = await response.json();
+  //     setMostRequestedBooks(data)
+  //     console.log (mostrequestedbooks)
+  //   } catch (error) {
+  //     console.error("Error fetching most requested:", error);
+  //   }
+  // };
 
-const fetchMostActiveBorrowers = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/getActiveBorrowers`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const fetchMostActiveBorrowers = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/report/getActiveBorrowers`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMostActiveBorrows(data)
+      console.log(data)
+    } catch (error) {
+      console.error("Error fetching most requested:", error);
     }
+  };
 
-    const data = await response.json();
-    setMostActiveBorrows(data)
-    console.log (data)
-  } catch (error) {
-    console.error("Error fetching most requested:", error);
-  }
-};
-
-const handleFilter = () => {
-  if (startDate && endDate) {
-    // fetchMostRequestedBooks ();
-  } else {
-    alert("Please select both start and end dates.");
-  }
-};
+  const handleFilter = () => {
+    if (startDate && endDate) {
+      // fetchMostRequestedBooks ();
+    } else {
+      alert("Please select both start and end dates.");
+    }
+  };
 
   const renderTable = (title: string, data: ReportData[], columns: string[]) => (
 
@@ -1201,7 +1201,7 @@ const handleFilter = () => {
     fetchBookRequests();
     fetchMediaRequests();
     fetchDeviceRequests();
-    fetchTotalFineAmount();
+    //fetchTotalFineAmount();
     fetchMonthlyRegistrations();
     fetchMonthlyBookBorrow();
     fetchMonthlyBookRequest();
@@ -1209,7 +1209,7 @@ const handleFilter = () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
-    fetchAvailableBookCopies ();
+    fetchAvailableBookCopies();
     // fetchMostRequestedBooks ();
     fetchMostActiveBorrowers();
   }, []);
@@ -1820,222 +1820,222 @@ const handleFilter = () => {
         )}
 
         {activeTab === "bookReports" && (
-            <>
-              <div className="filter-section">
-                <label>Select Date Range:</label>
-                <div className="date-pickers">
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    placeholderText="Start Date"
-                  />
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    placeholderText="End Date"
-                  />
-                </div>
-                <button className="filter-button" onClick={handleFilter}>
-                  Filter
-                </button>
+          <>
+            <div className="filter-section">
+              <label>Select Date Range:</label>
+              <div className="date-pickers">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  placeholderText="Start Date"
+                />
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  placeholderText="End Date"
+                />
               </div>
-              {renderTable(
-                "AvailableBookCopies",
-                availableBookCopies|| [],
-                ["bTitle","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
-              )}
-              
-              {renderTable(
-                "Most Requested Books",
-                mostrequestedbooks || [],
-                ["bTitle","userID","bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
-              )}
-              {renderTable(
-                "Most and Least Borrowed Books",
-                reports.borrowedBooksStats || [],
-                ["Title", "BorrowedCount"]
-              )}
-              {renderTable(
-                "Fulfilled and Unfulfilled Book Requests",
-                reports.bookRequestsStatus || [],
-                ["Title", "User", "RequestedCount"]
-              )}
-              {renderTable(
-                "Books on Hold with Users",
-                reports.booksOnHold || [],
-                ["Title", "User", "OnHoldDuration"]
-              )}
-              {renderTable(
-                "Request to Fulfillment Duration for Books",
-                reports.bookRequestDuration || [],
-                ["Title", "RequestDuration"]
-              )}
-            </>
-          )}
+              <button className="filter-button" onClick={handleFilter}>
+                Filter
+              </button>
+            </div>
+            {renderTable(
+              "AvailableBookCopies",
+              availableBookCopies || [],
+              ["bTitle", "bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
+            )}
 
-          {activeTab === "mediaReports" && (
-            <>
-                  <div className="filter-section">
-                    <label>Select Date Range:</label>
-                    <div className="date-pickers">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        placeholderText="Start Date"
-                      />
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        placeholderText="End Date"
-                      />
-                    </div>
-                    <button className="filter-button" onClick={handleFilter}>
-                      Filter
-                    </button>
-                  </div>
-              {renderTable(
-                "Most Requested Media",
-                reports.mostBorrowedMedia || [],
-                ["Title", "User", "Author"]
-              )}
-              {renderTable(
-                "List of Available Media Copies",
-                reports.availableMediaCopies || [],
-                ["Title", "CopiesAvailable"]
-              )}
-              {renderTable(
-                "Currently Borrowed Media with Users",
-                reports.currentlyBorrowedMedia || [],
-                ["Title", "User"]
-              )}
-              {renderTable(
-                "Most and Least Borrowed Media",
-                reports.borrowedMediaStats || [],
-                ["Title", "BorrowedCount"]
-              )}
-              {renderTable(
-                "Fulfilled and Unfulfilled Media Requests",
-                reports.mediaRequestsStatus || [],
-                ["Title", "User", "RequestedCount"]
-              )}
-              {renderTable(
-                "Media on Hold with Users",
-                reports.mediaOnHold || [],
-                ["Title", "User", "OnHoldDuration"]
-              )}
-              {renderTable(
-                "Request to Fulfillment Duration for Media",
-                reports.mediaRequestDuration || [],
-                ["Title", "RequestDuration"]
-              )}
-            </>
-          )}
+            {renderTable(
+              "Most Requested Books",
+              mostrequestedbooks || [],
+              ["bTitle", "userID", "bAuthor", "b.publisher", "b.genre", "b.edition", "b.ISBN"]
+            )}
+            {renderTable(
+              "Most and Least Borrowed Books",
+              reports.borrowedBooksStats || [],
+              ["Title", "BorrowedCount"]
+            )}
+            {renderTable(
+              "Fulfilled and Unfulfilled Book Requests",
+              reports.bookRequestsStatus || [],
+              ["Title", "User", "RequestedCount"]
+            )}
+            {renderTable(
+              "Books on Hold with Users",
+              reports.booksOnHold || [],
+              ["Title", "User", "OnHoldDuration"]
+            )}
+            {renderTable(
+              "Request to Fulfillment Duration for Books",
+              reports.bookRequestDuration || [],
+              ["Title", "RequestDuration"]
+            )}
+          </>
+        )}
 
-          {activeTab === "deviceReports" && (
-            <>
-                  <div className="filter-section">
-                    <label>Select Date Range:</label>
-                    <div className="date-pickers">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        placeholderText="Start Date"
-                      />
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        placeholderText="End Date"
-                      />
-                    </div>
-                    <button className="filter-button" onClick={handleFilter}>
-                      Filter
-                    </button>
-                  </div>
-              {renderTable(
-                "Most Requested Devices",
-                reports.mostBorrowedDevices || [],
-                ["Title", "User", "Brand"]
-              )}
-              {renderTable(
-                "List of Available Devices",
-                reports.availableDeviceCopies || [],
-                ["Title", "Serial Number"]
-              )}
-              {renderTable(
-                "Currently Borrowed Devices with Users",
-                reports.currentlyBorrowedDevices || [],
-                ["Title", "User"]
-              )}
-              {renderTable(
-                "Most and Least Borrowed Devices",
-                reports.borrowedDevicesStats || [],
-                ["Title", "BorrowedCount"]
-              )}
-              {renderTable(
-                "Fulfilled and Unfulfilled Device Requests",
-                reports.deviceRequestsStatus || [],
-                ["Title", "User", "RequestedCount"]
-              )}
-              {renderTable(
-                "Devices on Hold with Users",
-                reports.devicesOnHold || [],
-                ["Title", "User", "OnHoldDuration"]
-              )}
-              {renderTable(
-                "Request to Fulfillment Duration for Devices",
-                reports.deviceRequestDuration || [],
-                ["Title", "RequestDuration"]
-              )}
-            </>
-          )}
+        {activeTab === "mediaReports" && (
+          <>
+            <div className="filter-section">
+              <label>Select Date Range:</label>
+              <div className="date-pickers">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  placeholderText="Start Date"
+                />
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  placeholderText="End Date"
+                />
+              </div>
+              <button className="filter-button" onClick={handleFilter}>
+                Filter
+              </button>
+            </div>
+            {renderTable(
+              "Most Requested Media",
+              reports.mostBorrowedMedia || [],
+              ["Title", "User", "Author"]
+            )}
+            {renderTable(
+              "List of Available Media Copies",
+              reports.availableMediaCopies || [],
+              ["Title", "CopiesAvailable"]
+            )}
+            {renderTable(
+              "Currently Borrowed Media with Users",
+              reports.currentlyBorrowedMedia || [],
+              ["Title", "User"]
+            )}
+            {renderTable(
+              "Most and Least Borrowed Media",
+              reports.borrowedMediaStats || [],
+              ["Title", "BorrowedCount"]
+            )}
+            {renderTable(
+              "Fulfilled and Unfulfilled Media Requests",
+              reports.mediaRequestsStatus || [],
+              ["Title", "User", "RequestedCount"]
+            )}
+            {renderTable(
+              "Media on Hold with Users",
+              reports.mediaOnHold || [],
+              ["Title", "User", "OnHoldDuration"]
+            )}
+            {renderTable(
+              "Request to Fulfillment Duration for Media",
+              reports.mediaRequestDuration || [],
+              ["Title", "RequestDuration"]
+            )}
+          </>
+        )}
 
-          {activeTab === "userReports" && (
-            <>
-                  <div className="filter-section">
-                    <label>Select Date Range:</label>
-                    <div className="date-pickers">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        placeholderText="Start Date"
-                      />
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        placeholderText="End Date"
-                      />
-                    </div>
-                    <button className="filter-button" onClick={handleFilter}>
-                      Filter
-                    </button>
-                  </div>
-              {renderTable(
-                "Most Active Borrowers",
-                reports.mostActiveBorrowers || [],
-                ["User", "BorrowedCount"]
-              )}
-              {renderTable(
-                "Available Book Copies",
-                reports.availableBookCopies || [],
-                ["bTitle", "bAuthor", "publisher", "genre", "edition", "ISBN"]
-              )}
-              {renderTable(
-                "Users with Most Overdue Items",
-                reports.usersWithMostOverdue || [],
-                ["User", "OverdueCount"]
-              )}
-              {renderTable(
-                "Users with Current Fines",
-                reports.usersWithFines || [],
-                ["User", "FineAmount"]
-              )}
-              {renderTable(
-                "Users with Unpaid Fines",
-                reports.usersWithUnpaidFines || [],
-                ["User", "FineAmount"]
-              )}
-            </>
-          )}
+        {activeTab === "deviceReports" && (
+          <>
+            <div className="filter-section">
+              <label>Select Date Range:</label>
+              <div className="date-pickers">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  placeholderText="Start Date"
+                />
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  placeholderText="End Date"
+                />
+              </div>
+              <button className="filter-button" onClick={handleFilter}>
+                Filter
+              </button>
+            </div>
+            {renderTable(
+              "Most Requested Devices",
+              reports.mostBorrowedDevices || [],
+              ["Title", "User", "Brand"]
+            )}
+            {renderTable(
+              "List of Available Devices",
+              reports.availableDeviceCopies || [],
+              ["Title", "Serial Number"]
+            )}
+            {renderTable(
+              "Currently Borrowed Devices with Users",
+              reports.currentlyBorrowedDevices || [],
+              ["Title", "User"]
+            )}
+            {renderTable(
+              "Most and Least Borrowed Devices",
+              reports.borrowedDevicesStats || [],
+              ["Title", "BorrowedCount"]
+            )}
+            {renderTable(
+              "Fulfilled and Unfulfilled Device Requests",
+              reports.deviceRequestsStatus || [],
+              ["Title", "User", "RequestedCount"]
+            )}
+            {renderTable(
+              "Devices on Hold with Users",
+              reports.devicesOnHold || [],
+              ["Title", "User", "OnHoldDuration"]
+            )}
+            {renderTable(
+              "Request to Fulfillment Duration for Devices",
+              reports.deviceRequestDuration || [],
+              ["Title", "RequestDuration"]
+            )}
+          </>
+        )}
+
+        {activeTab === "userReports" && (
+          <>
+            <div className="filter-section">
+              <label>Select Date Range:</label>
+              <div className="date-pickers">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  placeholderText="Start Date"
+                />
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  placeholderText="End Date"
+                />
+              </div>
+              <button className="filter-button" onClick={handleFilter}>
+                Filter
+              </button>
+            </div>
+            {renderTable(
+              "Most Active Borrowers",
+              reports.mostActiveBorrowers || [],
+              ["User", "BorrowedCount"]
+            )}
+            {renderTable(
+              "Available Book Copies",
+              reports.availableBookCopies || [],
+              ["bTitle", "bAuthor", "publisher", "genre", "edition", "ISBN"]
+            )}
+            {renderTable(
+              "Users with Most Overdue Items",
+              reports.usersWithMostOverdue || [],
+              ["User", "OverdueCount"]
+            )}
+            {renderTable(
+              "Users with Current Fines",
+              reports.usersWithFines || [],
+              ["User", "FineAmount"]
+            )}
+            {renderTable(
+              "Users with Unpaid Fines",
+              reports.usersWithUnpaidFines || [],
+              ["User", "FineAmount"]
+            )}
+          </>
+        )}
       </div>
     </div >
   );

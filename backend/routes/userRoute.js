@@ -37,5 +37,5 @@ route.get("/users/:userID/mediaHold", getUsermediaHold);
 route.get("/users/:userID/deviceHold", getUserdeviceHold);
 route.get("/user-registrations", getMonthlyUserRegistrations);
 route.get("/totalFineAmount", getTotalFineAmount);
-route.get("/users/getActiveBorrowers", activeBorrowers);
+route.get("/users/report/getActiveBorrowers", activeBorrowers);
 export default route;

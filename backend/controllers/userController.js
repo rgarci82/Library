@@ -369,27 +369,27 @@ export async function getTotalFineAmount(req, res) {
 
 export async function activeBorrowers(req, res) {
   try{
-  const [activeBorrowers] = await db.query(`
-    SELECT 
-    u.userId AS User, 
-    COUNT(borrow.borrowID) AS BorrowedCount
-FROM users u
-LEFT JOIN (
-    SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
-    UNION ALL
-    SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
-    UNION ALL
-    SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
-) borrow ON u.userId = borrow.userId
-GROUP BY u.userId
-ORDER BY BorrowedCount DESC
-LIMIT 10;
-  `);
-  console.log (activeBorrowers)
-  res.json(activeBorrowers)
-  }catch(error){console.error("Error fetch fine amounts");
+    const [activeBorrowers] = await pool.query(`
+        SELECT 
+        u.userId AS User, 
+        COUNT(borrow.borrowID) AS BorrowedCount
+    FROM users u
+    LEFT JOIN (
+        SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
+        UNION ALL
+        SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
+        UNION ALL
+        SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
+    ) borrow ON u.userId = borrow.userId
+    GROUP BY u.userId
+    ORDER BY BorrowedCount DESC
+    LIMIT 10;
+    `);
+    res.json(activeBorrowers)
+  }catch(error){
+    console.error("Error fetch fine amounts");
     res.status(500).json({ message: "Internal server error" });
-}
+    }
 }
 
 //    // Query for Users with Current Fines
