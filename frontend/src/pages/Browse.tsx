@@ -155,6 +155,9 @@ const BrowsePage: React.FC = () => {
   }
 
   const fetchBookCopies = async (ISBN: string, book: Book) => {
+    if (!userData) {
+      navigate('/login')
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
         method: 'GET',
@@ -181,6 +184,9 @@ const BrowsePage: React.FC = () => {
   }
 
   const fetchMediaCopies = async (MediaID: number, media: Media) => {
+    if (!userData) {
+      navigate('/login')
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
         method: 'GET',
@@ -207,6 +213,9 @@ const BrowsePage: React.FC = () => {
   }
 
   const fetchDeviceAvailability = async (serialNumber: string, device: Device) => {
+    if (!userData) {
+      navigate('/login')
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/devices/${serialNumber}/getDeviceAvailability`, {
         method: 'GET',
@@ -234,9 +243,6 @@ const BrowsePage: React.FC = () => {
 
   const borrowBook = async (book: Book) => {
     try {
-      if (!userData) {
-        navigate('/login')
-      }
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/borrow`, {
         method: 'POST',
         headers: {
