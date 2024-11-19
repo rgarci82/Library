@@ -150,6 +150,31 @@ export async function postMostBooksBorrowed(req, res) {
   }
 }
 
+//All requested books (approved)
+export async function postAllBookRequested(req, res) {
+  try {
+
+    const { startDate, endDate } = req.body;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+    const [allbooksrequested] = await pool.query(`
+      SELECT ISBN,userID, bTitle, bAuthor, publisher, genre, edition, requestDate
+             FROM bookrequest 
+             WHERE requestDate BETWEEN '2024-11-10'
+ AND '2024-11-16' 
+ AND status = "approved"
+    `, [startDate, endDate]);
+
+    // Send the response with the result
+    res.json(allbooksrequested);
+  } catch (error) {
+    console.error("Error fetching most requested books:", error);
+    res.status(500).json({ error: "Failed to fetch most requested books" });
+  }
+}
 
 //most requested book
 export async function postMostRequestedBooks(req, res) {
@@ -178,6 +203,7 @@ LIMIT 10
     res.status(500).json({ error: "Failed to fetch most requested books" });
   }
 }
+
 
 
 //All media borrowed 
@@ -238,6 +264,31 @@ export async function postMostMediaBorrowed(req, res) {
   }
 }
 
+//All requested media (approved)
+export async function postAllMediaRequested(req, res) {
+  try {
+
+    const { startDate, endDate } = req.body;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+    const [allmediarequested] = await pool.query(`
+      SELECT  mTitle, userID, MediaID, mAuthor, publisher, genre, edition
+             FROM mediarequest 
+             WHERE requestDate BETWEEN '2024-11-10'
+ AND '2024-11-16' 
+ AND status = "approved"
+    `, [startDate, endDate]);
+
+    // Send the response with the result
+    res.json(allmediarequested);
+  } catch (error) {
+    console.error("Error fetching most requested books:", error);
+    res.status(500).json({ error: "Failed to fetch most requested books" });
+  }
+}
 //most requested media
 export async function postMostRequestedMedia(req, res) {
   try {

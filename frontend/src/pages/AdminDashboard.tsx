@@ -164,6 +164,15 @@ interface AllBorrowedMedia{
   edition?: number;
   dueDate?: Date;
 }
+interface AllRequestedBooks{
+  bTitle?: string;
+  userID?: number; 
+  bAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  ISBN?: string;
+  requestDate?: Date;
+}
 interface MostRequestedBooks{
   bTitle?: string;
   userID?: number; 
@@ -184,8 +193,18 @@ interface MostBorrowededMedia{
   edition?: number;
  
 }
-
 interface MostRequestedMedia{
+  mTitle?: string;
+  userID?: number; 
+  mediaID?: number;
+  mAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  edition?: number;
+
+}
+
+interface AllRequestedMedia{
   mTitle?: string;
   userID?: number; 
   mediaID?: number;
@@ -266,9 +285,11 @@ const AdminDashboard = () => {
   const [quantityRequestMedia, setQuantityRequestMedia] = useState<number | "">(1);
   const [allbooksborrowed, setAllBooksBorrowed] = useState<AllBorrowedBooks[]>([]);
   const [mostbooksborrowed, setMostBooksBorrowed] = useState<MostBooksBorrowed[]>([]);
+  const [allrequestedbooks, setAllRequestedBooks] = useState<AllRequestedBooks[]>([]);
   const [mostrequestedbooks, setMostRequestedBooks] = useState<MostRequestedBooks[]>([]);
   const [allmediaborrowed, setAllMediaBorrowed] = useState<AllBorrowedMedia[]>([]);
   const [mostmediaborrowed, setMostMediaBorrowed] = useState<MostBorrowededMedia[]>([]);
+  const [allrequestedmedia, setAllRequestedMedia] = useState<AllRequestedMedia[]>([]);
   const [mostrequestedmedia, setMostRequestedMedia] = useState<MostRequestedMedia[]>([]);
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -1189,6 +1210,40 @@ const handleFilterbb = () => {
     alert("Please select both start and end dates.");
   }
 };
+
+//all requested books
+const fetchAllRequestedBooks = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/allrequestedbooks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+
+      },
+      body:JSON.stringify({startDate, endDate})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setAllRequestedBooks(data)
+    console.log (data)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+
+const handleFilterar = () => {
+  if (startDate && endDate) {
+    fetchAllRequestedBooks();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
+
+
 //most requested books
 const fetchMostRequestedBooks = async () => {
   try {
@@ -1311,6 +1366,39 @@ const fetchMostRequestedMedia = async () => {
   }
 };
 
+//all requested media
+const fetchAllRequestedMedia = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/allrequestedmedia`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+
+      },
+      body:JSON.stringify({startDate, endDate})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setAllRequestedMedia(data)
+    console.log (data)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+
+const handleFiltermr = () => {
+  if (startDate && endDate) {
+    fetchAllRequestedMedia();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
+
+
 const handleFiltermedia = () => {
   if (startDate && endDate) {
     fetchMostRequestedMedia ();
@@ -1371,6 +1459,8 @@ const handleFiltermedia = () => {
     fetchAllMediaBorrowed ();
     fetchMostBorrowedMedia ();
     fetchMostRequestedMedia ();
+    fetchAllRequestedBooks ();
+    fetchAllRequestedMedia ();
   }, []);
 
   const handleSignOut = () => {
@@ -1995,6 +2085,7 @@ const handleFiltermedia = () => {
                   />
                 </div>
                 <button className="filter-button" onClick={handleFilterabb}></button>
+                <button className="filter-button" onClick={handleFilterar}></button>
                 <button className="filter-button" onClick={handleFilter}>
                 <button className="filter-button" onClick={handleFilterbb}></button>
                 
@@ -2011,17 +2102,18 @@ const handleFiltermedia = () => {
                 mostbooksborrowed|| [],
                 ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
               )}
+              {renderTable(
+                "All Approved Book Requestes",
+                allrequestedbooks || [],
+                ["bTitle","userID","bAuthor", "publisher", "genre", "edition", "ISBN","requestDate"]
+              )}
               
               {renderTable(
                 "Most Requested Books",
                 mostrequestedbooks || [],
                 ["bTitle","userID","bAuthor", "publisher", "genre", "edition", "ISBN", "requestCount"]
               )}
-              {renderTable(
-                "Most and Least Borrowed Books",
-                reports.borrowedBooksStats || [],
-                ["Title", "BorrowedCount"]
-              )}
+              
               {renderTable(
                 "Fulfilled and Unfulfilled Book Requests",
                 reports.bookRequestsStatus || [],
@@ -2058,6 +2150,7 @@ const handleFiltermedia = () => {
                     </div>
                     <button className="filter-button" onClick={handleFilteramb}></button>
                     <button className="filter-button" onClick={handleFiltermedia}>
+                    <button className="filter-button" onClick={handleFiltermr}></button>  
                     <button className="filter-button" onClick={handleFiltermb}></button>
                       Filter
                     </button>
@@ -2071,6 +2164,11 @@ const handleFiltermedia = () => {
                 "Most Borrowed Media",
                 mostmediaborrowed || [],
                 ["mTitle", "userID", "MediaID", "mAuthor", "publisher", "genre", "edition"]
+              )}
+              {renderTable(
+                "All Approved Media Requests",
+                allrequestedmedia|| [],
+                ["mTitle", "userID", "MediaID", "mAuthor", "publisher", "genre", "edition", "requestDate"]
               )}
               {renderTable(
                 "Most Requested Media",
