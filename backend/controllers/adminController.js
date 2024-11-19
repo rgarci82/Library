@@ -90,7 +90,36 @@ export const getAdminReport = async (req, res) => {
   }
 };
 
-//Books
+//All books borrowed 
+export async function postAllBooksBorrowed(req, res) {
+  try {
+    // Extract startDate and endDate from the request body
+    const { startDate, endDate } = req.body;
+
+    // Check if the dates are provided
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+    // Run the query to get the most borrowed books
+    const [allbooksborrowed] = await pool.query(`
+      SELECT b.ISBN, b.bTitle, b.bAuthor, b.publisher, b.genre, b.edition, bc.itemID, bb.dueDate
+             FROM bookborrowed bb
+             JOIN bookcopy bc ON bb.itemID = bc.itemID
+             JOIN book b ON bc.ISBN = b.ISBN
+             WHERE bb.borrowDate BETWEEN ?AND ?
+    `, [startDate, endDate]);
+
+    // Send the response with the result
+    res.json(allbooksborrowed);
+  } catch (error) {
+    console.error("Error fetching most borrowed books:", error);
+    res.status(500).json({ error: "Failed to fetch most borrowed books" });
+  }
+}
+
+
+//Most borrowed Books
 export async function postMostBooksBorrowed(req, res) {
   try {
     // Extract startDate and endDate from the request body
@@ -102,7 +131,7 @@ export async function postMostBooksBorrowed(req, res) {
     }
 
     // Run the query to get the most borrowed books
-    const [mostBooksBorrowed] = await pool.query(`
+    const [mostbooksborrowed] = await pool.query(`
       SELECT b.ISBN, b.bTitle, b.bAuthor, b.publisher, b.genre, b.edition, COUNT(bb.borrowID) AS borrowCount
       FROM bookborrowed bb
       JOIN bookcopy bc ON bb.itemID = bc.itemID
@@ -114,7 +143,7 @@ export async function postMostBooksBorrowed(req, res) {
     `, [startDate, endDate]);
 
     // Send the response with the result
-    res.json(mostBooksBorrowed);
+    res.json(mostbooksborrowed);
   } catch (error) {
     console.error("Error fetching most borrowed books:", error);
     res.status(500).json({ error: "Failed to fetch most borrowed books" });
@@ -122,7 +151,7 @@ export async function postMostBooksBorrowed(req, res) {
 }
 
 
-//most requested 
+//most requested book
 export async function postMostRequestedBooks(req, res) {
   try {
     const { startDate, endDate } = req.body;
@@ -150,6 +179,66 @@ LIMIT 10
   }
 }
 
+
+//All media borrowed 
+export async function postAllMediaBorrowed(req, res) {
+  try {
+
+    const { startDate, endDate } = req.body;
+
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+
+    const [allmediaborrowed] = await pool.query(`
+      SELECT m.MediaID, m.mTitle, userID,  m.mAuthor, m. publisher, m.genre, m.edition, mc.itemID, mb.dueDate
+             FROM mediaborrowed mb
+             JOIN mediacopy mc ON mb.itemID = mc.itemID
+             JOIN media m ON mc.MediaID = m.MediaID
+             WHERE mb.borrowDate BETWEEN ? AND ?
+    `, [startDate, endDate]);
+
+    res.json(allmediaborrowed);
+  } catch (error) {
+    console.error("Error fetching all borrowed media:", error);
+    res.status(500).json({ error: "Failed to fetch all borrowed media" });
+  }
+}
+
+//most borrowed media
+export async function postMostMediaBorrowed(req, res) {
+  try {
+    
+    const { startDate, endDate } = req.body;
+
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Start date and end date are required" });
+    }
+
+   
+    const [mostmediaborrowed] = await pool.query(`
+      SELECT m.MediaID, m.mTitle, m.mAuthor, m.publisher, m.genre, m.edition, COUNT(mb.borrowID) AS borrowCount
+      FROM mediaborrowed mb
+      JOIN mediacopy mc ON mb.itemID = mc.itemID
+      JOIN media m ON mc.MediaID = mc.MediaID
+      WHERE mb.borrowDate BETWEEN ? AND ?
+      GROUP BY m.MediaID, m.mTitle, m.mAuthor, m.publisher, m.genre, m.edition
+      ORDER BY borrowCount DESC
+      LIMIT 10
+    `, [startDate, endDate]);
+
+    // Send the response with the result
+    res.json(mostmediaborrowed);
+  } catch (error) {
+    console.error("Error fetching most borrowed media:", error);
+    res.status(500).json({ error: "Failed to fetch most borrowed media" });
+  }
+}
+
+//most requested media
 export async function postMostRequestedMedia(req, res) {
   try {
     const { startDate, endDate } = req.body;
@@ -176,3 +265,4 @@ export async function postMostRequestedMedia(req, res) {
     res.status(500).json({ error: "Failed to fetch most requested media" });
   }
 }
+

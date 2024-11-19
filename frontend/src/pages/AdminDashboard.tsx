@@ -137,16 +137,33 @@ interface ReportData {
   onHoldDuration?: string;
   requestDuration?: string;
 }
-
+interface AllBorrowedBooks{
+  bTitle?: string;
+  userID?: number; 
+  bAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  ISBN?: string;
+  Duedate?: Date;
+}
 interface MostBooksBorrowed{
   bTitle?: string;  
-  
+  edition?: number;
   bAuthor?: string;
   publisher?: string;
   genre?:string;
   ISBN?: string;
 }
-
+interface AllBorrowedMedia{
+  mTitle?: string;
+  userID?: number; 
+  mediaID?: number;
+  mAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  edition?: number;
+  dueDate?: Date;
+}
 interface MostRequestedBooks{
   bTitle?: string;
   userID?: number; 
@@ -155,6 +172,17 @@ interface MostRequestedBooks{
   genre?:string;
   ISBN?: string;
   requestCount?: number;
+}
+
+interface MostBorrowededMedia{
+  mTitle?: string;
+  userID?: number; 
+  mediaID?: number;
+  mAuthor?: string;
+  publisher?: string;
+  genre?:string;
+  edition?: number;
+ 
 }
 
 interface MostRequestedMedia{
@@ -236,8 +264,11 @@ const AdminDashboard = () => {
   const [selectedRequestID, setSelectedRequestID] = useState<number | null>(null);
   const [quantityRequestBook, setQuantityRequestBook] = useState<number | "">(1);
   const [quantityRequestMedia, setQuantityRequestMedia] = useState<number | "">(1);
-  const [mostBooksBorrowed, setMostBooksBorrowed] = useState<MostBooksBorrowed[]>([]);
+  const [allbooksborrowed, setAllBooksBorrowed] = useState<AllBorrowedBooks[]>([]);
+  const [mostbooksborrowed, setMostBooksBorrowed] = useState<MostBooksBorrowed[]>([]);
   const [mostrequestedbooks, setMostRequestedBooks] = useState<MostRequestedBooks[]>([]);
+  const [allmediaborrowed, setAllMediaBorrowed] = useState<AllBorrowedMedia[]>([]);
+  const [mostmediaborrowed, setMostMediaBorrowed] = useState<MostBorrowededMedia[]>([]);
   const [mostrequestedmedia, setMostRequestedMedia] = useState<MostRequestedMedia[]>([]);
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -1098,44 +1129,67 @@ const AdminDashboard = () => {
     await fetchMedia();
   };
 
-  
+    //all borrowed
+const fetchAllBooksBorrowed = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/allborrowedbooks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
 
-  const fetchMostBooksBorrowed = async (startDate: string | null, endDate: string | null) => {
-    try {
-      // Check if both startDate and endDate are provided
-      if (!startDate || !endDate) {
-        throw new Error("Start Date and End Date are required.");
-      }
-  
-      // Make a POST request with the provided date range
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostborrowedbooks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ startDate, endDate }), // Include the date range in the request body
-      });
-  
-      // Handle non-OK responses
-      if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
-      }
-  
-      // Parse the JSON response
-      const data = await response.json();
-  
-      // Update state with the fetched data (assuming you have setMostBooksBorrowed function)
-      setMostBooksBorrowed(data);
-  
-    } catch (error) {
-      // Log any errors for debugging
-      console.error("Error fetching most borrowed books:", error);
+      },
+      body:JSON.stringify({startDate, endDate})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
     }
-  };
-  
 
+    const data = await response.json();
+    setAllBooksBorrowed(data)
+    console.log (data)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+const handleFilterabb = () => {
+  if (startDate && endDate) {
+    fetchAllBooksBorrowed();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
+  //most borrowed
+const fetchMostBorrowedBooks = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostborrowedbooks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
 
-//most requested
+      },
+      body:JSON.stringify({startDate, endDate})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setMostBooksBorrowed(data)
+    console.log (data)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+const handleFilterbb = () => {
+  if (startDate && endDate) {
+    fetchMostBorrowedBooks();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
+//most requested books
 const fetchMostRequestedBooks = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostrequestedbooks`, {
@@ -1161,11 +1215,74 @@ const fetchMostRequestedBooks = async () => {
 
 const handleFilter = () => {
   if (startDate && endDate) {
-    fetchMostRequestedBooks ();
+    fetchMostRequestedBooks();
   } else {
     alert("Please select both start and end dates.");
   }
 };
+//all media borrowed
+const fetchAllMediaBorrowed = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/allborrowedmedia`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+
+      },
+      body:JSON.stringify({startDate, endDate})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setAllMediaBorrowed(data)
+    console.log (data)
+  } catch (error) {
+    console.error("Error fetching most requested:", error);
+  }
+};
+const handleFilteramb = () => {
+  if (startDate && endDate) {
+    fetchAllMediaBorrowed();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
+
+  //most borrowed media
+  const fetchMostBorrowedMedia = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/mostborrowedmedia`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+  
+        },
+        body:JSON.stringify({startDate, endDate})
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setMostMediaBorrowed(data)
+      console.log (data)
+    } catch (error) {
+      console.error("Error fetching most requested:", error);
+    }
+  };
+  const handleFiltermb = () => {
+    if (startDate && endDate) {
+      fetchMostBorrowedMedia();
+    } else {
+      alert("Please select both start and end dates.");
+    }
+  };
+
+
 //most requested media
 const fetchMostRequestedMedia = async () => {
   try {
@@ -1185,22 +1302,22 @@ const fetchMostRequestedMedia = async () => {
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
     }
-
-    const data = await response.json();
-
    
-    if (Array.isArray(data)) {
-      setMostRequestedMedia(data); // Update state with the fetched data
-      console.log(data); // Log the response for debugging
-    } else {
-      throw new Error("Unexpected data format received.");
-    }
+    const data = await response.json();
+    setMostRequestedMedia(data)
+    console.log (data)
   } catch (error) {
-  
     console.error("Error fetching most requested:", error);
   }
 };
 
+const handleFiltermedia = () => {
+  if (startDate && endDate) {
+    fetchMostRequestedMedia ();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
   const renderTable = (title: string, data: ReportData[], columns: string[]) => (
 
     <div className="report-section">
@@ -1248,9 +1365,11 @@ const fetchMostRequestedMedia = async () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
-
-   
+    fetchAllBooksBorrowed ();
+    fetchMostBorrowedBooks ();
     fetchMostRequestedBooks ();
+    fetchAllMediaBorrowed ();
+    fetchMostBorrowedMedia ();
     fetchMostRequestedMedia ();
   }, []);
 
@@ -1875,14 +1994,22 @@ const fetchMostRequestedMedia = async () => {
                     placeholderText="End Date"
                   />
                 </div>
+                <button className="filter-button" onClick={handleFilterabb}></button>
                 <button className="filter-button" onClick={handleFilter}>
+                <button className="filter-button" onClick={handleFilterbb}></button>
+                
                   Filter
                 </button>
               </div>
               {renderTable(
+                "All Currently borrowed Books",
+                allbooksborrowed || [],
+                ["bTitle","userID","bAuthor", "publisher", "genre", "edition", "ISBN", "Due date"]
+              )}
+              {renderTable(
                 "Most Borrowed Books",
-                mostBooksBorrowed|| [],
-                ["bTitle","bAuthor", "publisher", "genre", "edition", "ISBN", ]
+                mostbooksborrowed|| [],
+                ["ISBN", "bTitle", "bAuthor", "publisher", "genre", "edition"]
               )}
               
               {renderTable(
@@ -1929,10 +2056,22 @@ const fetchMostRequestedMedia = async () => {
                         placeholderText="End Date"
                       />
                     </div>
-                    <button className="filter-button" onClick={handleFilter}>
+                    <button className="filter-button" onClick={handleFilteramb}></button>
+                    <button className="filter-button" onClick={handleFiltermedia}>
+                    <button className="filter-button" onClick={handleFiltermb}></button>
                       Filter
                     </button>
                   </div>
+              {renderTable(
+                "All Currently Borrowed Media",
+                allmediaborrowed || [],
+                ["mTitle", "userID", "MediaID", "mAuthor", "publisher", "genre", "edition", "DueDate"]
+              )}
+              {renderTable(
+                "Most Borrowed Media",
+                mostmediaborrowed || [],
+                ["mTitle", "userID", "MediaID", "mAuthor", "publisher", "genre", "edition"]
+              )}
               {renderTable(
                 "Most Requested Media",
                 mostrequestedmedia || [],
