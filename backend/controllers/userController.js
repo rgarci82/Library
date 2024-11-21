@@ -369,142 +369,120 @@ export async function getTotalFineAmount(req, res) {
 
 export async function activeBorrowers(req, res) {
   try{
+    const {startDate,endDate} = req.body;
+
     const [activeBorrowers] = await pool.query(`
-        SELECT 
-        u.userId AS User, 
-        COUNT(borrow.borrowID) AS BorrowedCount
-    FROM users u
-    LEFT JOIN (
-        SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
-        UNION ALL
-        SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
-        UNION ALL
-        SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
-    ) borrow ON u.userId = borrow.userId
-    GROUP BY u.userId
-    ORDER BY BorrowedCount DESC
-    LIMIT 10;
+       SELECT 
+    u.userId AS User, 
+    COUNT(borrow.borrowID) AS BorrowedCount
+FROM users u
+LEFT JOIN (
+    SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
+    UNION ALL
+    SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
+    UNION ALL
+    SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
+) borrow ON u.userId = borrow.userId
+GROUP BY u.userId
+HAVING COUNT(borrow.borrowID) > 0
+ORDER BY BorrowedCount DESC;
     `);
+    
     res.json(activeBorrowers)
   }catch(error){
     console.error("Error fetch fine amounts");
     res.status(500).json({ message: "Internal server error" });
     }
 }
-
+//make function in controller, make route for function, use state, make fetch function, add in useEffect, display in render table 
 export async function currentFines(req, res) {
     try{
-      const [activeBorrowers] = await pool.query(`
+      const [currentFines] = await pool.query(`
     SELECT 
     u.userId AS User,
-    SUM(f.fineAmount) AS TotalFineAmount
+    SUM(fines.fineAmount) AS TotalFineAmount
 FROM users u
-LEFT JOIN fines f ON u.userId = f.userId
+LEFT JOIN (
+    SELECT userId, fineAmount FROM bookborrowed
+    UNION ALL
+    SELECT userId, fineAmount FROM mediaborrowed
+    UNION ALL
+    SELECT userId, fineAmount FROM deviceborrowed
+) fines ON u.userId = fines.userId
 GROUP BY u.userId
-ORDER BY TotalFineAmount DESC
-LIMIT 10;`);
+HAVING SUM(fines.fineAmount) IS NOT NULL
+ORDER BY TotalFineAmount DESC;
+;`);
 
-      res.json(activeBorrowers)
+      res.json(currentFines)
     }catch(error){
       console.error("Error fetch fine amounts");
       res.status(500).json({ message: "Internal server error" });
       }
   }
-//    // Query for Users with Current Fines
-//    const [currentFines] = await db.query(`
-//     SELECT 
-//       u.userId AS User, 
-//       u.userName AS UserName, 
-//       SUM(t.fineAmount) AS FineAmount
-//     FROM users u
-//     LEFT JOIN transactions t ON u.userId = t.userId
-//     WHERE t.fineAmount > 0 AND t.paymentStatus = 'unpaid'
-//     GROUP BY u.userId
-//     ORDER BY FineAmount DESC
-//     LIMIT 10;
-//   `);
+export async function mostOverdue(req, res) {
+  try {
+    const [overdueUsers] = await pool.query(`
+      SELECT 
+          u.userId AS User,
+          COUNT(overdue.borrowID) AS OverdueCount
+      FROM users u
+      LEFT JOIN (
+          SELECT userId, borrowID 
+          FROM bookborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+          UNION ALL
+          SELECT userId, borrowID 
+          FROM mediaborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+          UNION ALL
+          SELECT userId, borrowID 
+          FROM deviceborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+      ) overdue ON u.userId = overdue.userId
+      GROUP BY u.userId
+      ORDER BY OverdueCount DESC
+      LIMIT 10;
+    `);
+
+    res.json(overdueUsers);
+  } catch (error) {
+    console.error("Error fetching overdue users:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function userMostOverdue(req, res) {
+    try {
+      const [overdueUsers] = await pool.query(`
+        SELECT 
+            u.userId AS User,
+            COUNT(overdue.borrowID) AS OverdueCount
+        FROM users u
+        LEFT JOIN (
+            SELECT userId, borrowID 
+            FROM bookborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID 
+            FROM mediaborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID 
+            FROM deviceborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+        ) overdue ON u.userId = overdue.userId
+        GROUP BY u.userId
+        ORDER BY OverdueCount DESC
+        LIMIT 10;
+      `);
+  
+      res.json(overdueUsers);
+    } catch (error) {
+      console.error("Error fetching overdue users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
 
   
-//   const [mostOverdueUsers] = await db.query(`
-//     SELECT 
-//       u.userId AS User, 
-//       u.userName AS UserName, 
-//       COUNT(t.transactionId) AS OverdueCount
-//     FROM users u
-//     LEFT JOIN transactions t ON u.userId = t.userId
-//     WHERE t.status = 'overdue'
-//     GROUP BY u.userId
-//     ORDER BY OverdueCount DESC
-//     LIMIT 10;
-//   `);
-//   const getUserReports = async (req, res) => {
-//     try {
-//       // Query for Most Active Borrowers
-//       const [activeBorrowers] = await db.query(`
-//         SELECT 
-//           u.userId AS User, 
-//           u.userName AS UserName, 
-//           COUNT(t.transactionId) AS BorrowedCount
-//         FROM users u
-//         LEFT JOIN transactions t ON u.userId = t.userId
-//         WHERE t.status = 'borrowed'
-//         GROUP BY u.userId
-//         ORDER BY BorrowedCount DESC
-//         LIMIT 10;
-//       `);
-  
-//       // Query for Users with Most Overdue Items
-//       const [mostOverdueUsers] = await db.query(`
-//         SELECT 
-//           u.userId AS User, 
-//           u.userName AS UserName, 
-//           COUNT(t.transactionId) AS OverdueCount
-//         FROM users u
-//         LEFT JOIN transactions t ON u.userId = t.userId
-//         WHERE t.status = 'overdue'
-//         GROUP BY u.userId
-//         ORDER BY OverdueCount DESC
-//         LIMIT 10;
-//       `);
-  
-//       // Query for Users with Current Fines
-//       const [currentFines] = await db.query(`
-//         SELECT 
-//           u.userId AS User, 
-//           u.userName AS UserName, 
-//           SUM(t.fineAmount) AS FineAmount
-//         FROM users u
-//         LEFT JOIN transactions t ON u.userId = t.userId
-//         WHERE t.fineAmount > 0 AND t.paymentStatus = 'unpaid'
-//         GROUP BY u.userId
-//         ORDER BY FineAmount DESC
-//         LIMIT 10;
-//       `);
-  
-//       // Query for Users with Unpaid Fines
-//       const [unpaidFines] = await db.query(`
-//         SELECT 
-//           u.userId AS User, 
-//           u.userName AS UserName, 
-//           SUM(t.fineAmount) AS FineAmount
-//         FROM users u
-//         LEFT JOIN transactions t ON u.userId = t.userId
-//         WHERE t.fineAmount > 0
-//         GROUP BY u.userId
-//         ORDER BY FineAmount DESC
-//         LIMIT 10;
-//       `);
-  
-//       // Combine results
-//       res.json({
-//         mostActiveBorrowers: activeBorrowers,
-//         mostOverdueUsers: mostOverdueUsers,
-//         usersWithCurrentFines: currentFines,
-//         usersWithUnpaidFines: unpaidFines,
-//       });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send('Error fetching user reports');
-//     }
-//   };
-// }
+

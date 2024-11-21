@@ -204,16 +204,33 @@ const AdminDashboard = () => {
   const [media, setMedia] = useState<Media[]>([]);
   const [mediaRequests, setMediaRequests] = useState<MediaRequest[]>([]);
 
-  //devices
+  //devices (Userstate for devices UD\\)
   const [serialNumber, setSerialNumber] = useState("");
   const [dName, setDname] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
-
+  const [availableDevices, setAvailableDevices] = useState([]);
+  const [borrowedDevices, setBorrowedDevices] = useState([]);
+  const [borrowedDevicesList, setBorrowedDevicesList] = useState([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [deviceRequests, setDeviceRequests] = useState<DeviceRequest[]>([]);
+  const [mostRequestedDevices, setMostRequestedDevices] = useState([]);
+  const [deviceRequestList, setDeviceRequestList] = useState([]);
+  const [fulfilledUnfulfilledDRequest, setFulfilledUnfulfilledDRequest] = useState([]);
+  const [devicesOnHold, setDevicesOnHold] = useState([]);
+  const [requestFulfillmentDuration, setRequestFulfillmentDuration] = useState([]);
+
+
+
+
+  
+
   //users
   const [mostActiveBorrows, setMostActiveBorrows] = useState([])
+  const [currentFines, setCurrentFines] = useState([]);
+  const [userMostOverdue, setUserMostOverdue] = useState([]);
+
+
   //reports
   const [monthlyRegistrations, setMonthlyRegistrations] = useState<
     MonthlyRegistrationRecord[]
@@ -1048,7 +1065,7 @@ const AdminDashboard = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/totalFineAmount`,
         {
-          method: 'GET'
+          method: 'POST'
         }
       );
 
@@ -1072,7 +1089,7 @@ const AdminDashboard = () => {
 
       // Fetch user data
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${decoded.id}`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -1232,6 +1249,220 @@ const fetchMostRequestedMedia = async () => {
       </table>
     </div>
   );
+//Fetch for Devices (FD\\ for search)
+  const fetchMostRequestedDevices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/getMostRequestedDevices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch most requested devices");
+      }
+      const data = await response.json();
+      setMostRequestedDevices(data);
+    } catch (error) {
+      console.error("Error fetching most requested devices:", error);
+    }
+  };
+
+  const fetchAvailableDevices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/listAvailableDevices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch available devices");
+      }
+      const data = await response.json();
+      setAvailableDevices(data);
+    } catch (error) {
+      console.error("Error fetching available devices:", error);
+    }
+  };
+
+  const fetchBorrowedDevices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/currentlyBorrowedDevices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch borrowed devices");
+      }
+      const data = await response.json();
+      setBorrowedDevices(data);
+    } catch (error) {
+      console.error("Error fetching borrowed devices:", error);
+    }
+  };
+  
+  
+const fetchMostAndLeastBorrowedDevices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/mostAndLeastBorrowedDevices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch borrowed devices");
+      }
+      const data = await response.json();
+      setBorrowedDevicesList(data);
+    } catch (error) {
+      console.error("Error fetching borrowed devices:", error);
+    }
+  };
+
+  const fetchFulfilledAndUnfulfilledDeviceRequests = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/fulfilledAndUnfulfilledDeviceRequests`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch device requests");
+      }
+      const data = await response.json();
+      setFulfilledUnfulfilledDRequest(data);
+    } catch (error) {
+      console.error("Error fetching device requests:", error);
+    }
+  };
+  
+  const fetchDevicesOnHoldWithUsers = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/devicesOnHoldWithUsers`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch devices on hold with users");
+      }
+      const data = await response.json();
+      setDevicesOnHold(data);
+    } catch (error) {
+      console.error("Error fetching devices on hold:", error);
+    }
+  };
+  
+  const fetchRequestToFulfillmentDurationForDevices = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/devices/report/requestToFulfillmentDurationForDevices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch request to fulfillment duration for devices");
+      }
+      const data = await response.json();
+      setRequestFulfillmentDuration(data);
+    } catch (error) {
+      console.error("Error fetching request to fulfillment duration:", error);
+    }
+  };
+  
+
+  //Fetch for Users (FU\\)
+  const fetchActiveBorrows = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/report/getActiveBorrowers`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ startDate, endDate }),
+      }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch Active Borrows requests");
+      }
+      const data = await response.json();
+      setMostActiveBorrows(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchCurrentFines = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/report/getCurrentFines`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch current fines");
+      }
+      const data = await response.json();
+      setCurrentFines(data);
+    } catch (error) {
+      console.error("Error fetching current fines:", error);
+    }
+  };
+
+  const fetchUserMostOverdue = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/report/getMostOverdue`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch overdue users");
+      }
+      const data = await response.json();
+      setUserMostOverdue(data);
+    } catch (error) {
+      console.error("Error fetching overdue users:", error);
+    }
+  };
 
   useEffect(() => {
     fetchUserData();
@@ -1249,8 +1480,16 @@ const fetchMostRequestedMedia = async () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
-
-   
+    fetchActiveBorrows();
+    fetchCurrentFines();
+    fetchUserMostOverdue();
+    fetchMostRequestedDevices();
+    fetchAvailableDevices();
+    fetchBorrowedDevices();
+    fetchMostAndLeastBorrowedDevices();
+    fetchFulfilledAndUnfulfilledDeviceRequests();
+    fetchDevicesOnHoldWithUsers();
+    fetchRequestToFulfillmentDurationForDevices();
     fetchMostRequestedBooks ();
     fetchMostRequestedMedia ();
   }, []);
@@ -1991,40 +2230,40 @@ const fetchMostRequestedMedia = async () => {
               <button className="filter-button" onClick={handleFilter}>
                 Filter
               </button>
-            </div>
-            {renderTable(
+            </div> 
+            {renderTable(//Render Devices (RD\\)
               "Most Requested Devices",
-              reports.mostBorrowedDevices || [],
+              mostRequestedDevices || [] || [],
               ["Title", "User", "Brand"]
             )}
-            {renderTable(
+            {renderTable( 
               "List of Available Devices",
-              reports.availableDeviceCopies || [],
-              ["Title", "Serial Number"]
+              availableDevices || [],
+              ["Title", "SerialNumber"]
             )}
             {renderTable(
               "Currently Borrowed Devices with Users",
-              reports.currentlyBorrowedDevices || [],
+              borrowedDevices || [],
               ["Title", "User"]
             )}
             {renderTable(
               "Most and Least Borrowed Devices",
-              reports.borrowedDevicesStats || [],
+              borrowedDevicesList || [],
               ["Title", "BorrowedCount"]
             )}
             {renderTable(
               "Fulfilled and Unfulfilled Device Requests",
-              reports.deviceRequestsStatus || [],
-              ["Title", "User", "RequestedCount"]
+              fulfilledUnfulfilledDRequest || [],
+              ["Title", "User", "RequestedCount", "Status"]
             )}
             {renderTable(
               "Devices on Hold with Users",
-              reports.devicesOnHold || [],
+              devicesOnHold || [],
               ["Title", "User", "OnHoldDuration"]
             )}
             {renderTable(
               "Request to Fulfillment Duration for Devices",
-              reports.deviceRequestDuration || [],
+              requestFulfillmentDuration || [],
               ["Title", "RequestDuration"]
             )}
           </>
@@ -2052,34 +2291,28 @@ const fetchMostRequestedMedia = async () => {
             </div>
             {renderTable(
               "Most Active Borrowers",
-              reports.mostActiveBorrowers || [],
+              mostActiveBorrows || [],
               ["User", "BorrowedCount"] 
             )}
-            {renderTable(
-              "Available Book Copies",
-              reports.availableBookCopies || [],
-              ["bTitle", "bAuthor", "publisher", "genre", "edition", "ISBN"]
-            )}
+            
             {renderTable(
               "Users with Most Overdue Items",
-              reports.usersWithMostOverdue || [],
+              userMostOverdue || [],
               ["User", "OverdueCount"]
             )}
             {renderTable(
               "Users with Current Fines",
-              reports.usersWithFines || [],
-              ["User", "FineAmount"]
+              currentFines || [],
+              ["User", "TotalFineAmount"]
             )}
-            {renderTable(
-              "Users with Unpaid Fines",
-              reports.usersWithUnpaidFines || [],
-              ["User", "FineAmount"]
-            )}
+            
           </>
         )}
       </div>
     </div >
   );
 };
+
+
 
 export default AdminDashboard;

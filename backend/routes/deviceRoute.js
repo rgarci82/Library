@@ -16,6 +16,13 @@ import {
   getDeviceAvailability,
   getMonthlyDeviceBorrow,
   getMonthlyDeviceRequests,
+  mostRequestedDevices,
+  listAvailableDevices,
+  currentlyBorrowedDevices,
+  mostAndLeastBorrowedDevices,
+  fulfilledAndUnfulfilledDeviceRequests,
+  devicesOnHoldWithUsers,
+  requestToFulfillmentDurationForDevices,
 } from "../controllers/deviceController.js";
 
 const route = express.Router();
@@ -36,5 +43,15 @@ route.put("/devices/:serialNumber/softDelete", deleteDevice);
 route.get("/devices/:serialNumber/getDeviceAvailability", getDeviceAvailability);
 route.get("/devices/borrow/monthly", getMonthlyDeviceBorrow)
 route.get("/devices/request/monthly", getMonthlyDeviceRequests)
+route.post("/devices/report/getMostRequestedDevices", mostRequestedDevices);
+route.post("/devices/report/listAvailableDevices", listAvailableDevices);
+route.post("/devices/report/currentlyBorrowedDevices", currentlyBorrowedDevices);
+route.post("/devices/report/mostAndLeastBorrowedDevices", mostAndLeastBorrowedDevices);
+route.post("/devices/report/fulfilledAndUnfulfilledDeviceRequests", fulfilledAndUnfulfilledDeviceRequests);
+route.post("/devices/report/devicesOnHoldWithUsers", devicesOnHoldWithUsers);
+route.post("/devices/report/requestToFulfillmentDurationForDevices", requestToFulfillmentDurationForDevices);
+
+
+
 
 export default route;

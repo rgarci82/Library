@@ -533,5 +533,140 @@ export async function getMonthlyDeviceRequests(req, res){
   }
 }
 
+export async function mostRequestedDevices(req, res) {
+  try {
+    const [mostRequestedDevices] = await pool.query(`
+      SELECT 
+        d.dName AS Title,
+        u.userID AS User,
+        d.brand AS Brand,
+        COUNT(db.borrowID) AS RequestCount
+      FROM deviceborrowed db
+      JOIN device d ON db.serialNumber = d.serialNumber
+      JOIN users u ON db.userId = u.userId
+      GROUP BY d.dName, u.userId, d.brand
+      ORDER BY RequestCount DESC
+      LIMIT 10;
+    `);
 
+    res.json(mostRequestedDevices);
+  } catch (error) {
+    console.error("Error fetching most requested devices:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
+export async function listAvailableDevices(req, res) {
+  try {
+    const [availableDevices] = await pool.query(`
+      SELECT 
+    d.dName AS Title,
+    d.serialNumber AS SerialNumber
+FROM device d
+LEFT JOIN deviceborrowed db ON d.serialNumber = db.serialNumber
+WHERE db.serialNumber IS NOT NULL
+GROUP BY d.dName, d.serialNumber
+ORDER BY d.dName;
+    `);
+console.log (availableDevices)
+    res.json(availableDevices);
+  } catch (error) {
+    console.error("Error fetching available devices:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function currentlyBorrowedDevices(req, res) {
+  try {
+    const [borrowedDevices] = await pool.query(`
+      SELECT 
+        d.dName AS Title,
+        u.userId AS User
+      FROM deviceborrowed db
+      JOIN device d ON db.serialNumber = d.serialNumber
+      JOIN users u ON db.userId = u.userId
+      WHERE db.returnDate IS NULL
+      GROUP BY d.dName, u.userId
+      ORDER BY d.dName;
+    `);
+
+    res.json(borrowedDevices);
+  } catch (error) {
+    console.error("Error fetching currently borrowed devices:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function mostAndLeastBorrowedDevices(req, res) {
+  try {
+    const [borrowedDevices] = await pool.query(`
+      SELECT 
+        d.dName AS Title,
+        COUNT(db.borrowID) AS BorrowedCount
+      FROM deviceborrowed db
+      JOIN device d ON db.serialNumber = d.serialNumber
+      GROUP BY d.dName
+      ORDER BY BorrowedCount DESC
+    `);
+
+    res.json(borrowedDevices);
+  } catch (error) {
+    console.error("Error fetching most and least borrowed devices:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function fulfilledAndUnfulfilledDeviceRequests(req, res) {
+  try {
+    const [deviceRequests] = await pool.query(`
+      SELECT 
+        dr.dName AS Title,
+        dr.userId AS User,
+        COUNT(dr.requestID) AS RequestedCount,
+        dr.status AS Status
+      FROM devicerequest dr
+      GROUP BY dr.dName, dr.userId, dr.status
+      ORDER BY RequestedCount DESC
+    `);
+
+    res.json(deviceRequests);
+  } catch (error) {
+    console.error("Error fetching fulfilled and unfulfilled device requests:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function devicesOnHoldWithUsers(req, res) {
+  try {
+    const [devicesOnHold] = await pool.query(`
+      SELECT 
+  d.dName AS Title,
+  dh.userId AS User,
+  DATEDIFF(CURDATE(), dh.holdDate) AS OnHoldDuration
+FROM devicehold dh
+JOIN device d ON dh.serialNumber = d.serialNumber
+WHERE dh.status = 'OnHold'
+ORDER BY OnHoldDuration DESC;
+    `);
+    res.json(devicesOnHold);
+  } catch (error) {
+    console.error("Error fetching devices on hold with users:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function requestToFulfillmentDurationForDevices(req, res) {
+  try {
+    const [requestFulfillmentDuration] = await pool.query(`
+      SELECT 
+        d.dName AS Title,
+        DATEDIFF(CURDATE(), dr.requestDate) AS RequestDuration
+      FROM devicerequest dr
+      JOIN device d ON dr.serialNumber = d.serialNumber
+      ORDER BY RequestDuration DESC
+    `);
+    res.json(requestFulfillmentDuration);
+  } catch (error) {
+    console.error("Error fetching request to fulfillment duration for devices:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
