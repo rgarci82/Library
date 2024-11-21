@@ -1453,6 +1453,8 @@ const handleFiltermedia = () => {
     fetchMonthlyMediaBorrow();
     fetchMonthlyDeviceRequest();
     fetchMonthlyDeviceBorrow();
+     }, []);
+    /*
     fetchAllBooksBorrowed ();
     fetchMostBorrowedBooks ();
     fetchMostRequestedBooks ();
@@ -1462,7 +1464,7 @@ const handleFiltermedia = () => {
     fetchAllRequestedBooks ();
     fetchAllRequestedMedia ();
   }, []);
-
+*/
   const handleSignOut = () => {
     toast.success('Logged out successfully', {
       position: "top-right",
@@ -2084,12 +2086,12 @@ const handleFiltermedia = () => {
                     placeholderText="End Date"
                   />
                 </div>
-                <button className="filter-button" onClick={handleFilterabb}></button>
-                <button className="filter-button" onClick={handleFilterar}></button>
+                <button className="filter-button" onClick={handleFilterabb}>Filter All borrowed</button>
+                <button className="filter-button" onClick={handleFilterar}>Filter All requested</button>
                 <button className="filter-button" onClick={handleFilter}>
-                <button className="filter-button" onClick={handleFilterbb}></button>
+                <button className="filter-button" onClick={handleFilterbb}> Filter most borrowed</button>
                 
-                  Filter
+                  Most requested
                 </button>
               </div>
               {renderTable(
@@ -2148,11 +2150,11 @@ const handleFiltermedia = () => {
                         placeholderText="End Date"
                       />
                     </div>
-                    <button className="filter-button" onClick={handleFilteramb}></button>
+                    <button className="filter-button" onClick={handleFilteramb}>Filter All borrowed</button>
                     <button className="filter-button" onClick={handleFiltermedia}>
-                    <button className="filter-button" onClick={handleFiltermr}></button>  
-                    <button className="filter-button" onClick={handleFiltermb}></button>
-                      Filter
+                    <button className="filter-button" onClick={handleFiltermr}>Filter Most requested</button>  
+                    <button className="filter-button" onClick={handleFiltermb}>Filter Most borrowed</button>
+                      Most requested
                     </button>
                   </div>
               {renderTable(
@@ -2225,9 +2227,11 @@ const handleFiltermedia = () => {
                       />
                     </div>
                     <button className="filter-button" onClick={handleFilter}>
+                    
                       Filter
                     </button>
                   </div>
+                  
               {renderTable(
                 "Most Requested Devices",
                 reports.mostBorrowedDevices || [],
