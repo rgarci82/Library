@@ -1218,7 +1218,13 @@ const fetchMostRequestedMedia = async () => {
     console.error("Error fetching most requested:", error);
   }
 };
-
+const handleFiltermedia = () => {
+  if (startDate && endDate) {
+    fetchMostRequestedMedia ();
+  } else {
+    alert("Please select both start and end dates.");
+  }
+};
   const renderTable = (title: string, data: ReportData[], columns: string[]) => (
 
     <div className="report-section">
@@ -2169,7 +2175,7 @@ const fetchMostAndLeastBorrowedDevices = async () => {
                         placeholderText="End Date"
                       />
                     </div>
-                    <button className="filter-button" onClick={handleFilter}>
+                    <button className="filter-button" onClick={handleFiltermedia}>
                       Filter
                     </button>
                   </div>
