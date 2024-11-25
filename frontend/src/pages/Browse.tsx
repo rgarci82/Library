@@ -159,6 +159,21 @@ const BrowsePage: React.FC = () => {
       navigate('/login')
       return;
     }
+
+    if (userData.userType === 'Admin') {
+      toast.error('Admin cannot borrow books', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/books/${ISBN}/bookCopy`, {
         method: 'GET',
@@ -189,6 +204,21 @@ const BrowsePage: React.FC = () => {
       navigate('/login')
       return;
     }
+
+    if (userData.userType === 'Admin') {
+      toast.error('Admin cannot borrow media', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${MediaID}/mediaCopy`, {
         method: 'GET',
@@ -217,6 +247,21 @@ const BrowsePage: React.FC = () => {
   const fetchDeviceAvailability = async (serialNumber: string, device: Device) => {
     if (!userData) {
       navigate('/login')
+      return;
+    }
+
+    if (userData.userType === 'Admin') {
+      toast.error('Admin cannot borrow devices', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
       return;
     }
     try {
@@ -395,7 +440,7 @@ const BrowsePage: React.FC = () => {
         });
       }
     } catch (error) {
-        toast.error(`Error: ${error}`, {
+      toast.error(`Error: ${error}`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -647,7 +692,7 @@ const BrowsePage: React.FC = () => {
           <div style={styles.navIcons}>
             {isLoggedIn ? (
               <li className='nav__list'>
-                <Link to={localStorage.getItem('isAdmin') === 'True' ? '/adminDashboard' : '/user'} style={styles.browseButton}>Profile</Link>
+                <Link to={userData.userType === 'Admin' ? '/adminDashboard' : '/user'} style={styles.browseButton}>Profile</Link>
               </li>
             ) : (
               <>

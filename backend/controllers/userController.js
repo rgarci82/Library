@@ -364,5 +364,125 @@ export async function getTotalFineAmount(req, res) {
   } catch (error) {
       console.error("Error fetch fine amounts");
       res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function activeBorrowers(req, res) {
+  try{
+    const {startDate,endDate} = req.body;
+
+    const [activeBorrowers] = await pool.query(`
+       SELECT 
+    u.userId AS User, 
+    COUNT(borrow.borrowID) AS BorrowedCount
+FROM users u
+LEFT JOIN (
+    SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
+    UNION ALL
+    SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
+    UNION ALL
+    SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
+) borrow ON u.userId = borrow.userId
+GROUP BY u.userId
+HAVING COUNT(borrow.borrowID) > 0
+ORDER BY BorrowedCount DESC;
+    `);
+    
+    res.json(activeBorrowers)
+  }catch(error){
+    console.error("Error fetch fine amounts");
+    res.status(500).json({ message: "Internal server error" });
+    }
+}
+//make function in controller, make route for function, use state, make fetch function, add in useEffect, display in render table 
+export async function currentFines(req, res) {
+    try{
+      const [currentFines] = await pool.query(`
+    SELECT 
+    u.userId AS User,
+    SUM(fines.fineAmount) AS TotalFineAmount
+FROM users u
+LEFT JOIN (
+    SELECT userId, fineAmount FROM bookborrowed
+    UNION ALL
+    SELECT userId, fineAmount FROM mediaborrowed
+    UNION ALL
+    SELECT userId, fineAmount FROM deviceborrowed
+) fines ON u.userId = fines.userId
+GROUP BY u.userId
+HAVING SUM(fines.fineAmount) IS NOT NULL
+ORDER BY TotalFineAmount DESC;
+;`);
+
+      res.json(currentFines)
+    }catch(error){
+      console.error("Error fetch fine amounts");
+      res.status(500).json({ message: "Internal server error" });
+      }
+  }
+export async function mostOverdue(req, res) {
+  try {
+    const [overdueUsers] = await pool.query(`
+      SELECT 
+          u.userId AS User,
+          COUNT(overdue.borrowID) AS OverdueCount
+      FROM users u
+      LEFT JOIN (
+          SELECT userId, borrowID 
+          FROM bookborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+          UNION ALL
+          SELECT userId, borrowID 
+          FROM mediaborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+          UNION ALL
+          SELECT userId, borrowID 
+          FROM deviceborrowed 
+          WHERE dueDate < NOW() AND returnDate IS NULL
+      ) overdue ON u.userId = overdue.userId
+      GROUP BY u.userId
+      ORDER BY OverdueCount DESC
+      LIMIT 10;
+    `);
+
+    res.json(overdueUsers);
+  } catch (error) {
+    console.error("Error fetching overdue users:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export async function userMostOverdue(req, res) {
+    try {
+      const [overdueUsers] = await pool.query(`
+        SELECT 
+            u.userId AS User,
+            COUNT(overdue.borrowID) AS OverdueCount
+        FROM users u
+        LEFT JOIN (
+            SELECT userId, borrowID 
+            FROM bookborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID 
+            FROM mediaborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID 
+            FROM deviceborrowed 
+            WHERE dueDate < NOW() AND returnDate IS NULL
+        ) overdue ON u.userId = overdue.userId
+        GROUP BY u.userId
+        ORDER BY OverdueCount DESC
+        LIMIT 10;
+      `);
+  
+      res.json(overdueUsers);
+    } catch (error) {
+      console.error("Error fetching overdue users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  
+
