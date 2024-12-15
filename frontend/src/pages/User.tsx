@@ -93,7 +93,8 @@ const UserPage: React.FC = () => {
   const [usermediaHold, setUsermediaHold] = useState<mediaHold[]>([]);
   const [userdeviceHold, setUserdeviceHold] = useState<deviceHold[]>([]);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<borrowedItem | null>(null);
   const [selectedHold, setSelectedHold] = useState<holdItem | null>(null);
@@ -640,7 +641,7 @@ const UserPage: React.FC = () => {
   //Return confirmation modal
   const handleReturnClick = (item: borrowedItem) => {
     setSelectedItem(item);
-    setShowModal(true);
+    setShowReturnModal(true);
   };
 
   //Confirming return button
@@ -651,12 +652,27 @@ const UserPage: React.FC = () => {
     else {
       console.log("No item selected");
     }
-    setShowModal(false);
+    setShowReturnModal(false);
+  };
+
+  //Pay fines button
+  const handlePayClick = () => {
+    if (userFine.totalFine > 0){
+      
+    }
+    else{
+      console.log("No fines exist.");
+    }
+  };
+
+  //Fines detail button
+  const handleDetailsClick = () => {
+    setShowDetailsModal(true);
   };
 
   //Return cancel button
   const handleCancel = () => {
-    setShowModal(false);
+    setShowReturnModal(false);
     setSelectedItem(null);
   };
 
@@ -779,6 +795,7 @@ const UserPage: React.FC = () => {
       <div className="user-info-boxes">
         {userData ? (
           <>
+            {/* Bprrowed Books */}
             {activeTab === 'books' && (
               userBorrowedBooks.length > 0 ? (
                 userBorrowedBooks.map((book) => (
@@ -855,7 +872,7 @@ const UserPage: React.FC = () => {
             )}
 
             {/* Modal */}
-            {showModal && selectedItem && (
+            {showReturnModal && selectedItem && (
               <div className="modal">
                 <div className="modal-content">
                   <p className="confirmation-text">Are you sure you want to return this item?</p>
@@ -872,6 +889,26 @@ const UserPage: React.FC = () => {
                 <ul>
                   <li className="fine-text-css">Amount: ${parseFloat(userFine.totalFine).toFixed(2)}</li>
                 </ul>
+                {userFine.totalFine > 0 && <div className="button-container" onClick={() => handlePayClick()}>
+                  <button className="button-text pay-button">
+                    Pay Fines
+                  </button>
+                  <button className="button-text details-button" onClick={() => handleDetailsClick()}>
+                    Details
+                  </button>
+
+                </div>}
+              </div>
+            )}
+
+            {/* Modal */}
+            {showDetailsModal && (
+              <div className="modal">
+                <div className="modal-content">
+                  <button className="close-details-buttonyhs" onClick={() => setShowDetailsModal(false)}>
+                    Close
+                  </button>
+                </div>
               </div>
             )}
 

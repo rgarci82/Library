@@ -335,14 +335,14 @@ export async function getUserdeviceHold(req, res) {
 export async function getMonthlyUserRegistrations(req, res) {
   try {
     const [results] = await pool.query(`
-              SELECT 
-                  YEAR(created_at) AS year,
-                  MONTHNAME(created_at) AS month,
-                  COUNT(*) AS user_count
-              FROM users
-              GROUP BY year, month
-              ORDER BY year DESC, month DESC;
-          `);
+      SELECT 
+          YEAR(created_at) AS year,
+          MONTHNAME(created_at) AS month,
+          COUNT(*) AS user_count
+      FROM users
+      GROUP BY year, month
+      ORDER BY year DESC, month DESC;
+    `);
 
     res.json(results);
   } catch (error) {
@@ -373,19 +373,19 @@ export async function activeBorrowers(req, res) {
 
     const [activeBorrowers] = await pool.query(`
        SELECT 
-    u.userId AS User, 
-    COUNT(borrow.borrowID) AS BorrowedCount
-FROM users u
-LEFT JOIN (
-    SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
-    UNION ALL
-    SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
-    UNION ALL
-    SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
-) borrow ON u.userId = borrow.userId
-GROUP BY u.userId
-HAVING COUNT(borrow.borrowID) > 0
-ORDER BY BorrowedCount DESC;
+        u.userId AS User, 
+        COUNT(borrow.borrowID) AS BorrowedCount
+        FROM users u
+        LEFT JOIN (
+            SELECT userId, borrowID FROM bookborrowed WHERE returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID FROM mediaborrowed WHERE returnDate IS NULL
+            UNION ALL
+            SELECT userId, borrowID FROM deviceborrowed WHERE returnDate IS NULL
+        ) borrow ON u.userId = borrow.userId
+        GROUP BY u.userId
+        HAVING COUNT(borrow.borrowID) > 0
+        ORDER BY BorrowedCount DESC;
     `);
     
     res.json(activeBorrowers)

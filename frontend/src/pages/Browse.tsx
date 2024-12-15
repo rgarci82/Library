@@ -1045,7 +1045,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '20px',
     border: 'none',
     borderRadius: '5px',
-    backgroundColor: '#e94e77',
+    backgroundColor: '#f03a6a',
     color: '#fff',
     cursor: 'pointer',
   },
