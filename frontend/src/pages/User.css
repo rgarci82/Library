@@ -334,6 +334,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   max-width: 500px;
+  max-height: 80%; /* Limit the height to 80% of the viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
   width: 100%;
   text-align: center;
 }

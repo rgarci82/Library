@@ -36,6 +36,14 @@ interface BorrowedDevice {
   model: string,
   dueDate: Date;
 }
+
+interface FineDetail {
+  Title: string;
+  Signature: string;
+  ID: string;
+  Fines: number;
+  type: 'book' | 'media' | 'device';
+}
 interface RequestedBooks {
   bTitle: string;
   requestDate: Date;
@@ -83,6 +91,7 @@ const UserPage: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [userDataLoading, setUserDataLoading] = useState(true);
   const [userFine, setUserFine] = useState<any>(null);
+  const [userFineDetails, setUserFineDetails] = useState<any>(null);
   const [userBorrowedBooks, setUserBorrowedBooks] = useState<BorrowedBook[]>([]);
   const [userBorrowedMedia, setUserBorrowedMedia] = useState<BorrowedMedia[]>([]);
   const [userBorrowedDevice, setUserBorrowedDevice] = useState<BorrowedDevice[]>([]);
@@ -218,6 +227,27 @@ const UserPage: React.FC = () => {
 
       const finesData = await finesResponse.json();
       setUserFine(finesData);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserFineDetails = async () => {
+    setLoading(true);
+    try {
+      const finesResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userData.userID}/fineDetails`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!finesResponse.ok) throw new Error("Failed to fetch user fine");
+
+      const fineDetails = await finesResponse.json();
+      setUserFineDetails(fineDetails);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -712,6 +742,7 @@ const UserPage: React.FC = () => {
   useEffect(() => {
     if (userDataLoading || !userData?.userID) return;
     fetchUserFine();
+    fetchUserFineDetails();
     fetchUserBorrowedBooks();
     fetchUserBorrowedMedia();
     fetchUserBorrowedDevice();
@@ -885,7 +916,7 @@ const UserPage: React.FC = () => {
             {/* Fines */}
             {activeTab === 'fines' && (
               <div className="info-box fines-box">
-                <h3 className="title-css">Fine</h3>
+                <h3 className="title-css">Fines</h3>
                 <ul>
                   <li className="fine-text-css">Amount: ${parseFloat(userFine.totalFine).toFixed(2)}</li>
                 </ul>
@@ -896,7 +927,6 @@ const UserPage: React.FC = () => {
                   <button className="button-text details-button" onClick={() => handleDetailsClick()}>
                     Details
                   </button>
-
                 </div>}
               </div>
             )}
@@ -905,7 +935,35 @@ const UserPage: React.FC = () => {
             {showDetailsModal && (
               <div className="modal">
                 <div className="modal-content">
-                  <button className="close-details-buttonyhs" onClick={() => setShowDetailsModal(false)}>
+                  <div>
+                    {userFineDetails.map((detail: FineDetail, index: number) => (
+                      <div key={index}>
+                        {detail.type === "book" && (
+                          <div>
+                            <p>Book Title: {detail.Title}, by {detail.Signature} --- ${detail.Fines}</p>
+                            <p>ISBN: {detail.ID} </p>
+                            <p>--------------------------------------------------</p>
+                          </div>
+                        )}
+                        {detail.type === "media" && (
+                          <div>
+                            <p>Media Title: {detail.Title}, by {detail.Signature} --- ${detail.Fines}</p>
+                            <p>MediaID: {detail.ID} </p>
+                            <p>--------------------------------------------------</p>
+                          </div>
+                        )}
+                        {detail.type === "device" && (
+                          <div>
+                            <p>Device Title: {detail.Title}, made by {detail.Signature} --- ${detail.Fines}</p>
+                            <p>Serial Number: {detail.ID} </p>
+                            <p>--------------------------------------------------</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button className="close-details-button" onClick={() => setShowDetailsModal(false)}>
                     Close
                   </button>
                 </div>

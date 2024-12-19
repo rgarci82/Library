@@ -123,6 +123,36 @@ export async function getUserFine(req, res) {
     }
 }
 
+export async function getUserFineDetails(req, res) {
+    try {
+        const { userID } = req.params;
+        
+        const fineDetails = await pool.query(
+            `SELECT b.bTitle AS Title, b.bAuthor AS Signature, b.ISBN AS ID, bb.fineAmount AS Fines, 'book' AS type
+            FROM bookborrowed AS bb, bookcopy AS bc, book AS b
+            WHERE bb.userID = ? AND bb.fineAmount IS NOT NULL AND bb.itemID = bc.itemID AND bc.ISBN = b.ISBN
+            
+            UNION ALL 
+            
+            SELECT m.mTitle, m.mAuthor, m.MediaID, mb.fineAmount, 'media' AS type
+            FROM mediaborrowed AS mb, mediacopy AS mc, media AS m
+            WHERE mb.userID = ? AND mb.fineAmount IS NOT NULL AND mb.itemID = mc.itemID AND mc.MediaID = m.MediaID
+            
+            UNION ALL
+            
+            SELECT d.dName, d.brand, d.serialNumber, db.fineAmount, 'device' AS type
+            FROM deviceborrowed AS db, device as d
+            WHERE db.userID = ? AND db.fineAmount IS NOT NULL AND db.serialNumber = d.serialNumber`,
+            [userID, userID, userID]
+        );
+        
+        res.json( fineDetails[0] ); // Return the fine details
+    } catch (error) {
+        console.error("Error fetching user fine:", error); // Detailed error logging
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
 export async function getUserBorrowedBooks(req, res) {
     try {
         const { userID } = req.params;
